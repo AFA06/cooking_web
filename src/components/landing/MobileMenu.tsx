@@ -8,7 +8,7 @@ interface Item {
   href: string;
 }
 
-export function MobileMenu({ items }: { items: Item[] }) {
+export function MobileMenu({ items, children }: { items: Item[]; children?: React.ReactNode }) {
   const [open, setOpen] = React.useState(false);
   React.useEffect(() => {
     if (!open) return;
@@ -42,6 +42,7 @@ export function MobileMenu({ items }: { items: Item[] }) {
               </li>
             ))}
           </ul>
+          {children}
         </nav>
       )}
     </div>

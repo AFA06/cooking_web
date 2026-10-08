@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { MobileMenu } from "@/components/landing/MobileMenu";
 import { getCurrentUser } from "@/server/auth";
+import { logout } from "@/app/auth/actions";
 import { NAVIGATION_LINKS, PLATFORM_CONFIG } from "@/lib/constants";
 
 export async function Navigation() {
@@ -44,6 +45,9 @@ export async function Navigation() {
                 <Button size="sm" variant="outline" asChild>
                   <Link href={PLATFORM_CONFIG.urls.account}>Mening oshxonam</Link>
                 </Button>
+                <form action={logout} className="hidden md:block">
+                  <Button size="sm" variant="ghost" type="submit">Chiqish</Button>
+                </form>
               </>
             ) : (
               <>
@@ -55,7 +59,13 @@ export async function Navigation() {
                 </Button>
               </>
             )}
-            <MobileMenu items={mobileItems} />
+            <MobileMenu items={mobileItems}>
+              {user && (
+                <form action={logout} className="border-t border-amber-200 pt-2">
+                  <button type="submit" className="block w-full py-4 text-left text-lg font-medium text-amber-950">Chiqish</button>
+                </form>
+              )}
+            </MobileMenu>
           </div>
         </nav>
       </Container>
