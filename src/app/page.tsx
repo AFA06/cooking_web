@@ -6,7 +6,6 @@ import { CreatorSection } from "@/components/landing/CreatorSection";
 import { FeaturedRecipes } from "@/components/landing/FeaturedRecipes";
 import { CookingExperience } from "@/components/landing/CookingExperience";
 import { FreeVsPremium } from "@/components/landing/FreeVsPremium";
-import { CreatorCTA } from "@/components/landing/CreatorCTA";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { Footer } from "@/components/landing/Footer";
 
@@ -24,7 +23,6 @@ export default function Home() {
         <FeaturedRecipes />
         <CookingExperience />
         <FreeVsPremium />
-        <CreatorCTA />
         <FinalCTA />
       </main>
       <Footer />

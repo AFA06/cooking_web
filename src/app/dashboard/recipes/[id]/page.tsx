@@ -5,7 +5,7 @@ import { Container } from "@/components/ui/Container";
 import { RecipeEditor, type EditorInitial } from "@/components/dashboard/RecipeEditor";
 import { getCurrentCreator, getOwnedRecipeForEdit } from "@/server/creator";
 
-export const metadata: Metadata = { title: "Edit recipe", robots: { index: false } };
+export const metadata: Metadata = { title: "Retseptni tahrirlash", robots: { index: false } };
 
 export default async function EditRecipePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -43,7 +43,7 @@ export default async function EditRecipePage({ params }: { params: Promise<{ id:
 
   return (
     <Container size="md" className="py-12">
-      <h1 className="text-3xl sm:text-4xl font-serif font-medium text-amber-950 mb-8 break-words">Edit: {r.title}</h1>
+      <h1 className="text-3xl sm:text-4xl font-serif font-medium text-amber-950 mb-8 break-words">Tahrirlash: {r.title}</h1>
       <RecipeEditor initial={initial} />
     </Container>
   );

@@ -6,6 +6,10 @@ async function main() {
   const { CREATORS, RECIPES } = await import("../src/db/seed-data");
   const { eq } = await import("drizzle-orm");
 
+  // Remove the previous (English) demo creators; their recipes cascade.
+  const { inArray } = await import("drizzle-orm");
+  await db.delete(schema.creators).where(inArray(schema.creators.slug, ["aziza-kitchen", "bekzod-cooks", "feruzas-table"]));
+
   const creatorIds = new Map<string, string>();
   for (const c of CREATORS) {
     const [row] = await db

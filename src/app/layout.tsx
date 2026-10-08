@@ -1,34 +1,27 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Fraunces } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({
-  subsets: ["latin", "cyrillic"],
+  subsets: ["latin", "latin-ext", "cyrillic"],
   variable: "--font-inter",
   display: "swap",
 });
 
-const playfair = Playfair_Display({
-  subsets: ["latin", "cyrillic"],
-  variable: "--font-playfair",
+const fraunces = Fraunces({
+  subsets: ["latin", "latin-ext"],
+  variable: "--font-fraunces",
   display: "swap",
 });
 
 export const metadata: Metadata = {
   title: {
-    default: "Damda — Step-by-step recipes from the creators you love",
+    default: "Damda — sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
     template: "%s | Damda",
   },
   description:
-    "Stop going back to YouTube while you're cooking. Structured, guided cooking experiences from real food creators. Free and premium recipes.",
-  keywords: [
-    "cooking",
-    "recipes",
-    "uzbek food",
-    "guided cooking",
-    "food creators",
-    "step by step recipes",
-  ],
+    "Pishirayotganda YouTube’ga qaytmang. Haqiqiy oshpaz va ijodkorlarning retseptlari — masalliq, miqdor, taymer va keyingi qadam bilan. Bepul va premium retseptlar.",
+  keywords: ["retseptlar", "o‘zbek taomlari", "qadam-baqadam retsept", "osh", "lag‘mon", "pazandalik"],
   authors: [{ name: "Damda" }],
   creator: "Damda",
   publisher: "Damda",
@@ -43,15 +36,15 @@ export const metadata: Metadata = {
     locale: "uz_UZ",
     url: "https://damda.uz",
     siteName: "Damda",
-    title: "Damda — Step-by-step recipes from the creators you love",
+    title: "Damda — sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
     description:
-      "Stop going back to YouTube while you're cooking. Structured, guided cooking experiences from real food creators.",
+      "Pishirayotganda YouTube’ga qaytmang. Haqiqiy ijodkorlarning retseptlari qadam-baqadam yo‘l-yo‘riq bilan.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Damda — Step-by-step recipes from the creators you love",
+    title: "Damda — sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
     description:
-      "Stop going back to YouTube while you're cooking. Structured, guided cooking experiences from real food creators.",
+      "Pishirayotganda YouTube’ga qaytmang. Haqiqiy ijodkorlarning retseptlari qadam-baqadam yo‘l-yo‘riq bilan.",
   },
   robots: {
     index: true,
@@ -68,13 +61,11 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fef9f3" },
-    { media: "(prefers-color-scheme: dark)", color: "#1c1917" },
+    { color: "#fbf7f0" },
   ],
   width: "device-width",
   initialScale: 1,
-  maximumScale: 5,
-};
+  };
 
 export default function RootLayout({
   children,
@@ -84,13 +75,18 @@ export default function RootLayout({
   return (
     <html
       lang="uz"
-      className={`${inter.variable} ${playfair.variable} h-full antialiased`}
+      className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />
-        <link rel="dns-prefetch" href="https://images.unsplash.com" />
       </head>
       <body className="min-h-full flex flex-col bg-amber-50 text-amber-950">
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-white focus:px-4 focus:py-2"
+        >
+          Asosiy tarkibga o‘tish
+        </a>
         {children}
       </body>
     </html>

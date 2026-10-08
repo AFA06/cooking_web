@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/Badge";
 import { listCreators } from "@/server/recipes";
 
 export const metadata: Metadata = {
-  title: "Creators",
-  description: "Food creators publishing step-by-step recipes on Damda.",
+  title: "Ijodkorlar",
+  description: "Damda’da qadam-baqadam retseptlar nashr etayotgan ijodkorlar.",
   alternates: { canonical: "/creators" },
 };
 
@@ -18,8 +18,8 @@ export default async function CreatorsPage() {
   return (
     <Container size="lg" className="py-12 sm:py-16">
       <header className="max-w-2xl">
-        <h1 className="text-3xl sm:text-5xl font-serif font-medium text-amber-950">Creators</h1>
-        <p className="mt-4 text-lg text-amber-800">The food creators behind the recipes. These are sample profiles.</p>
+        <h1 className="text-3xl sm:text-5xl font-serif font-medium text-amber-950">Ijodkorlar</h1>
+        <p className="mt-4 text-lg text-amber-800">Retseptlar muallifi bo‘lgan ijodkorlar. Bular namuna profillar.</p>
       </header>
       <ul className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
         {creators.map((c) => (
@@ -30,10 +30,10 @@ export default async function CreatorsPage() {
               )}
               <div className="min-w-0">
                 <h2 className="font-serif text-xl text-amber-950 group-hover:text-amber-700 break-words">{c.name}</h2>
-                <p className="text-sm text-amber-700">{c.recipeCount} recipes</p>
+                <p className="text-sm text-amber-700">{c.recipeCount} ta retsept</p>
               </div>
             </Link>
-            {c.isFoundingCreator && <Badge variant="founding" className="mt-4">Founding creator</Badge>}
+            {c.isFoundingCreator && <Badge variant="founding" className="mt-4">Asoschi ijodkor</Badge>}
             {c.bio && <p className="mt-3 text-amber-800 text-sm">{c.bio}</p>}
           </li>
         ))}

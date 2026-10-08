@@ -4,7 +4,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy",
+  title: "Maxfiylik siyosati",
   alternates: { canonical: "/privacy" },
 };
 
@@ -12,26 +12,26 @@ export default function Page() {
   return (
     <SiteShell>
       <Container size="sm" className="py-12 sm:py-16">
-        <h1 className="text-3xl sm:text-5xl font-serif font-medium text-amber-950">Privacy Policy</h1>
-        <p className="mt-4 border-l-2 border-amber-600 pl-4 text-amber-800">
-          This is a draft template and will be replaced with final text before launch. It is not legal advice.
+        <h1 className="text-3xl font-medium text-amber-950 sm:text-5xl">Maxfiylik siyosati</h1>
+        <p className="mt-4 border-l-2 border-amber-700 pl-4 text-amber-900">
+          Bu qoralama shablon bo‘lib, ishga tushirishdan oldin yakuniy matn bilan almashtiriladi. Bu yuridik maslahat emas.
         </p>
-        <div className="mt-8 space-y-6 text-amber-900 leading-relaxed">
+        <div className="mt-8 space-y-6 leading-relaxed text-amber-900">
           <section>
-            <h2 className="text-xl font-serif text-amber-950">What we collect</h2>
-            <p className="mt-2">When you create an account we store your name, email address and a hashed password. We also store the recipes you save and your cooking history.</p>
+            <h2 className="text-xl font-medium text-amber-950">Biz nimalarni yig‘amiz</h2>
+            <p className="mt-2">Hisob yaratganingizda ismingiz, email manzilingiz va shifrlangan parolingiz saqlanadi. Shuningdek, saqlagan retseptlaringiz va pishirish tarixingiz saqlanadi.</p>
           </section>
           <section>
-            <h2 className="text-xl font-serif text-amber-950">How we use it</h2>
-            <p className="mt-2">We use this information to run your account, show your saved recipes and history, and improve {PLATFORM_CONFIG.name}. We do not sell your personal data.</p>
+            <h2 className="text-xl font-medium text-amber-950">Ulardan qanday foydalanamiz</h2>
+            <p className="mt-2">Ma’lumotlar hisobingizni yuritish, saqlangan retseptlar va tarixni ko‘rsatish hamda {PLATFORM_CONFIG.name}ni yaxshilash uchun ishlatiladi. Shaxsiy ma’lumotlaringizni sotmaymiz.</p>
           </section>
           <section>
-            <h2 className="text-xl font-serif text-amber-950">Cookies</h2>
-            <p className="mt-2">We use a single session cookie to keep you logged in.</p>
+            <h2 className="text-xl font-medium text-amber-950">Cookie fayllar</h2>
+            <p className="mt-2">Tizimda qolishingiz uchun bitta sessiya cookie’sidan foydalanamiz.</p>
           </section>
           <section>
-            <h2 className="text-xl font-serif text-amber-950">Your choices</h2>
-            <p className="mt-2">Contact details for access and deletion requests will be added here before launch.</p>
+            <h2 className="text-xl font-medium text-amber-950">Sizning tanlovingiz</h2>
+            <p className="mt-2">Ma’lumotlarga kirish va ularni o‘chirish so‘rovlari uchun aloqa ma’lumotlari ishga tushirishdan oldin shu yerga qo‘shiladi.</p>
           </section>
         </div>
       </Container>

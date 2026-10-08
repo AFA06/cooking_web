@@ -1,8 +1,6 @@
 export const PLATFORM_CONFIG = {
   name: "Damda",
-  tagline: "Step-by-step recipes from the creators you love",
-  description:
-    "Stop going back to YouTube while you're cooking. Structured, guided cooking experiences from real food creators.",
+  tagline: "Sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
   urls: {
     recipes: "/recipes",
     creators: "/creators",
@@ -28,19 +26,19 @@ export type SupportedLocale = (typeof PLATFORM_CONFIG.supportedLocales)[number];
 
 export const NAVIGATION_LINKS = {
   public: [
-    { label: "Recipes", href: PLATFORM_CONFIG.urls.recipes },
-    { label: "Creators", href: PLATFORM_CONFIG.urls.creators },
-    { label: "Become a Creator", href: PLATFORM_CONFIG.urls.becomeCreator },
+    { label: "Retseptlar", href: PLATFORM_CONFIG.urls.recipes },
+    { label: "Ijodkorlar", href: PLATFORM_CONFIG.urls.creators },
+    { label: "Ijodkor bo‘lish", href: PLATFORM_CONFIG.urls.becomeCreator },
   ],
   footer: {
     product: [
-      { label: "Recipes", href: PLATFORM_CONFIG.urls.recipes },
-      { label: "Creators", href: PLATFORM_CONFIG.urls.creators },
-      { label: "Become a Creator", href: PLATFORM_CONFIG.urls.becomeCreator },
+      { label: "Retseptlar", href: PLATFORM_CONFIG.urls.recipes },
+      { label: "Ijodkorlar", href: PLATFORM_CONFIG.urls.creators },
+      { label: "Ijodkor bo‘lish", href: PLATFORM_CONFIG.urls.becomeCreator },
     ],
     legal: [
-      { label: "Terms", href: "/terms" },
-      { label: "Privacy", href: "/privacy" },
+      { label: "Foydalanish shartlari", href: "/terms" },
+      { label: "Maxfiylik siyosati", href: "/privacy" },
     ],
   },
 } as const;

@@ -20,7 +20,7 @@ export function SaveButton({ recipeId, slug, initialSaved, isLoggedIn }: Props) 
   if (!isLoggedIn) {
     return (
       <Button size="lg" variant="outline" asChild>
-        <Link href={`/auth/login?next=${encodeURIComponent(`/recipes/${slug}`)}`}>Log in to save</Link>
+        <Link href={`/auth/login?next=${encodeURIComponent(`/recipes/${slug}`)}`}>Saqlash uchun kiring</Link>
       </Button>
     );
   }
@@ -41,7 +41,7 @@ export function SaveButton({ recipeId, slug, initialSaved, isLoggedIn }: Props) 
           })
         }
       >
-        {saved ? "Saved ✓" : "Save recipe"}
+        {saved ? "Saqlangan ✓" : "Retseptni saqlash"}
       </Button>
       {error && (
         <p role="alert" className="mt-2 text-sm text-red-700">

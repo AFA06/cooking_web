@@ -1,60 +1,61 @@
-import * as React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { MobileMenu } from "@/components/landing/MobileMenu";
 import { getCurrentUser } from "@/server/auth";
 import { NAVIGATION_LINKS, PLATFORM_CONFIG } from "@/lib/constants";
 
 export async function Navigation() {
   const user = await getCurrentUser();
+  const isCreator = user?.role === "creator" || user?.role === "admin";
+  const mobileItems = [
+    ...NAVIGATION_LINKS.public,
+    ...(user
+      ? [...(isCreator ? [{ label: "Boshqaruv paneli", href: "/dashboard" }] : []), { label: "Mening oshxonam", href: PLATFORM_CONFIG.urls.account }]
+      : [{ label: "Ro‘yxatdan o‘tish", href: PLATFORM_CONFIG.urls.signup }]),
+  ];
+
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-b border-amber-100">
-      <Container size="lg">
-        <nav className="flex h-16 items-center justify-between" aria-label="Main navigation">
-          <Link
-            href="/"
-            className="text-xl font-serif font-medium text-amber-950 tracking-tight"
-            aria-label={`${PLATFORM_CONFIG.name} - Home`}
-          >
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-amber-200 bg-amber-50/95 backdrop-blur">
+      <Container size="xl">
+        <nav className="flex h-16 items-center justify-between gap-4" aria-label="Asosiy menyu">
+          <Link href="/" className="font-serif text-2xl font-semibold tracking-tight text-amber-950" aria-label={`${PLATFORM_CONFIG.name} — bosh sahifa`}>
             {PLATFORM_CONFIG.name}
           </Link>
 
-          <div className="flex items-center gap-6">
-            <div className="hidden md:flex items-center gap-6">
-              {NAVIGATION_LINKS.public.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm font-medium text-amber-700 hover:text-amber-900 transition-colors"
-                >
+          <ul className="hidden items-center gap-8 md:flex">
+            {NAVIGATION_LINKS.public.map((link) => (
+              <li key={link.href}>
+                <Link href={link.href} className="text-[0.95rem] font-medium text-amber-900 transition-colors hover:text-amber-700">
                   {link.label}
                 </Link>
-              ))}
-            </div>
+              </li>
+            ))}
+          </ul>
 
-            <div className="flex items-center gap-3">
-              {user ? (
-                <>
-                  {(user.role === "creator" || user.role === "admin") && (
-                    <Button size="sm" variant="ghost" asChild>
-                      <Link href="/dashboard">Dashboard</Link>
-                    </Button>
-                  )}
-                  <Button size="sm" variant="outline" asChild>
-                    <Link href={PLATFORM_CONFIG.urls.account}>My kitchen</Link>
+          <div className="flex items-center gap-2">
+            {user ? (
+              <>
+                {isCreator && (
+                  <Button size="sm" variant="ghost" asChild className="hidden sm:inline-flex">
+                    <Link href="/dashboard">Panel</Link>
                   </Button>
-                </>
-              ) : (
-                <>
-                  <Button variant="ghost" size="sm" asChild>
-                    <Link href={PLATFORM_CONFIG.urls.login}>Log in</Link>
-                  </Button>
-                  <Button size="sm" asChild>
-                    <Link href={PLATFORM_CONFIG.urls.signup}>Sign up</Link>
-                  </Button>
-                </>
-              )}
-            </div>
+                )}
+                <Button size="sm" variant="outline" asChild>
+                  <Link href={PLATFORM_CONFIG.urls.account}>Mening oshxonam</Link>
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button size="sm" variant="ghost" asChild>
+                  <Link href={PLATFORM_CONFIG.urls.login}>Kirish</Link>
+                </Button>
+                <Button size="sm" asChild className="hidden sm:inline-flex">
+                  <Link href={PLATFORM_CONFIG.urls.signup}>Ro‘yxatdan o‘tish</Link>
+                </Button>
+              </>
+            )}
+            <MobileMenu items={mobileItems} />
           </div>
         </nav>
       </Container>

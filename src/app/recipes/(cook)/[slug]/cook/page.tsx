@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const recipe = await getRecipeBySlug(slug);
-  return { title: recipe ? `Cooking: ${recipe.title}` : "Recipe not found", robots: { index: false } };
+  return { title: recipe ? `Pishirish: ${recipe.title}` : "Retsept topilmadi", robots: { index: false } };
 }
 
 export default async function CookPage({ params }: Props) {

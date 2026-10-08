@@ -14,13 +14,13 @@ export interface ActionResult {
 }
 
 const profileSchema = z.object({
-  name: z.string().trim().min(2, "Enter a display name").max(80),
+  name: z.string().trim().min(2, "Ko‘rinadigan ismni kiriting").max(80),
   bio: z.string().trim().max(500).optional().default(""),
 });
 
 export async function becomeCreator(_: ActionResult, formData: FormData): Promise<ActionResult> {
   const user = await getCurrentUser();
-  if (!user) return { error: "Please log in first." };
+  if (!user) return { error: "Avval tizimga kiring." };
   const parsed = profileSchema.safeParse(Object.fromEntries(formData));
   if (!parsed.success) return { error: parsed.error.issues[0].message };
 
@@ -47,7 +47,7 @@ export async function saveRecipe(
   publish: boolean,
 ): Promise<{ error: string } | { id: string }> {
   const ctx = await getCurrentCreator();
-  if (!ctx) return { error: "You need a creator profile to publish recipes." };
+  if (!ctx) return { error: "Retsept nashr etish uchun ijodkor profili kerak." };
   const parsed = recipeInputSchema.safeParse(input);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   const d = parsed.data;
@@ -75,7 +75,7 @@ export async function saveRecipe(
       .from(schema.recipes)
       .where(and(eq(schema.recipes.id, id), eq(schema.recipes.creatorId, ctx.creator.id)))
       .limit(1);
-    if (!owned) return { error: "Recipe not found." };
+    if (!owned) return { error: "Retsept topilmadi." };
     await db
       .update(schema.recipes)
       .set({ ...fields, status: publish ? "published" : "draft", publishedAt: publish ? (owned.publishedAt ?? new Date()) : owned.publishedAt })

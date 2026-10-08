@@ -19,7 +19,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const recipe = await getRecipeBySlug(slug);
   
   if (!recipe) {
-    return { title: "Recipe Not Found" };
+    return { title: "Retsept topilmadi" };
   }
 
   return {

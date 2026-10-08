@@ -12,7 +12,7 @@ interface Props {
 }
 
 const inputClass =
-  "mt-1 w-full h-11 px-3 border border-amber-300 bg-white text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-600";
+  "mt-1 w-full h-12 px-3 border border-amber-300 bg-white text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-600";
 
 export function AuthForm({ mode, action, next }: Props) {
   const [state, formAction, pending] = React.useActionState(action, {});
@@ -24,7 +24,7 @@ export function AuthForm({ mode, action, next }: Props) {
       <input type="hidden" name="next" value={next} />
       {isSignup && (
         <div>
-          <label htmlFor="name" className="text-sm font-medium text-amber-950">Name</label>
+          <label htmlFor="name" className="text-sm font-medium text-amber-950">Ism</label>
           <input id="name" name="name" type="text" autoComplete="name" required className={inputClass} />
         </div>
       )}
@@ -33,7 +33,7 @@ export function AuthForm({ mode, action, next }: Props) {
         <input id="email" name="email" type="email" autoComplete="email" required className={inputClass} />
       </div>
       <div>
-        <label htmlFor="password" className="text-sm font-medium text-amber-950">Password</label>
+        <label htmlFor="password" className="text-sm font-medium text-amber-950">Parol</label>
         <input
           id="password"
           name="password"
@@ -43,7 +43,7 @@ export function AuthForm({ mode, action, next }: Props) {
           minLength={isSignup ? 8 : undefined}
           className={inputClass}
         />
-        {isSignup && <p className="mt-1 text-xs text-amber-700">At least 8 characters.</p>}
+        {isSignup && <p className="mt-1 text-xs text-amber-700">Kamida 8 ta belgi.</p>}
       </div>
       {state.error && (
         <p role="alert" className="text-sm text-red-700">
@@ -51,12 +51,12 @@ export function AuthForm({ mode, action, next }: Props) {
         </p>
       )}
       <Button type="submit" size="lg" className="w-full" loading={pending}>
-        {isSignup ? "Create account" : "Log in"}
+        {isSignup ? "Hisob yaratish" : "Kirish"}
       </Button>
       <p className="text-sm text-amber-800">
-        {isSignup ? "Already have an account? " : "New here? "}
+        {isSignup ? "Hisobingiz bormi? " : "Yangimisiz? "}
         <Link href={`${isSignup ? "/auth/login" : "/auth/signup"}${suffix}`} className="font-medium underline underline-offset-2">
-          {isSignup ? "Log in" : "Create an account"}
+          {isSignup ? "Kirish" : "Hisob yaratish"}
         </Link>
       </p>
     </form>

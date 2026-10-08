@@ -5,8 +5,8 @@ import { listPublishedRecipes } from "@/server/recipes";
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "Recipes",
-  description: "Browse step-by-step recipes from food creators. Free and premium.",
+  title: "Retseptlar",
+  description: "Ijodkorlarning qadam-baqadam retseptlarini ko‘ring. Bepul va premium retseptlar.",
   alternates: { canonical: "/recipes" },
 };
 

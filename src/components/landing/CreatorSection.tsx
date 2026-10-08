@@ -1,86 +1,45 @@
-import * as React from "react";
-import { Container } from "@/components/ui/Container";
+import Image from "next/image";
+import Link from "next/link";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Container } from "@/components/ui/Container";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 
-const BENEFITS = [
-  {
-    icon: "📝",
-    title: "Publish recipes your way",
-    description:
-      "Structure your recipes with ingredients, steps, timers, tips, and media. Your recipes become guided cooking experiences, not just videos.",
-  },
-  {
-    icon: "🔗",
-    title: "One link to share everywhere",
-    description:
-      "Post one link on Instagram, TikTok, Telegram, YouTube. Your audience gets the full guided experience instantly — no app download required.",
-  },
-  {
-    icon: "📊",
-    title: "See what resonates",
-    description:
-      "Track views, starts, completions, and saves. Understand which recipes your audience actually cooks, not just watches.",
-  },
-  {
-    icon: "💰",
-    title: "Monetize premium content",
-    description:
-      "Offer free recipes to build trust. Premium recipes unlock detailed guidance, timers, and exclusive tips. You set the price, we handle the rest.",
-  },
+const POINTS = [
+  "Retseptlaringizni batafsil pishirish qo‘llanmasiga aylantiring",
+  "Bitta havola bilan auditoriyangizga ulashing",
+  "Bepul va premium retseptlar nashr eting",
+  "Qaysi havola nechta o‘quvchi keltirganini ko‘ring",
 ];
 
 export function CreatorSection() {
   return (
-    <section className="py-20 lg:py-28 bg-white" aria-labelledby="creator-heading">
-      <Container size="lg">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-start">
-          <div className="sticky top-24">
-            <Badge variant="founding" className="mb-4 inline-block">
-              Founding creators: 0% commission
-            </Badge>
-            <h2 id="creator-heading" className="text-3xl sm:text-4xl font-serif font-medium text-amber-950">
-              Your audience already loves your recipes.
-              <br />
-              Give them a better way to cook them.
-            </h2>
-            <p className="mt-6 text-amber-700 text-lg leading-relaxed">
-              Join the first 10 founding creators and pay 0% platform commission
-              forever. Build your recipe library, reach more home cooks, and earn
-              from premium content.
-            </p>
-            <Button size="lg" className="mt-8 w-full sm:w-auto" asChild>
-              <a href={PLATFORM_CONFIG.urls.becomeCreator}>Join as a Creator</a>
-            </Button>
-          </div>
-
-          <div className="space-y-6">
-            {BENEFITS.map((benefit, i) => (
-              <div
-                key={i}
-                className="flex gap-4 p-5 rounded-xl bg-amber-50 hover:bg-amber-100 transition-colors"
-              >
-                <div className="w-12 h-12 rounded-xl bg-white flex items-center justify-center text-2xl flex-shrink-0">
-                  {benefit.icon}
-                </div>
-                <div>
-                  <h3 className="font-semibold text-amber-950">{benefit.title}</h3>
-                  <p className="mt-1 text-sm text-amber-700">{benefit.description}</p>
-                </div>
-              </div>
+    <section className="border-y border-amber-200 bg-amber-100/60 py-20 lg:py-28" aria-labelledby="creator-heading">
+      <Container size="xl" className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
+        <div className="relative aspect-[4/3] bg-amber-200">
+          <Image
+            src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&q=80"
+            alt="Stolda tayyorlangan go‘shtli taom va ziravorlar"
+            fill
+            sizes="(max-width: 1024px) 100vw, 50vw"
+            className="object-cover"
+          />
+        </div>
+        <div>
+          <p className="text-sm font-semibold uppercase tracking-[0.14em] text-amber-700">Ijodkorlar uchun</p>
+          <h2 id="creator-heading" className="mt-4 text-3xl font-medium text-amber-950 sm:text-5xl">
+            Auditoriyangiz retseptlaringizni allaqachon yaxshi ko‘radi. Ularga pishirishning qulay yo‘lini bering.
+          </h2>
+          <ul className="mt-8 divide-y divide-amber-200 border-t border-amber-200">
+            {POINTS.map((p) => (
+              <li key={p} className="py-3 text-amber-900">{p}</li>
             ))}
-
-            <div className="mt-8 p-5 rounded-xl bg-amber-950 text-white">
-              <h3 className="font-semibold text-lg">Founding creator terms</h3>
-              <ul className="mt-3 space-y-2 text-sm text-amber-200">
-                <li>• First 10 creators: 0% commission permanently</li>
-                <li>• After founding phase: 10% platform commission</li>
-                <li>• You own your content and audience relationship</li>
-                <li>• Payouts monthly, transparent reporting</li>
-              </ul>
-            </div>
-          </div>
+          </ul>
+          <p className="mt-6 text-amber-900">
+            Dastlabki {PLATFORM_CONFIG.creator.foundingCreatorCount} ta ijodkor asoschi hamkor sifatida qo‘shiladi va asoschilik davrida platforma komissiyasini to‘lamaydi.
+          </p>
+          <Button size="lg" className="mt-8" asChild>
+            <Link href={PLATFORM_CONFIG.urls.becomeCreator}>Ijodkor bo‘lish</Link>
+          </Button>
         </div>
       </Container>
     </section>

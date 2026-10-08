@@ -18,14 +18,14 @@ function safeNext(value: FormDataEntryValue | null): string {
 }
 
 const signupSchema = z.object({
-  name: z.string().trim().min(2, "Enter your name").max(80),
-  email: z.string().trim().toLowerCase().email("Enter a valid email").max(254),
-  password: z.string().min(8, "Password must be at least 8 characters").max(72),
+  name: z.string().trim().min(2, "Ismingizni kiriting").max(80),
+  email: z.string().trim().toLowerCase().email("To‘g‘ri email kiriting").max(254),
+  password: z.string().min(8, "Parol kamida 8 ta belgidan iborat bo‘lishi kerak").max(72),
 });
 
 const loginSchema = z.object({
-  email: z.string().trim().toLowerCase().email("Enter a valid email"),
-  password: z.string().min(1, "Enter your password").max(72),
+  email: z.string().trim().toLowerCase().email("To‘g‘ri email kiriting"),
+  password: z.string().min(1, "Parolingizni kiriting").max(72),
 });
 
 // Compared against when the email is unknown, to keep response time similar.
@@ -37,7 +37,7 @@ export async function signup(_: AuthState, formData: FormData): Promise<AuthStat
   const { name, email, password } = parsed.data;
 
   const [existing] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.email, email)).limit(1);
-  if (existing) return { error: "An account with this email already exists. Try logging in." };
+  if (existing) return { error: "Bu email bilan hisob allaqachon mavjud. Tizimga kirib ko‘ring." };
 
   const passwordHash = await bcrypt.hash(password, 12);
   const [user] = await db.insert(schema.users).values({ name, email, passwordHash }).returning({ id: schema.users.id });
@@ -52,7 +52,7 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
 
   const [user] = await db.select().from(schema.users).where(eq(schema.users.email, email)).limit(1);
   const ok = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
-  if (!user || !ok) return { error: "Incorrect email or password." };
+  if (!user || !ok) return { error: "Email yoki parol noto‘g‘ri." };
 
   await createSession(user.id);
   redirect(safeNext(formData.get("next")));

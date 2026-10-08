@@ -4,13 +4,13 @@ const optionalUrl = z
   .string()
   .trim()
   .max(1000)
-  .refine((v) => v === "" || /^https?:\/\//i.test(v), "Image links must start with http:// or https://");
+  .refine((v) => v === "" || /^https?:\/\//i.test(v), "Rasm havolasi http:// yoki https:// bilan boshlanishi kerak");
 
 export const recipeInputSchema = z
   .object({
-    title: z.string().trim().min(3, "Title is too short").max(120, "Title is too long"),
-    description: z.string().trim().min(10, "Add a short description").max(600),
-    coverUrl: z.string().trim().regex(/^https?:\/\//i, "Add a cover image link starting with http:// or https://").max(1000),
+    title: z.string().trim().min(3, "Sarlavha juda qisqa").max(120, "Sarlavha juda uzun"),
+    description: z.string().trim().min(10, "Qisqacha tavsif qo‘shing").max(600),
+    coverUrl: z.string().trim().regex(/^https?:\/\//i, "Muqova rasmi havolasini kiriting (http:// yoki https:// bilan boshlanadi)").max(1000),
     servings: z.coerce.number().int().min(1).max(100),
     prepTimeMinutes: z.coerce.number().int().min(0).max(2880),
     cookTimeMinutes: z.coerce.number().int().min(0).max(2880),
@@ -21,18 +21,18 @@ export const recipeInputSchema = z
     ingredients: z
       .array(
         z.object({
-          name: z.string().trim().min(1, "Every ingredient needs a name").max(120),
-          quantity: z.string().trim().min(1, "Every ingredient needs a quantity").max(30),
+          name: z.string().trim().min(1, "Har bir masalliqning nomi bo‘lishi kerak").max(120),
+          quantity: z.string().trim().min(1, "Har bir masalliqning miqdori bo‘lishi kerak").max(30),
           unit: z.string().trim().max(30),
         }),
       )
-      .min(1, "Add at least one ingredient")
+      .min(1, "Kamida bitta masalliq qo‘shing")
       .max(60),
     steps: z
       .array(
         z.object({
-          title: z.string().trim().min(1, "Every step needs a title").max(120),
-          instruction: z.string().trim().min(1, "Every step needs instructions").max(2000),
+          title: z.string().trim().min(1, "Har bir qadamning sarlavhasi bo‘lishi kerak").max(120),
+          instruction: z.string().trim().min(1, "Har bir qadamning ko‘rsatmasi bo‘lishi kerak").max(2000),
           mediaUrl: optionalUrl,
           timerMinutes: z.coerce.number().int().min(0).max(1440),
           temperatureCelsius: z.coerce.number().int().min(0).max(500),
@@ -40,11 +40,11 @@ export const recipeInputSchema = z
           ingredientPositions: z.array(z.number().int().min(1)).max(60),
         }),
       )
-      .min(1, "Add at least one step")
+      .min(1, "Kamida bitta qadam qo‘shing")
       .max(60),
   })
   .refine((v) => !v.isPremium || (v.priceAmount !== null && v.priceAmount > 0), {
-    message: "Premium recipes need a price",
+    message: "Premium retsept uchun narx kerak",
     path: ["priceAmount"],
   });
 

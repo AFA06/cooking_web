@@ -6,7 +6,7 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { getCurrentUser } from "@/server/auth";
 import { login } from "../actions";
 
-export const metadata: Metadata = { title: "Log in", robots: { index: false } };
+export const metadata: Metadata = { title: "Kirish", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
@@ -17,8 +17,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
   return (
     <SiteShell>
       <Container size="sm" className="py-14 sm:py-20 max-w-md">
-        <h1 className="text-3xl font-serif font-medium text-amber-950">Log in</h1>
-        <p className="mt-2 text-amber-800">Welcome back.</p>
+        <h1 className="text-3xl font-serif font-medium text-amber-950">Kirish</h1>
+        <p className="mt-2 text-amber-800">Xush kelibsiz!</p>
         <AuthForm mode="login" action={login} next={safe} />
       </Container>
     </SiteShell>
