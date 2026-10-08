@@ -3,7 +3,6 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
-import { saveRecipe } from "@/app/dashboard/actions";
 import type { RecipeInput } from "@/lib/recipe-schema";
 
 type Ingredient = { name: string; quantity: string; unit: string };
@@ -83,7 +82,17 @@ function toInput(v: EditorInitial): RecipeInput {
   };
 }
 
-export function RecipeEditor({ initial }: { initial: EditorInitial }) {
+type SaveAction = (recipeId: string | null, input: RecipeInput, publish: boolean) => Promise<{ error: string } | { id: string }>;
+
+interface RecipeEditorProps {
+  initial: EditorInitial;
+  /** Server action that persists the recipe. */
+  save: SaveAction;
+  /** Where the edit page for a recipe lives, e.g. "/dashboard/recipes". */
+  basePath: string;
+}
+
+export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
   const router = useRouter();
   const [v, setV] = React.useState<EditorInitial>(initial);
   const [error, setError] = React.useState<string | null>(null);
@@ -106,14 +115,14 @@ export function RecipeEditor({ initial }: { initial: EditorInitial }) {
     startTransition(async () => {
       setError(null);
       setNotice(null);
-      const result = await saveRecipe(v.id, toInput(v), publish);
+      const result = await save(v.id, toInput(v), publish);
       if ("error" in result) {
         setError(result.error);
         return;
       }
       setV((p) => ({ ...p, id: result.id, status: publish ? "published" : "draft" }));
       setNotice(publish ? "Nashr etildi." : "Qoralama saqlandi.");
-      if (!v.id) router.replace(`/dashboard/recipes/${result.id}`);
+      if (!v.id) router.replace(`${basePath}/${result.id}`);
       else router.refresh();
     });
 
@@ -264,7 +273,7 @@ export function RecipeEditor({ initial }: { initial: EditorInitial }) {
         </Button>
       </section>
 
-      <div className="sticky bottom-0 bg-amber-50 border-t border-amber-200 py-4 space-y-2">
+      <div className="sticky bottom-0 z-10 space-y-2 border-t border-amber-200 bg-white/95 py-4 backdrop-blur">
         {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
         {notice && <p role="status" className="text-sm text-emerald-800">{notice}</p>}
         <div className="flex flex-wrap gap-3">

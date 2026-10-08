@@ -12,7 +12,11 @@ export async function Navigation() {
   const mobileItems = [
     ...NAVIGATION_LINKS.public,
     ...(user
-      ? [...(isCreator ? [{ label: "Boshqaruv paneli", href: "/dashboard" }] : []), { label: "Mening oshxonam", href: PLATFORM_CONFIG.urls.account }]
+      ? [
+          ...(user.role === "admin" ? [{ label: "Admin paneli", href: "/admin" }] : []),
+          ...(isCreator ? [{ label: "Ijodkor paneli", href: "/dashboard" }] : []),
+          { label: "Mening oshxonam", href: PLATFORM_CONFIG.urls.account },
+        ]
       : [{ label: "Ro‘yxatdan o‘tish", href: PLATFORM_CONFIG.urls.signup }]),
   ];
 
@@ -37,6 +41,11 @@ export async function Navigation() {
           <div className="flex items-center gap-2">
             {user ? (
               <>
+                {user.role === "admin" && (
+                  <Button size="sm" variant="ghost" asChild className="hidden sm:inline-flex">
+                    <Link href="/admin">Admin</Link>
+                  </Button>
+                )}
                 {isCreator && (
                   <Button size="sm" variant="ghost" asChild className="hidden sm:inline-flex">
                     <Link href="/dashboard">Panel</Link>

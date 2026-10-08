@@ -7,6 +7,7 @@ import { z } from "zod";
 import { db, schema } from "@/db";
 import { getCurrentUser } from "@/server/auth";
 import { getCurrentCreator } from "@/server/creator";
+import { persistRecipe } from "@/server/recipe-write";
 import { recipeInputSchema, slugify, type RecipeInput } from "@/lib/recipe-schema";
 
 export interface ActionResult {
@@ -50,74 +51,19 @@ export async function saveRecipe(
   if (!ctx) return { error: "Retsept nashr etish uchun ijodkor profili kerak." };
   const parsed = recipeInputSchema.safeParse(input);
   if (!parsed.success) return { error: parsed.error.issues[0].message };
-  const d = parsed.data;
-
-  const fields = {
-    title: d.title,
-    description: d.description,
-    coverUrl: d.coverUrl,
-    coverAlt: d.title,
-    servings: d.servings,
-    prepTimeMinutes: d.prepTimeMinutes,
-    cookTimeMinutes: d.cookTimeMinutes,
-    difficulty: d.difficulty,
-    isPremium: d.isPremium,
-    priceAmount: d.isPremium ? d.priceAmount : null,
-    priceCurrency: d.isPremium ? "UZS" : null,
-    tags: d.tags,
-    updatedAt: new Date(),
-  };
-
-  let id = recipeId;
-  if (id) {
-    const [owned] = await db
-      .select({ id: schema.recipes.id, publishedAt: schema.recipes.publishedAt })
-      .from(schema.recipes)
-      .where(and(eq(schema.recipes.id, id), eq(schema.recipes.creatorId, ctx.creator.id)))
-      .limit(1);
-    if (!owned) return { error: "Retsept topilmadi." };
-    await db
-      .update(schema.recipes)
-      .set({ ...fields, status: publish ? "published" : "draft", publishedAt: publish ? (owned.publishedAt ?? new Date()) : owned.publishedAt })
-      .where(eq(schema.recipes.id, id));
-  } else {
-    const base = slugify(d.title) || "recipe";
-    let slug = base;
-    for (let i = 0; i < 5; i++) {
-      const [taken] = await db.select({ id: schema.recipes.id }).from(schema.recipes).where(eq(schema.recipes.slug, slug)).limit(1);
-      if (!taken) break;
-      slug = `${base}-${Math.random().toString(36).slice(2, 6)}`;
-    }
-    const [row] = await db
-      .insert(schema.recipes)
-      .values({ ...fields, slug, creatorId: ctx.creator.id, status: publish ? "published" : "draft", publishedAt: publish ? new Date() : null })
-      .returning({ id: schema.recipes.id });
-    id = row.id;
-  }
-
-  // Ingredients and steps are replaced as a unit.
-  await db.delete(schema.recipeIngredients).where(eq(schema.recipeIngredients.recipeId, id));
-  await db.delete(schema.recipeSteps).where(eq(schema.recipeSteps.recipeId, id));
-  await db.insert(schema.recipeIngredients).values(
-    d.ingredients.map((i, n) => ({ recipeId: id!, position: n + 1, name: i.name, quantity: i.quantity, unit: i.unit })),
-  );
-  await db.insert(schema.recipeSteps).values(
-    d.steps.map((s, n) => ({
-      recipeId: id!,
-      position: n + 1,
-      title: s.title,
-      instruction: s.instruction,
-      mediaUrl: s.mediaUrl || null,
-      timerSeconds: s.timerMinutes > 0 ? s.timerMinutes * 60 : null,
-      temperatureCelsius: s.temperatureCelsius > 0 ? s.temperatureCelsius : null,
-      tip: s.tip || null,
-      ingredientPositions: s.ingredientPositions.filter((p) => p <= d.ingredients.length),
-    })),
-  );
+  const result = await persistRecipe({
+    recipeId,
+    creatorId: ctx.creator.id,
+    ownerOnly: true,
+    data: parsed.data,
+    publish,
+  });
+  if ("error" in result) return result;
 
   revalidatePath("/dashboard");
   revalidatePath("/recipes");
-  return { id };
+  revalidatePath(`/recipes/${result.slug}`);
+  return { id: result.id };
 }
 
 export async function setRecipeStatus(recipeId: string, status: "draft" | "published"): Promise<void> {

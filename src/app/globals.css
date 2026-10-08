@@ -67,6 +67,14 @@ h3 {
   text-wrap: balance;
 }
 
+/* Fraunces switches to its "wonky" alternates at display sizes; keep the upright forms. */
+.font-serif,
+h1,
+h2,
+h3 {
+  font-variation-settings: "WONK" 0, "SOFT" 0;
+}
+
 p {
   text-wrap: pretty;
 }

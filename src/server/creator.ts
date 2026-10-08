@@ -1,5 +1,5 @@
 import "server-only";
-import { and, count, desc, eq, sql } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { getCurrentUser, type CurrentUser } from "@/server/auth";
 
@@ -34,27 +34,4 @@ export async function listCreatorRecipes(creatorId: string) {
     .where(eq(schema.recipes.creatorId, creatorId))
     .orderBy(desc(schema.recipes.updatedAt));
   return rows;
-}
-
-export async function getOwnedRecipeForEdit(creatorId: string, recipeId: string) {
-  const [recipe] = await db
-    .select()
-    .from(schema.recipes)
-    .where(and(eq(schema.recipes.id, recipeId), eq(schema.recipes.creatorId, creatorId)))
-    .limit(1);
-  if (!recipe) return null;
-  const [ingredients, steps] = await Promise.all([
-    db.select().from(schema.recipeIngredients).where(eq(schema.recipeIngredients.recipeId, recipeId)),
-    db.select().from(schema.recipeSteps).where(eq(schema.recipeSteps.recipeId, recipeId)),
-  ]);
-  return {
-    recipe,
-    ingredients: ingredients.sort((a, b) => a.position - b.position),
-    steps: steps.sort((a, b) => a.position - b.position),
-  };
-}
-
-export async function countCreatorRecipes(creatorId: string) {
-  const [row] = await db.select({ n: count() }).from(schema.recipes).where(eq(schema.recipes.creatorId, creatorId));
-  return row.n;
 }

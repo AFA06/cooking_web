@@ -1,138 +1,110 @@
-import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
-import { desc, eq } from "drizzle-orm";
-import { db, schema } from "@/db";
-import { Container } from "@/components/ui/Container";
-import { Button } from "@/components/ui/Button";
-import { SiteShell } from "@/components/layout/SiteShell";
-import { getCurrentUser } from "@/server/auth";
-import { formatDate } from "@/lib/format";
-import { setCreatorFlag, setRecipeFeatured, setRecipeStatusAsAdmin } from "./actions";
+import { RangeTabs } from "@/components/admin/RangeTabs";
+import { TimeSeriesChart } from "@/components/admin/TimeSeriesChart";
+import { Avatar, BarList, PageHeader, Panel, StatTile, StatusPill } from "@/components/admin/ui";
+import { RANGE_LABEL, comparePeriods } from "@/lib/admin-stats";
+import { formatNumber, formatPrice, formatRelative } from "@/lib/format";
+import { getDailySeries, getPlatformTotals, getRecentUsers, getSources, getTopRecipes, parseRange, requireAdminPage } from "@/server/admin";
 
-export const metadata: Metadata = { title: "Admin paneli", robots: { index: false } };
-export const dynamic = "force-dynamic";
+const ROLE_LABEL = { user: "Foydalanuvchi", creator: "Ijodkor", admin: "Admin" } as const;
 
-function Toggle({ action, on, children }: { action: () => Promise<void>; on: boolean; children: React.ReactNode }) {
-  return (
-    <form action={action}>
-      <Button type="submit" size="sm" variant={on ? "primary" : "outline"} aria-pressed={on}>
-        {children}
-      </Button>
-    </form>
-  );
-}
-
-export default async function AdminPage() {
-  const user = await getCurrentUser();
-  if (!user) redirect("/auth/login?next=/admin");
-  if (user.role !== "admin") notFound();
-
-  const [users, creators, recipes, purchases] = await Promise.all([
-    db.select({ id: schema.users.id, name: schema.users.name, email: schema.users.email, role: schema.users.role, createdAt: schema.users.createdAt })
-      .from(schema.users).orderBy(desc(schema.users.createdAt)).limit(200),
-    db.select().from(schema.creators).orderBy(schema.creators.name),
-    db.select({
-      id: schema.recipes.id, slug: schema.recipes.slug, title: schema.recipes.title, status: schema.recipes.status,
-      isFeatured: schema.recipes.isFeatured, isPremium: schema.recipes.isPremium, creator: schema.creators.name,
-    }).from(schema.recipes).innerJoin(schema.creators, eq(schema.recipes.creatorId, schema.creators.id)).orderBy(desc(schema.recipes.updatedAt)),
-    db.select({
-      id: schema.purchases.id, amount: schema.purchases.amount, currency: schema.purchases.currency,
-      status: schema.purchases.status, createdAt: schema.purchases.createdAt, email: schema.users.email, recipe: schema.recipes.title,
-    }).from(schema.purchases)
-      .innerJoin(schema.users, eq(schema.purchases.userId, schema.users.id))
-      .innerJoin(schema.recipes, eq(schema.purchases.recipeId, schema.recipes.id))
-      .orderBy(desc(schema.purchases.createdAt)).limit(100),
+export default async function AdminOverviewPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
+  const admin = await requireAdminPage();
+  const range = parseRange((await searchParams).range);
+  const [series, totals, topRecipes, sources, recentUsers] = await Promise.all([
+    getDailySeries(range * 2),
+    getPlatformTotals(),
+    getTopRecipes(range),
+    getSources(range),
+    getRecentUsers(),
   ]);
+  const p = comparePeriods(series, range);
 
-  const th = "py-2 pr-4 text-xs uppercase tracking-wide text-amber-600 font-medium";
+  const platform = [
+    { label: "Foydalanuvchilar", value: totals.users, href: "/admin/users" },
+    { label: "Ijodkorlar", value: totals.creators, href: "/admin/creators" },
+    { label: "Nashr etilgan retseptlar", value: totals.published, href: "/admin/recipes?status=published" },
+    { label: "Qoralamalar", value: totals.drafts, href: "/admin/recipes?status=draft" },
+    { label: "Premium retseptlar", value: totals.premium, href: "/admin/recipes?type=premium" },
+    { label: "Saqlashlar", value: totals.saves },
+  ];
 
   return (
-    <SiteShell>
-      <Container size="xl" className="py-12 space-y-14">
-        <h1 className="text-3xl sm:text-5xl font-serif font-medium text-amber-950">Admin paneli</h1>
+    <>
+      <PageHeader
+        eyebrow="Boshqaruv paneli"
+        title={`Xush kelibsiz, ${admin.name.split(" ")[0]}`}
+        description={`Platformaning so‘nggi ${RANGE_LABEL[range]}dagi holati.`}
+        actions={<RangeTabs base="/admin" range={range} />}
+      />
 
-        <section aria-labelledby="creators-h">
-          <h2 id="creators-h" className="text-2xl font-serif text-amber-950">Ijodkorlar ({creators.length})</h2>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[36rem] text-left">
-              <thead><tr className="border-b border-amber-200"><th className={th}>Ism</th><th className={th}>Asoschi</th><th className={th}>Tavsiya</th></tr></thead>
-              <tbody className="divide-y divide-amber-100">
-                {creators.map((c) => (
-                  <tr key={c.id}>
-                    <td className="py-3 pr-4"><Link href={`/creators/${c.slug}`} className="underline">{c.name}</Link></td>
-                    <td className="py-3 pr-4"><Toggle on={c.isFoundingCreator} action={setCreatorFlag.bind(null, c.id, "isFoundingCreator", !c.isFoundingCreator)}>{c.isFoundingCreator ? "Asoschi" : "Asoschi qilish"}</Toggle></td>
-                    <td className="py-3 pr-4"><Toggle on={c.isFeatured} action={setCreatorFlag.bind(null, c.id, "isFeatured", !c.isFeatured)}>{c.isFeatured ? "Tavsiya etilgan" : "Tavsiya qilish"}</Toggle></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatTile label="Ko‘rishlar" value={formatNumber(p.total("views"))} current={p.total("views")} previous={p.previousTotal("views")} series={p.values("views")} />
+        <StatTile label="Yangi foydalanuvchilar" value={formatNumber(p.total("signups"))} current={p.total("signups")} previous={p.previousTotal("signups")} series={p.values("signups")} />
+        <StatTile label="Pishirish boshlangan" value={formatNumber(p.total("cooks"))} current={p.total("cooks")} previous={p.previousTotal("cooks")} series={p.values("cooks")} />
+        <StatTile label="Tugatish darajasi" value={String(p.completionRate)} suffix="%" current={p.completionRate} previous={p.previousCompletionRate} series={p.values("completions")} />
+      </div>
 
-        <section aria-labelledby="recipes-h">
-          <h2 id="recipes-h" className="text-2xl font-serif text-amber-950">Retseptlar ({recipes.length})</h2>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[44rem] text-left">
-              <thead><tr className="border-b border-amber-200"><th className={th}>Sarlavha</th><th className={th}>Ijodkor</th><th className={th}>Turi</th><th className={th}>Holati</th><th className={th}>Tavsiya</th></tr></thead>
-              <tbody className="divide-y divide-amber-100">
-                {recipes.map((r) => (
-                  <tr key={r.id}>
-                    <td className="py-3 pr-4 max-w-xs break-words">{r.status === "published" ? <Link href={`/recipes/${r.slug}`} className="underline">{r.title}</Link> : r.title}</td>
-                    <td className="py-3 pr-4">{r.creator}</td>
-                    <td className="py-3 pr-4">{r.isPremium ? "Premium" : "Bepul"}</td>
-                    <td className="py-3 pr-4"><Toggle on={r.status === "published"} action={setRecipeStatusAsAdmin.bind(null, r.id, r.status === "published" ? "draft" : "published")}>{r.status === "published" ? "Nashr etilgan" : "Qoralama"}</Toggle></td>
-                    <td className="py-3 pr-4"><Toggle on={r.isFeatured} action={setRecipeFeatured.bind(null, r.id, !r.isFeatured)}>{r.isFeatured ? "Tavsiya etilgan" : "Tavsiya qilish"}</Toggle></td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+      <Panel
+        className="mt-6"
+        title="Kunlik ko‘rishlar"
+        description={`Retsept sahifalariga kirishlar, so‘nggi ${RANGE_LABEL[range]}`}
+        action={<Link href={`/admin/analytics${range === 30 ? "" : `?range=${range}`}`} className="text-sm font-medium text-amber-700 hover:underline">Batafsil statistika →</Link>}
+      >
+        <TimeSeriesChart data={p.points("views")} label="Ko‘rishlar" />
+      </Panel>
 
-        <section aria-labelledby="users-h">
-          <h2 id="users-h" className="text-2xl font-serif text-amber-950">Foydalanuvchilar ({users.length})</h2>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full min-w-[36rem] text-left">
-              <thead><tr className="border-b border-amber-200"><th className={th}>Ism</th><th className={th}>Email</th><th className={th}>Roli</th><th className={th}>Qo‘shilgan</th></tr></thead>
-              <tbody className="divide-y divide-amber-100">
-                {users.map((u) => (
-                  <tr key={u.id}>
-                    <td className="py-3 pr-4 break-words">{u.name}</td>
-                    <td className="py-3 pr-4 break-all">{u.email}</td>
-                    <td className="py-3 pr-4 capitalize">{u.role}</td>
-                    <td className="py-3 pr-4">{formatDate(u.createdAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </section>
+      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+        <Panel title="Eng ko‘p ko‘rilgan retseptlar" description={`So‘nggi ${RANGE_LABEL[range]}`}>
+          <BarList
+            empty="Bu davrda hali ko‘rishlar yo‘q."
+            items={topRecipes.map((r) => ({ key: r.id, label: r.title, sublabel: r.creator, value: r.views, href: `/admin/recipes/${r.id}` }))}
+          />
+        </Panel>
+        <Panel title="Trafik manbalari" description="Havoladagi ?src= belgisi bo‘yicha">
+          <BarList empty="Bu davrda hali tashriflar yo‘q." items={sources.map((s) => ({ key: s.source, label: s.source, value: s.views }))} />
+        </Panel>
+      </div>
 
-        <section aria-labelledby="purchases-h">
-          <h2 id="purchases-h" className="text-2xl font-serif text-amber-950">Xaridlar ({purchases.length})</h2>
-          {purchases.length === 0 ? (
-            <p className="mt-4 text-amber-700">Hali xaridlar yo‘q. To‘lov tizimi ulanmagan.</p>
-          ) : (
-            <div className="mt-4 overflow-x-auto">
-              <table className="w-full min-w-[36rem] text-left">
-                <thead><tr className="border-b border-amber-200"><th className={th}>Sana</th><th className={th}>Foydalanuvchi</th><th className={th}>Retsept</th><th className={th}>Summa</th><th className={th}>Holati</th></tr></thead>
-                <tbody className="divide-y divide-amber-100">
-                  {purchases.map((p) => (
-                    <tr key={p.id}>
-                      <td className="py-3 pr-4">{formatDate(p.createdAt)}</td>
-                      <td className="py-3 pr-4 break-all">{p.email}</td>
-                      <td className="py-3 pr-4">{p.recipe}</td>
-                      <td className="py-3 pr-4">{p.amount.toLocaleString("ru-RU")} {p.currency}</td>
-                      <td className="py-3 pr-4 capitalize">{p.status}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <div className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+        <Panel title="Platforma jami" description="Butun davr uchun">
+          <dl className="grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-3">
+            {platform.map((item) => (
+              <div key={item.label}>
+                <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-600">{item.label}</dt>
+                <dd className="mt-1 font-serif text-3xl tabular-nums text-amber-950">
+                  {item.href ? <Link href={item.href} className="hover:text-amber-700">{formatNumber(item.value)}</Link> : formatNumber(item.value)}
+                </dd>
+              </div>
+            ))}
+            <div className="col-span-2 border-t border-amber-100 pt-6 sm:col-span-3">
+              <dt className="text-xs font-semibold uppercase tracking-[0.12em] text-amber-600">Daromad (to‘langan xaridlar)</dt>
+              <dd className="mt-1 font-serif text-3xl tabular-nums text-amber-950">{formatPrice(totals.revenue, "UZS")}</dd>
+              <p className="mt-1 text-sm text-amber-600">
+                {totals.paidPurchases > 0 ? `${formatNumber(totals.paidPurchases)} ta xarid` : "To‘lov tizimi hali ulanmagan."}
+              </p>
             </div>
-          )}
-        </section>
-      </Container>
-    </SiteShell>
+          </dl>
+        </Panel>
+
+        <Panel title="Yangi foydalanuvchilar" action={<Link href="/admin/users" className="text-sm font-medium text-amber-700 hover:underline">Barchasi →</Link>} flush>
+          <ul className="divide-y divide-amber-100">
+            {recentUsers.map((u) => (
+              <li key={u.id}>
+                <Link href={`/admin/users/${u.id}`} className="flex items-center gap-3 px-5 py-3.5 hover:bg-amber-50/60 sm:px-6">
+                  <Avatar name={u.name} />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-medium text-amber-950">{u.name}</span>
+                    <span className="block truncate text-xs text-amber-600">{u.email}</span>
+                  </span>
+                  <span className="hidden shrink-0 text-xs text-amber-600 sm:block">{formatRelative(u.createdAt)}</span>
+                  <StatusPill tone={u.role === "admin" ? "accent" : u.role === "creator" ? "good" : "neutral"}>{ROLE_LABEL[u.role]}</StatusPill>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </Panel>
+      </div>
+    </>
   );
 }
