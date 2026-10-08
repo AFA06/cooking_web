@@ -3,11 +3,11 @@ import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
-import { getFeaturedRecipes } from "@/data/recipes";
+import { getFeaturedRecipes } from "@/server/recipes";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 
-export function FeaturedRecipes() {
-  const recipes = getFeaturedRecipes(6);
+export async function FeaturedRecipes() {
+  const recipes = await getFeaturedRecipes(6);
 
   return (
     <section className="py-20 lg:py-28 bg-amber-50" aria-labelledby="featured-heading">

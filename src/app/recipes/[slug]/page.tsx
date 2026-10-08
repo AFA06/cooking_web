@@ -1,19 +1,19 @@
 import { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { RECIPES, getRecipeBySlug } from "@/data/recipes";
+import { getRecipeBySlug } from "@/server/recipes";
+import { getCurrentUser } from "@/server/auth";
+import { isRecipeSaved } from "@/server/user-data";
 import { RecipeDetail } from "@/components/recipe/RecipeDetail";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return RECIPES.map((r) => ({ slug: r.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const recipe = getRecipeBySlug(slug);
+  const recipe = await getRecipeBySlug(slug);
   
   if (!recipe) {
     return { title: "Recipe Not Found" };
@@ -47,11 +47,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function RecipePage({ params }: Props) {
   const { slug } = await params;
-  const recipe = getRecipeBySlug(slug);
+  const recipe = await getRecipeBySlug(slug);
 
   if (!recipe) {
     notFound();
   }
 
-  return <RecipeDetail recipe={recipe} />;
+  const user = await getCurrentUser();
+  const isSaved = user ? await isRecipeSaved(user.id, recipe.id) : false;
+
+  return <RecipeDetail recipe={recipe} isLoggedIn={!!user} isSaved={isSaved} />;
 }

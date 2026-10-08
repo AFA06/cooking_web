@@ -116,8 +116,6 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.plov, "A platter of Uzbek plov with lamb and carrots")],
     tags: ["Uzbek", "Rice", "Lamb", "Traditional"],
     publishedAt: PUBLISHED,
-    viewCount: 0,
-    saveCount: 0,
   },
   {
     id: "2",
@@ -154,8 +152,6 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.lagman, "A bowl of lagman noodles with beef and vegetables")],
     tags: ["Uzbek", "Noodles", "Beef", "Soup"],
     publishedAt: PUBLISHED,
-    viewCount: 0,
-    saveCount: 0,
   },
   {
     id: "3",
@@ -189,8 +185,6 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.dumplings, "Steamed manti dumplings on a wooden plate")],
     tags: ["Uzbek", "Dumplings", "Lamb"],
     publishedAt: PUBLISHED,
-    viewCount: 0,
-    saveCount: 0,
   },
   {
     id: "4",
@@ -221,8 +215,6 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.platter, "Golden baked samsa pastries")],
     tags: ["Uzbek", "Pastry", "Lamb"],
     publishedAt: PUBLISHED,
-    viewCount: 0,
-    saveCount: 0,
   },
   {
     id: "5",
@@ -255,8 +247,6 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.pasta, "Noodles with meat and vegetables")],
     tags: ["Khorezm", "Noodles", "Beef"],
     publishedAt: PUBLISHED,
-    viewCount: 0,
-    saveCount: 0,
   },
   {
     id: "6",
@@ -285,46 +275,5 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.veg, "Fresh sliced tomatoes and vegetables")],
     tags: ["Uzbek", "Salad", "Vegetarian"],
     publishedAt: PUBLISHED,
-    viewCount: 0,
-    saveCount: 0,
   },
 ];
-
-export function getRecipeBySlug(slug: string): Recipe | undefined {
-  return RECIPES.find((r) => r.slug === slug);
-}
-
-export function getRecipesByCreator(creatorSlug: string): Recipe[] {
-  return RECIPES.filter((r) => r.creator.slug === creatorSlug);
-}
-
-export function getFeaturedRecipes(limit = 6): Recipe[] {
-  return RECIPES.slice(0, limit);
-}
-
-export function getFreeRecipes(): Recipe[] {
-  return RECIPES.filter((r) => !r.isPremium);
-}
-
-export function getPremiumRecipes(): Recipe[] {
-  return RECIPES.filter((r) => r.isPremium);
-}
-
-export function searchRecipes(query: string): Recipe[] {
-  const lowerQuery = query.toLowerCase();
-  return RECIPES.filter(
-    (r) =>
-      r.title.toLowerCase().includes(lowerQuery) ||
-      r.description.toLowerCase().includes(lowerQuery) ||
-      r.creator.name.toLowerCase().includes(lowerQuery) ||
-      r.tags.some((t) => t.toLowerCase().includes(lowerQuery))
-  );
-}
-
-export const CUISINES = ["All", "Uzbek", "Khorezm"] as const;
-export const DIFFICULTIES = ["All", "Easy", "Medium", "Hard"] as const;
-export const PRICE_FILTERS = ["All", "Free", "Premium"] as const;
-
-export function getCreatorBySlug(slug: string): RecipeCreator | undefined {
-  return CREATORS.find((c) => c.slug === slug);
-}

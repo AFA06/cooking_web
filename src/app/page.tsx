@@ -10,6 +10,8 @@ import { CreatorCTA } from "@/components/landing/CreatorCTA";
 import { FinalCTA } from "@/components/landing/FinalCTA";
 import { Footer } from "@/components/landing/Footer";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <>

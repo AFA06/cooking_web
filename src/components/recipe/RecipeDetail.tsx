@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
+import { SaveButton } from "@/components/recipe/SaveButton";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { formatMinutes, formatPrice, toIsoDuration } from "@/lib/format";
@@ -30,7 +31,15 @@ function recipeJsonLd(recipe: Recipe) {
   };
 }
 
-export function RecipeDetail({ recipe }: { recipe: Recipe }) {
+export function RecipeDetail({
+  recipe,
+  isLoggedIn,
+  isSaved,
+}: {
+  recipe: Recipe;
+  isLoggedIn: boolean;
+  isSaved: boolean;
+}) {
   const total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
   const stepsLocked = recipe.isPremium;
 
@@ -104,6 +113,7 @@ export function RecipeDetail({ recipe }: { recipe: Recipe }) {
           <Button size="lg" asChild>
             <Link href={`/recipes/${recipe.slug}/cook`}>Start cooking</Link>
           </Button>
+          <SaveButton recipeId={recipe.id} slug={recipe.slug} initialSaved={isSaved} isLoggedIn={isLoggedIn} />
           {recipe.isPremium && (
             <Button size="lg" variant="outline" disabled title="Purchasing is not available yet">
               Unlock — coming soon

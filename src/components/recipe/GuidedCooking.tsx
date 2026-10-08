@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { formatClock } from "@/lib/format";
+import { finishCookingSession, startCookingSession } from "@/app/recipes/actions";
 import type { Recipe } from "@/types/recipe";
 
 function StepTimer({ seconds }: { seconds: number }) {
@@ -63,16 +64,36 @@ function StepTimer({ seconds }: { seconds: number }) {
   );
 }
 
-export function GuidedCooking({ recipe }: { recipe: Recipe }) {
+export function GuidedCooking({ recipe, isLoggedIn }: { recipe: Recipe; isLoggedIn: boolean }) {
   const [index, setIndex] = React.useState(0);
   const [finished, setFinished] = React.useState(false);
+  const sessionId = React.useRef<Promise<string | null> | null>(null);
   const total = recipe.steps.length;
+
+  const ensureSession = React.useCallback(() => {
+    if (!isLoggedIn || recipe.isPremium) return null;
+    if (!sessionId.current) {
+      sessionId.current = startCookingSession(recipe.id)
+        .then((r) => r?.sessionId ?? null)
+        .catch(() => null);
+    }
+    return sessionId.current;
+  }, [isLoggedIn, recipe.id, recipe.isPremium]);
+
+  React.useEffect(() => {
+    ensureSession();
+  }, [ensureSession]);
   const step = recipe.steps[index];
 
   const next = React.useCallback(() => {
-    if (index === total - 1) setFinished(true);
+    if (index === total - 1) {
+      setFinished(true);
+      ensureSession()?.then((id) => {
+          if (id) return finishCookingSession(id);
+        }).catch(() => undefined);
+    }
     else setIndex((i) => i + 1);
-  }, [index, total]);
+  }, [index, total, ensureSession]);
   const prev = React.useCallback(() => setIndex((i) => Math.max(0, i - 1)), []);
 
   React.useEffect(() => {
@@ -110,8 +131,13 @@ export function GuidedCooking({ recipe }: { recipe: Recipe }) {
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
         <h1 className="text-3xl sm:text-4xl font-serif text-amber-950">Enjoy your {recipe.title}</h1>
         <p className="mt-4 text-amber-800">You completed all {total} steps.</p>
+        {!isLoggedIn && (
+          <p className="mt-2 text-sm text-amber-700">
+            <Link href="/auth/signup" className="underline">Create an account</Link> to keep a history of what you cook.
+          </p>
+        )}
         <div className="mt-8 flex justify-center gap-3">
-          <Button onClick={() => { setIndex(0); setFinished(false); }}>Cook again</Button>
+          <Button onClick={() => { sessionId.current = null; setIndex(0); setFinished(false); ensureSession(); }}>Cook again</Button>
           <Button variant="outline" asChild>
             <Link href="/recipes">More recipes</Link>
           </Button>

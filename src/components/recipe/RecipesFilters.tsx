@@ -4,7 +4,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
 import { Separator } from "@/components/ui/Separator";
-import { CUISINES, DIFFICULTIES, PRICE_FILTERS } from "@/data/recipes";
+import { CUISINES, DIFFICULTIES, PRICE_FILTERS } from "@/lib/filters";
 
 interface FilterGroupProps {
   label: string;

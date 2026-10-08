@@ -26,7 +26,7 @@ export function Footer() {
 
           <nav aria-label="Footer">
             <ul className="space-y-3">
-              {NAVIGATION_LINKS.footer.product.map((link) => (
+              {[...NAVIGATION_LINKS.footer.product, ...NAVIGATION_LINKS.footer.legal].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-amber-300 hover:text-white transition-colors text-sm">
                     {link.label}

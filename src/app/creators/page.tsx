@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
-import { CREATORS, getRecipesByCreator } from "@/data/recipes";
+import { listCreators } from "@/server/recipes";
 
 export const metadata: Metadata = {
   title: "Creators",
@@ -11,7 +11,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/creators" },
 };
 
-export default function CreatorsPage() {
+export const dynamic = "force-dynamic";
+
+export default async function CreatorsPage() {
+  const creators = await listCreators();
   return (
     <Container size="lg" className="py-12 sm:py-16">
       <header className="max-w-2xl">
@@ -19,7 +22,7 @@ export default function CreatorsPage() {
         <p className="mt-4 text-lg text-amber-800">The food creators behind the recipes. These are sample profiles.</p>
       </header>
       <ul className="mt-10 grid sm:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-10">
-        {CREATORS.map((c) => (
+        {creators.map((c) => (
           <li key={c.id} className="border-t border-amber-200 pt-6">
             <Link href={`/creators/${c.slug}`} className="group flex items-center gap-4">
               {c.avatarUrl && (
@@ -27,7 +30,7 @@ export default function CreatorsPage() {
               )}
               <div className="min-w-0">
                 <h2 className="font-serif text-xl text-amber-950 group-hover:text-amber-700 break-words">{c.name}</h2>
-                <p className="text-sm text-amber-700">{getRecipesByCreator(c.slug).length} recipes</p>
+                <p className="text-sm text-amber-700">{c.recipeCount} recipes</p>
               </div>
             </Link>
             {c.isFoundingCreator && <Badge variant="founding" className="mt-4">Founding creator</Badge>}

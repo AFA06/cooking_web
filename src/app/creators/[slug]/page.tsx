@@ -4,19 +4,17 @@ import { notFound } from "next/navigation";
 import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
-import { CREATORS, getCreatorBySlug, getRecipesByCreator } from "@/data/recipes";
+import { getCreatorBySlug, getRecipesByCreator } from "@/server/recipes";
 
 interface Props {
   params: Promise<{ slug: string }>;
 }
 
-export function generateStaticParams() {
-  return CREATORS.map((c) => ({ slug: c.slug }));
-}
+export const dynamic = "force-dynamic";
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const creator = getCreatorBySlug(slug);
+  const creator = await getCreatorBySlug(slug);
   if (!creator) return { title: "Creator not found" };
   return {
     title: creator.name,
@@ -27,9 +25,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CreatorPage({ params }: Props) {
   const { slug } = await params;
-  const creator = getCreatorBySlug(slug);
+  const creator = await getCreatorBySlug(slug);
   if (!creator) notFound();
-  const recipes = getRecipesByCreator(creator.slug);
+  const recipes = await getRecipesByCreator(creator.slug);
 
   return (
     <Container size="lg" className="py-12 sm:py-16">

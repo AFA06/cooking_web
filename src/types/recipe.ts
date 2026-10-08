@@ -56,8 +56,6 @@ export interface Recipe {
   media: RecipeMedia[];
   tags: string[];
   publishedAt: string;
-  viewCount: number;
-  saveCount: number;
 }
 
 export interface RecipeCardProps {
