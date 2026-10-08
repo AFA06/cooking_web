@@ -50,7 +50,7 @@ export async function Navigation() {
                 <Button size="sm" variant="ghost" asChild>
                   <Link href={PLATFORM_CONFIG.urls.login}>Kirish</Link>
                 </Button>
-                <Button size="sm" asChild className="hidden sm:inline-flex">
+                <Button size="sm" asChild className="hidden min-[420px]:inline-flex">
                   <Link href={PLATFORM_CONFIG.urls.signup}>Ro‘yxatdan o‘tish</Link>
                 </Button>
               </>

@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { desc, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { Container } from "@/components/ui/Container";
@@ -25,7 +25,8 @@ function Toggle({ action, on, children }: { action: () => Promise<void>; on: boo
 
 export default async function AdminPage() {
   const user = await getCurrentUser();
-  if (!user || user.role !== "admin") notFound();
+  if (!user) redirect("/auth/login?next=/admin");
+  if (user.role !== "admin") notFound();
 
   const [users, creators, recipes, purchases] = await Promise.all([
     db.select({ id: schema.users.id, name: schema.users.name, email: schema.users.email, role: schema.users.role, createdAt: schema.users.createdAt })
