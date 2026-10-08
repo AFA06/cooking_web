@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { PLATFORM_CONFIG } from "@/lib/constants";
+import { CREATORS, RECIPES } from "@/data/recipes";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://damda.uz";
@@ -29,5 +30,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "monthly",
       priority: 0.6,
     },
+    ...RECIPES.map((r) => ({
+      url: `${baseUrl}/recipes/${r.slug}`,
+      lastModified: new Date(r.publishedAt),
+      changeFrequency: "weekly" as const,
+      priority: 0.7,
+    })),
+    ...CREATORS.map((c) => ({
+      url: `${baseUrl}/creators/${c.slug}`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.6,
+    })),
   ];
 }

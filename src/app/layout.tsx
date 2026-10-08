@@ -46,21 +46,12 @@ export const metadata: Metadata = {
     title: "Damda — Step-by-step recipes from the creators you love",
     description:
       "Stop going back to YouTube while you're cooking. Structured, guided cooking experiences from real food creators.",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Damda cooking platform",
-      },
-    ],
   },
   twitter: {
     card: "summary_large_image",
     title: "Damda — Step-by-step recipes from the creators you love",
     description:
       "Stop going back to YouTube while you're cooking. Structured, guided cooking experiences from real food creators.",
-    images: ["/og-image.jpg"],
   },
   robots: {
     index: true,

@@ -7,8 +7,6 @@ export const PLATFORM_CONFIG = {
     recipes: "/recipes",
     creators: "/creators",
     becomeCreator: "/creators/join",
-    login: "/auth/login",
-    signup: "/auth/signup",
   },
   creator: {
     foundingCommissionRate: 0,
@@ -36,14 +34,6 @@ export const NAVIGATION_LINKS = {
       { label: "Recipes", href: PLATFORM_CONFIG.urls.recipes },
       { label: "Creators", href: PLATFORM_CONFIG.urls.creators },
       { label: "Become a Creator", href: PLATFORM_CONFIG.urls.becomeCreator },
-    ],
-    company: [
-      { label: "About", href: "/about" },
-      { label: "Contact", href: "/contact" },
-    ],
-    legal: [
-      { label: "Terms", href: "/terms" },
-      { label: "Privacy", href: "/privacy" },
     ],
   },
 } as const;

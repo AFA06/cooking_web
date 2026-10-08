@@ -35,7 +35,6 @@ export interface RecipeCreator {
   avatarUrl?: string;
   bio?: string;
   isFoundingCreator: boolean;
-  followerCount?: number;
 }
 
 export interface Recipe {
