@@ -11,7 +11,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:seed": "tsx scripts/seed.ts",
     "make-admin": "tsx scripts/make-admin.ts",
-    "set-password": "tsx scripts/set-password.ts"
+    "set-password": "tsx scripts/set-password.ts",
+    "create-user": "tsx scripts/create-user.ts"
   },
   "dependencies": {
     "@neondatabase/serverless": "^1.2.0",
