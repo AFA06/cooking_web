@@ -34,9 +34,16 @@ export async function Navigation() {
 
             <div className="flex items-center gap-3">
               {user ? (
-                <Button size="sm" variant="outline" asChild>
-                  <Link href={PLATFORM_CONFIG.urls.account}>My kitchen</Link>
-                </Button>
+                <>
+                  {(user.role === "creator" || user.role === "admin") && (
+                    <Button size="sm" variant="ghost" asChild>
+                      <Link href="/dashboard">Dashboard</Link>
+                    </Button>
+                  )}
+                  <Button size="sm" variant="outline" asChild>
+                    <Link href={PLATFORM_CONFIG.urls.account}>My kitchen</Link>
+                  </Button>
+                </>
               ) : (
                 <>
                   <Button variant="ghost" size="sm" asChild>
