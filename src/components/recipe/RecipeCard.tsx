@@ -41,11 +41,17 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
         >
           {recipe.isPremium ? "Premium" : "Bepul"}
         </span>
+        {recipe.cookedCount > 0 && (
+          <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-amber-50/95 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm">
+            <Flame className="h-3.5 w-3.5 text-amber-700" strokeWidth={2} aria-hidden="true" />
+            {formatNumber(recipe.cookedCount)} marta pishirilgan
+          </span>
+        )}
         <BookmarkButton recipeId={recipe.id} slug={recipe.slug} initialSaved={saved} isLoggedIn={isLoggedIn} className="absolute right-3 top-3 z-10" />
       </div>
 
       <div className="mt-5">
-        <h3 className="text-2xl font-medium leading-tight text-amber-950 break-words">
+        <h3 className="line-clamp-2 min-h-[2.5em] text-2xl font-medium leading-tight text-amber-950 break-words">
           <Link href={`/recipes/${recipe.slug}`} className="after:absolute after:inset-0 after:rounded-[1.25rem] group-hover:text-amber-700">
             {recipe.title}
           </Link>
@@ -83,15 +89,6 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
             </span>
             <dd>{DIFFICULTY_LABEL[recipe.difficulty]}</dd>
           </div>
-          {recipe.cookedCount > 0 && (
-            <div className="flex items-center gap-2">
-              <dt className="sr-only">Pishirilgan</dt>
-              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-900" aria-hidden="true">
-                <Flame className="h-4 w-4" strokeWidth={2} />
-              </span>
-              <dd>{formatNumber(recipe.cookedCount)}× pishirilgan</dd>
-            </div>
-          )}
         </dl>
       </div>
     </article>
