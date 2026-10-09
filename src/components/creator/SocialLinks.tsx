@@ -48,30 +48,32 @@ const HOVER: Record<SocialPlatform, string> = {
 
 export function SocialLinks({ links, canEdit = false }: { links: Links; canEdit?: boolean }) {
   const present = SOCIAL_PLATFORMS.filter((p) => links[p.key]);
-  if (present.length === 0 && !canEdit) return null;
+  const shape = "flex h-12 w-12 items-center justify-center rounded-full border";
   return (
     <div className="flex flex-wrap items-center gap-2.5">
-      {present.length > 0 && (
-        <ul className="flex flex-wrap gap-2.5" aria-label="Ijtimoiy tarmoqlar">
-          {present.map((p) => (
-            <li key={p.key}>
+      <ul className="flex flex-wrap gap-2.5" aria-label="Ijtimoiy tarmoqlar">
+        {SOCIAL_PLATFORMS.map((p) => (
+          <li key={p.key}>
+            {links[p.key] ? (
               <a
                 href={links[p.key]}
                 target="_blank"
                 rel="noopener noreferrer nofollow"
                 title={p.label}
                 aria-label={`${p.label} sahifasi`}
-                className={cn(
-                  "flex h-12 w-12 items-center justify-center rounded-full border border-amber-300 bg-white text-amber-950 transition-colors duration-200 hover:text-white",
-                  HOVER[p.key],
-                )}
+                className={cn(shape, "border-amber-300 bg-white text-amber-950 transition-colors duration-200 hover:text-white", HOVER[p.key])}
               >
                 <SocialIcon platform={p.key} className="h-[1.35rem] w-[1.35rem]" />
               </a>
-            </li>
-          ))}
-        </ul>
-      )}
+            ) : (
+              <span title={`${p.label} hali ulanmagan`} className={cn(shape, "border-amber-300 text-amber-500")}>
+                <SocialIcon platform={p.key} className="h-[1.35rem] w-[1.35rem]" />
+                <span className="sr-only">{p.label} hali ulanmagan</span>
+              </span>
+            )}
+          </li>
+        ))}
+      </ul>
       {canEdit && present.length < SOCIAL_PLATFORMS.length && (
         <Link
           href="/dashboard/profile"
