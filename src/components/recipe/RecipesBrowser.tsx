@@ -120,7 +120,7 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
 
           <div className="no-scrollbar -mx-5 flex items-center gap-2 overflow-x-auto px-5 lg:mx-0 lg:overflow-visible lg:px-0">
             <FilterMenu label="Vaqt" options={toOptions(TIME_FILTERS.map((t) => t.label))} value={filters.time} defaultValue={ALL} onChange={(time) => set({ time })} />
-            <FilterMenu label="Murakkablik" options={toOptions(DIFFICULTIES)} value={filters.difficulty} defaultValue={ALL} onChange={(difficulty) => set({ difficulty })} />
+            <FilterMenu label="Qiyinligi" options={toOptions(DIFFICULTIES)} value={filters.difficulty} defaultValue={ALL} onChange={(difficulty) => set({ difficulty })} />
             <span className="mx-1 hidden h-6 w-px bg-amber-300 lg:block" aria-hidden="true" />
             <FilterMenu
               label="Saralash"
@@ -175,7 +175,7 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
           <>
             <div className={cn(RECIPE_GRID_CLASSES, "mt-6 gap-x-6 gap-y-14 xl:gap-x-8")}>
               {visible.map((recipe, i) => (
-                <div key={recipe.id} className="rise h-full" style={{ animationDelay: `${(i % pageSize) * 40}ms` }}>
+                <div key={recipe.id} className="rise" style={{ animationDelay: `${(i % pageSize) * 40}ms` }}>
                   <RecipeCard
                     recipe={recipe}
                     isLoggedIn={isLoggedIn}

@@ -163,11 +163,11 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
             <input id="cook" type="number" min={0} className={field} value={v.cookTimeMinutes} onChange={(e) => set("cookTimeMinutes", e.target.value)} />
           </div>
           <div>
-            <label htmlFor="difficulty" className={label}>Murakkablik</label>
+            <label htmlFor="difficulty" className={label}>Qiyinligi</label>
             <select id="difficulty" className={field} value={v.difficulty} onChange={(e) => set("difficulty", e.target.value as EditorInitial["difficulty"])}>
               <option value="easy">Oson</option>
               <option value="medium">O‘rtacha</option>
-              <option value="hard">Murakkab</option>
+              <option value="hard">Qiyin</option>
             </select>
           </div>
         </div>

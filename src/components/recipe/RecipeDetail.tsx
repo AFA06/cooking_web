@@ -105,7 +105,7 @@ export function RecipeDetail({
             <dd className="mt-1 font-medium text-amber-950">{recipe.servings}</dd>
           </div>
           <div>
-            <dt className="text-xs uppercase tracking-wide text-amber-600">Murakkablik</dt>
+            <dt className="text-xs uppercase tracking-wide text-amber-600">Qiyinligi</dt>
             <dd className="mt-1 font-medium text-amber-950">{DIFFICULTY_LABEL[recipe.difficulty]}</dd>
           </div>
         </dl>

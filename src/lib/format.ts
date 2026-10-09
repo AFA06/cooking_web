@@ -21,7 +21,7 @@ export function toIsoDuration(minutes: number): string {
   return `PT${Math.max(0, Math.round(minutes))}M`;
 }
 
-export const DIFFICULTY_LABEL = { easy: "Oson", medium: "O‘rtacha", hard: "Murakkab" } as const;
+export const DIFFICULTY_LABEL = { easy: "Oson", medium: "O‘rtacha", hard: "Qiyin" } as const;
 
 export function formatDate(date: Date): string {
   return new Intl.DateTimeFormat("uz-UZ", { day: "numeric", month: "short", year: "numeric" }).format(date);

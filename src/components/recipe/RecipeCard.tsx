@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ChefHat, Clock, Flame } from "lucide-react";
+import { ChefHat, Clock, Flame, Users } from "lucide-react";
 import { BookmarkButton } from "@/components/recipe/BookmarkButton";
 import { DIFFICULTY_LABEL, formatMinutes, formatNumber, formatPrice } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
@@ -21,9 +21,14 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
   const total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
   const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency) : null;
   const { creator } = recipe;
+  const facts = [
+    { label: "Vaqt", value: formatMinutes(total), icon: Clock, tone: "text-amber-700" },
+    { label: "Porsiya", value: `${recipe.servings} kishilik`, icon: Users, tone: "text-sage-600" },
+    { label: "Qiyinligi", value: DIFFICULTY_LABEL[recipe.difficulty], icon: ChefHat, tone: "text-amber-700" },
+  ];
 
   return (
-    <article className="group relative flex h-full flex-col">
+    <article className="group relative">
       <div className={cn("relative overflow-hidden rounded-[1.25rem] bg-amber-100", shape === "portrait" ? "aspect-[4/5]" : "aspect-[4/3]")}>
         <Image
           src={recipe.coverMedia.url}
@@ -56,7 +61,7 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
         <BookmarkButton recipeId={recipe.id} slug={recipe.slug} initialSaved={saved} isLoggedIn={isLoggedIn} className="absolute right-3 top-3 z-10" />
       </div>
 
-      <div className="mt-5 flex flex-1 flex-col">
+      <div className="mt-5">
         <h3 className="line-clamp-2 text-2xl font-medium leading-tight text-amber-950 break-words">
           <Link href={`/recipes/${recipe.slug}`} className="after:absolute after:inset-0 after:rounded-[1.25rem] group-hover:text-amber-700">
             {recipe.title}
@@ -73,23 +78,17 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
           )}
           <span className="truncate">{creator.name}</span>
         </p>
-        <div className="h-4 shrink-0" aria-hidden="true" />
 
-        <dl className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-amber-200 pt-4 text-[0.95rem] font-medium text-amber-950">
-          <div className="flex items-center gap-2">
-            <dt className="sr-only">Umumiy vaqt</dt>
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-clay-100 text-amber-700" aria-hidden="true">
-              <Clock className="h-4 w-4" strokeWidth={2} />
-            </span>
-            <dd>{formatMinutes(total)}</dd>
-          </div>
-          <div className="flex items-center gap-2">
-            <dt className="sr-only">Murakkablik</dt>
-            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sage-100 text-sage-700" aria-hidden="true">
-              <ChefHat className="h-4 w-4" strokeWidth={2} />
-            </span>
-            <dd>{DIFFICULTY_LABEL[recipe.difficulty]}</dd>
-          </div>
+        <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-amber-200 pt-4">
+          {facts.map(({ label, value, icon: Icon, tone }) => (
+            <div key={label} className="min-w-0">
+              <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-amber-600">
+                <Icon className={cn("h-4 w-4 shrink-0", tone)} strokeWidth={2} aria-hidden="true" />
+                {label}
+              </dt>
+              <dd className="mt-1 text-[0.95rem] font-semibold text-amber-950">{value}</dd>
+            </div>
+          ))}
         </dl>
       </div>
     </article>
