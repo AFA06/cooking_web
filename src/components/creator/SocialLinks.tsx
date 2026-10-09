@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { Plus } from "lucide-react";
 import { SOCIAL_PLATFORMS, type SocialLinks as Links, type SocialPlatform } from "@/lib/social";
 import { cn } from "@/lib/utils";
 
@@ -37,24 +39,48 @@ export function SocialIcon({ platform, className }: { platform: SocialPlatform; 
   }
 }
 
-export function SocialLinks({ links }: { links: Links }) {
+const HOVER: Record<SocialPlatform, string> = {
+  instagram: "hover:border-[#c13584] hover:bg-[#c13584]",
+  tiktok: "hover:border-amber-950 hover:bg-amber-950",
+  telegram: "hover:border-[#229ed9] hover:bg-[#229ed9]",
+  youtube: "hover:border-[#d93025] hover:bg-[#d93025]",
+};
+
+export function SocialLinks({ links, canEdit = false }: { links: Links; canEdit?: boolean }) {
   const present = SOCIAL_PLATFORMS.filter((p) => links[p.key]);
-  if (present.length === 0) return null;
+  if (present.length === 0 && !canEdit) return null;
   return (
-    <ul className="flex flex-wrap gap-2" aria-label="Ijtimoiy tarmoqlar">
-      {present.map((p) => (
-        <li key={p.key}>
-          <a
-            href={links[p.key]}
-            target="_blank"
-            rel="noopener noreferrer nofollow"
-            className="flex h-11 items-center gap-2 rounded-full border border-amber-300 px-4 text-[0.95rem] font-medium text-amber-950 transition-colors hover:border-amber-950"
-          >
-            <SocialIcon platform={p.key} />
-            {p.label}
-          </a>
-        </li>
-      ))}
-    </ul>
+    <div className="flex flex-wrap items-center gap-2.5">
+      {present.length > 0 && (
+        <ul className="flex flex-wrap gap-2.5" aria-label="Ijtimoiy tarmoqlar">
+          {present.map((p) => (
+            <li key={p.key}>
+              <a
+                href={links[p.key]}
+                target="_blank"
+                rel="noopener noreferrer nofollow"
+                title={p.label}
+                aria-label={`${p.label} sahifasi`}
+                className={cn(
+                  "flex h-12 w-12 items-center justify-center rounded-full border border-amber-300 bg-white text-amber-950 transition-colors duration-200 hover:text-white",
+                  HOVER[p.key],
+                )}
+              >
+                <SocialIcon platform={p.key} className="h-[1.35rem] w-[1.35rem]" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+      {canEdit && present.length < SOCIAL_PLATFORMS.length && (
+        <Link
+          href="/dashboard/profile"
+          className="flex h-12 items-center gap-2 rounded-full border border-dashed border-amber-400 px-4 text-[0.95rem] font-medium text-amber-900 transition-colors hover:border-amber-950 hover:text-amber-950"
+        >
+          <Plus className="h-4 w-4" aria-hidden="true" />
+          Ijtimoiy tarmoq qo‘shish
+        </Link>
+      )}
+    </div>
   );
 }

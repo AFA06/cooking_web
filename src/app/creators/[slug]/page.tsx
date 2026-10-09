@@ -9,6 +9,7 @@ import { RatingStars, formatRating } from "@/components/reviews/RatingStars";
 import { ReviewList } from "@/components/reviews/ReviewList";
 import { formatNumber } from "@/lib/format";
 import { getCurrentUser } from "@/server/auth";
+import { getCreatorForUser } from "@/server/creator";
 import { getCreatorBySlug, getRecipesByCreator } from "@/server/recipes";
 import { getCreatorReviews, getCreatorSummary } from "@/server/reviews";
 import { getSavedRecipeIds } from "@/server/user-data";
@@ -32,11 +33,12 @@ export default async function CreatorPage({ params }: Props) {
   if (!creator) notFound();
 
   const user = await getCurrentUser();
-  const [recipes, summary, reviews, savedList] = await Promise.all([
+  const [recipes, summary, reviews, savedList, ownCreator] = await Promise.all([
     getRecipesByCreator(creator.slug),
     getCreatorSummary(creator.id),
     getCreatorReviews(creator.id),
     user ? getSavedRecipeIds(user.id) : [],
+    user ? getCreatorForUser(user.id) : null,
   ]);
   const savedIds = new Set(savedList);
   const { rating } = summary;
@@ -70,7 +72,7 @@ export default async function CreatorPage({ params }: Props) {
               <h1 className="mt-3 text-[2.6rem] font-medium leading-[1.04] text-amber-950 break-words sm:text-6xl">{creator.name}</h1>
               {creator.bio && <p className="mt-4 max-w-xl text-lg leading-relaxed text-amber-900">{creator.bio}</p>}
               <div className="mt-6">
-                <SocialLinks links={creator.socialLinks} />
+                <SocialLinks links={creator.socialLinks} canEdit={ownCreator?.id === creator.id} />
               </div>
             </div>
           </div>
