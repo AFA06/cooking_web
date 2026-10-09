@@ -20,6 +20,15 @@ export const dynamic = "force-dynamic";
 const arch = "relative aspect-[4/5] w-full overflow-hidden lg:aspect-auto lg:h-[min(46svh,30rem)] rounded-[50%_50%_1.75rem_1.75rem/40%_40%_1.75rem_1.75rem]";
 const stagger = "sm:even:mt-16";
 
+/** Where each plate sits on the hero table; the first is the centrepiece. */
+const PLATE_SPOTS = [
+  "left-[19%] top-[20%] w-[60%]",
+  "left-0 top-[3%] z-10 w-[30%]",
+  "right-[1%] top-0 z-10 w-[27%]",
+  "bottom-0 left-[3%] z-10 w-[28%]",
+  "-right-[5%] bottom-[2%] z-10 w-[33%]",
+];
+
 function CreatorDoor({ creator, index }: { creator: CreatorShowcase; index: number }) {
   const [first, second] = creator.dishes;
   const facts = [
@@ -109,50 +118,76 @@ export default async function CreatorsPage() {
     { value: creators.reduce((sum, c) => sum + c.cookedCount, 0), label: "marta pishirilgan" },
   ];
 
+  // One dish per creator first, then second dishes, so the table shows every kitchen.
+  const plates = [0, 1]
+    .flatMap((n) => creators.filter((c) => c.dishes[n]).map((c) => ({ url: c.dishes[n].url, avatarUrl: c.avatarUrl })))
+    .filter((p, i, all) => all.findIndex((o) => o.url === p.url) === i)
+    .slice(0, PLATE_SPOTS.length);
+
   return (
     <div className="overflow-x-clip">
-      <Container size="xl" className="flex min-h-[calc(100svh-4rem)] flex-col pb-8 pt-12 lg:pt-16">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Ijodkorlar</p>
-        <header className="grid flex-1 content-center gap-10 py-10 lg:grid-cols-[1.5fr_1fr] lg:items-end lg:gap-20">
-          <h1 className="font-serif text-[2.75rem] font-medium leading-[1.02] text-amber-950 sm:text-7xl xl:text-[6.5rem]">
-            Har bir taom ortida — <em className="text-amber-700">bir oshxona.</em>
-          </h1>
-          <div className="lg:pb-4">
-            <p className="max-w-md text-lg leading-relaxed text-amber-900">
-              Eshikni oching: har bir ijodkorning o‘z ta’mi, o‘z uslubi va qadam-baqadam yozilgan retseptlari bor.
-            </p>
-            <dl className="mt-8 flex gap-8 sm:gap-12">
-              {totals.map((t) => (
-                <div key={t.label}>
-                  <dd className="font-serif text-4xl text-amber-950 sm:text-5xl">{formatNumber(t.value)}</dd>
-                  <dt className="mt-1 text-sm text-amber-800">{t.label}</dt>
+      <section className="relative overflow-hidden bg-amber-950 text-amber-50">
+        <span className="pointer-events-none absolute -right-40 top-1/2 h-[70rem] w-[70rem] -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,109,81,0.28),transparent)]" aria-hidden="true" />
+        <Container size="xl" className="relative flex min-h-[calc(100svh-4rem)] flex-col pb-7 pt-10 lg:pt-12">
+          <div className="grid flex-1 items-center gap-10 lg:grid-cols-[1fr_auto] lg:gap-16">
+            <header className="rise">
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">Ijodkorlar</p>
+              <h1 className="mt-6 font-serif text-[2.75rem] font-medium leading-[1.02] sm:text-7xl xl:text-[6rem]">
+                Har bir taom ortida — <em className="text-clay-400">bir oshxona.</em>
+              </h1>
+              <p className="mt-7 max-w-md text-lg leading-relaxed text-amber-200">
+                Eshikni oching: har bir ijodkorning o‘z ta’mi, o‘z uslubi va qadam-baqadam yozilgan retseptlari bor.
+              </p>
+              <dl className="mt-9 flex gap-8 sm:gap-12">
+                {totals.map((t) => (
+                  <div key={t.label}>
+                    <dd className="font-serif text-4xl sm:text-5xl">{formatNumber(t.value)}</dd>
+                    <dt className="mt-1 text-sm text-amber-300">{t.label}</dt>
+                  </div>
+                ))}
+              </dl>
+            </header>
+
+            <div className="relative mx-auto aspect-square w-full max-w-[26rem] lg:mx-0 lg:h-[min(72svh,46rem)] lg:w-auto lg:max-w-none" aria-hidden="true">
+              {plates.map((p, i) => (
+                <div key={p.url} className={`rise absolute ${PLATE_SPOTS[i]}`} style={{ animationDelay: `${150 + i * 110}ms` }}>
+                  <div
+                    className="plate-turn relative aspect-square overflow-hidden rounded-full shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] ring-1 ring-amber-50/15"
+                    style={{ animationDuration: `${110 + i * 25}s`, animationDirection: i % 2 ? "reverse" : "normal" }}
+                  >
+                    <Image src={p.url} alt="" fill sizes="(min-width: 1024px) 30vw, 60vw" priority={i === 0} className="object-cover" />
+                  </div>
+                  {p.avatarUrl && (
+                    <Image src={p.avatarUrl} alt="" width={56} height={56} className="absolute bottom-[4%] right-[4%] h-[22%] min-h-9 w-[22%] min-w-9 rounded-full object-cover ring-[3px] ring-amber-950" />
+                  )}
                 </div>
               ))}
-            </dl>
+            </div>
           </div>
-        </header>
-        <a href="#oshxonalar" className="group flex items-center justify-between gap-6 border-t border-amber-200 pt-6 text-amber-950">
-          <span className="flex items-center">
-            {creators.slice(0, 5).map((c) =>
-              c.avatarUrl ? (
-                <Image key={c.id} src={c.avatarUrl} alt="" width={48} height={48} className="-ml-2.5 h-12 w-12 rounded-full object-cover ring-[3px] ring-amber-50 first:ml-0" />
-              ) : (
-                <span key={c.id} className="-ml-2.5 flex h-12 w-12 items-center justify-center rounded-full bg-amber-950 font-serif text-lg text-amber-50 ring-[3px] ring-amber-50 first:ml-0" aria-hidden="true">
-                  {c.name.slice(0, 1).toUpperCase()}
-                </span>
-              ),
-            )}
-          </span>
-          <span className="flex items-center gap-3 text-[0.95rem] font-semibold">
-            Oshxonalarga kirish
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-950 text-amber-50 transition-transform duration-300 group-hover:translate-y-1">
-              <ArrowDown className="h-5 w-5" aria-hidden="true" />
-            </span>
-          </span>
-        </a>
-      </Container>
 
-      <Container id="oshxonalar" size="xl" className="scroll-mt-16 pb-24 pt-10 lg:pb-32 lg:pt-12">
+          <a href="#oshxonalar" className="group mt-8 flex items-center justify-between gap-6 border-t border-amber-50/15 pt-6">
+            <span className="flex items-center">
+              {creators.slice(0, 5).map((c) =>
+                c.avatarUrl ? (
+                  <Image key={c.id} src={c.avatarUrl} alt="" width={48} height={48} className="-ml-2.5 h-12 w-12 rounded-full object-cover ring-[3px] ring-amber-950 first:ml-0" />
+                ) : (
+                  <span key={c.id} className="-ml-2.5 flex h-12 w-12 items-center justify-center rounded-full bg-amber-800 font-serif text-lg text-amber-50 ring-[3px] ring-amber-950 first:ml-0" aria-hidden="true">
+                    {c.name.slice(0, 1).toUpperCase()}
+                  </span>
+                ),
+              )}
+            </span>
+            <span className="flex items-center gap-3 text-[0.95rem] font-semibold">
+              Oshxonalarga kirish
+              <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-50 text-amber-950 transition-transform duration-300 group-hover:translate-y-1">
+                <ArrowDown className="h-5 w-5" aria-hidden="true" />
+              </span>
+            </span>
+          </a>
+        </Container>
+      </section>
+
+      <Container id="oshxonalar" size="xl" className="scroll-mt-16 pb-24 pt-12 lg:pb-32 lg:pt-14">
         <ul className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10 lg:gap-y-20">
           {creators.map((c, i) => (
             <CreatorDoor key={c.id} creator={c} index={i} />
