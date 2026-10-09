@@ -2,9 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { SaveButton } from "@/components/recipe/SaveButton";
+import { CookLink, ScaledIngredients, ScaledTime, ServingsCount, ServingsProvider, ServingsStepper } from "@/components/recipe/Servings";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { DIFFICULTY_LABEL, formatMinutes, formatPrice, toIsoDuration } from "@/lib/format";
+import { DIFFICULTY_LABEL, formatPrice, toIsoDuration } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import type { Recipe } from "@/types/recipe";
 
@@ -41,10 +42,11 @@ export function RecipeDetail({
   isLoggedIn: boolean;
   isSaved: boolean;
 }) {
-  const total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+  const times = { prepMinutes: recipe.prepTimeMinutes, cookMinutes: recipe.cookTimeMinutes };
   const stepsLocked = recipe.isPremium;
 
   return (
+    <ServingsProvider base={recipe.servings}>
     <article className="pb-20">
       <script
         type="application/ld+json"
@@ -92,17 +94,17 @@ export function RecipeDetail({
         <dl className="mt-8 grid grid-cols-2 gap-6 border-y border-amber-200 py-6 sm:grid-cols-4">
           <div>
             <dt className="text-xs uppercase tracking-wide text-amber-600">Umumiy vaqt</dt>
-            <dd className="mt-1 font-medium text-amber-950">{formatMinutes(total)}</dd>
+            <dd className="mt-1 font-medium text-amber-950"><ScaledTime {...times} part="total" /></dd>
           </div>
           <div>
             <dt className="text-xs uppercase tracking-wide text-amber-600">Tayyorlash / Pishirish</dt>
             <dd className="mt-1 font-medium text-amber-950">
-              {formatMinutes(recipe.prepTimeMinutes)} / {formatMinutes(recipe.cookTimeMinutes)}
+              <ScaledTime {...times} part="prep" /> / <ScaledTime {...times} part="cook" />
             </dd>
           </div>
           <div>
             <dt className="text-xs uppercase tracking-wide text-amber-600">Porsiya</dt>
-            <dd className="mt-1 font-medium text-amber-950">{recipe.servings}</dd>
+            <dd className="mt-1 font-medium text-amber-950"><ServingsCount /> kishilik</dd>
           </div>
           <div>
             <dt className="text-xs uppercase tracking-wide text-amber-600">Qiyinligi</dt>
@@ -111,9 +113,7 @@ export function RecipeDetail({
         </dl>
 
         <div className="mt-8 flex flex-col sm:flex-row gap-3">
-          <Button size="lg" asChild>
-            <Link href={`/recipes/${recipe.slug}/cook`}>Pishirishni boshlash</Link>
-          </Button>
+          <CookLink slug={recipe.slug} size="lg">Men bilan pishiring</CookLink>
           <SaveButton recipeId={recipe.id} slug={recipe.slug} initialSaved={isSaved} isLoggedIn={isLoggedIn} />
           {recipe.isPremium && (
             <Button size="lg" variant="outline" disabled title="To‘lov hozircha mavjud emas">
@@ -127,16 +127,11 @@ export function RecipeDetail({
             <h2 id="ingredients-heading" className="text-2xl font-serif font-medium text-amber-950">
               Masalliqlar
             </h2>
-            <ul className="mt-4 divide-y divide-amber-200 border-t border-amber-200">
-              {recipe.ingredients.map((i) => (
-                <li key={i.id} className="flex justify-between gap-4 py-3">
-                  <span className="text-amber-950">{i.name}</span>
-                  <span className="text-amber-700 whitespace-nowrap">
-                    {i.quantity} {i.unit}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <p className="mt-1 text-sm text-amber-600">Necha kishiga pishirasiz? Miqdorlar shunga qarab o‘zgaradi.</p>
+            <div className="mt-4">
+              <ServingsStepper />
+            </div>
+            <ScaledIngredients ingredients={recipe.ingredients} />
           </section>
 
           <section aria-labelledby="steps-heading">
@@ -169,5 +164,6 @@ export function RecipeDetail({
         </div>
       </Container>
     </article>
+    </ServingsProvider>
   );
 }

@@ -6,9 +6,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { StepTimer } from "@/components/recipe/StepTimer";
 import { finishCookingSession, startCookingSession } from "@/app/recipes/actions";
+import { scaleQuantity } from "@/lib/scaling";
 import type { Recipe } from "@/types/recipe";
 
-export function GuidedCooking({ recipe, isLoggedIn }: { recipe: Recipe; isLoggedIn: boolean }) {
+export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe; isLoggedIn: boolean; servings: number }) {
+  const factor = servings / recipe.servings;
   const [index, setIndex] = React.useState(0);
   const [finished, setFinished] = React.useState(false);
   const sessionId = React.useRef<Promise<string | null> | null>(null);
@@ -98,7 +100,9 @@ export function GuidedCooking({ recipe, isLoggedIn }: { recipe: Recipe; isLogged
         <Link href={`/recipes/${recipe.slug}`} className="underline-offset-2 hover:underline">
           Chiqish
         </Link>
-        <span>{recipe.title}</span>
+        <span>
+          {recipe.title} · {servings} kishilik
+        </span>
       </div>
       <div
         className="mt-4 h-1.5 w-full bg-amber-100"
@@ -131,10 +135,16 @@ export function GuidedCooking({ recipe, isLoggedIn }: { recipe: Recipe; isLogged
         <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-amber-800" aria-label="Shu qadam uchun masalliqlar">
           {stepIngredients.map((i) => (
             <li key={i.id}>
-              <span className="font-medium">{i.quantity} {i.unit}</span> {i.name}
+              <span className="font-medium">{scaleQuantity(i.quantity, i.unit, factor)} {i.unit}</span> {i.name}
             </li>
           ))}
         </ul>
+      )}
+
+      {factor !== 1 && (
+        <p className="mt-4 text-sm text-amber-600">
+          Miqdorlar {servings} kishiga hisoblangan. Matndagi sonlar va taymer asl retsept ({recipe.servings} kishilik) bo‘yicha — idish kattaligiga qarab vaqtni moslang.
+        </p>
       )}
 
       {step.timerSeconds ? (
