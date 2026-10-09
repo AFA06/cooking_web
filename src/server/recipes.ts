@@ -157,3 +157,59 @@ export async function getCreatorBySlug(slug: string): Promise<RecipeCreator | un
   const [row] = await db.select().from(schema.creators).where(eq(schema.creators.slug, slug)).limit(1);
   return row ? toCreator(row) : undefined;
 }
+
+export interface CreatorShowcase extends RecipeCreator {
+  recipeCount: number;
+  /** Cooking sessions finished on this creator's published recipes. */
+  cookedCount: number;
+  rating: { average: number; count: number };
+  /** Covers of the creator's leading published recipes, featured first. */
+  dishes: { url: string; alt: string }[];
+}
+
+/** Everything the creators index shows, in four queries regardless of how many creators exist. */
+export async function listCreatorShowcase(): Promise<CreatorShowcase[]> {
+  const published = eq(schema.recipes.status, "published");
+  const [creators, covers, cooked, ratings] = await Promise.all([
+    db.select().from(schema.creators),
+    db
+      .select({ creatorId: schema.recipes.creatorId, url: schema.recipes.coverUrl, alt: schema.recipes.coverAlt, title: schema.recipes.title })
+      .from(schema.recipes)
+      .where(published)
+      .orderBy(desc(schema.recipes.isFeatured), desc(schema.recipes.publishedAt)),
+    db
+      .select({ creatorId: schema.recipes.creatorId, n: count() })
+      .from(schema.cookingSessions)
+      .innerJoin(schema.recipes, eq(schema.cookingSessions.recipeId, schema.recipes.id))
+      .where(and(published, eq(schema.cookingSessions.status, "completed")))
+      .groupBy(schema.recipes.creatorId),
+    db
+      .select({ creatorId: schema.recipes.creatorId, n: count(), average: sql<number>`avg(${schema.reviews.rating})`.mapWith(Number) })
+      .from(schema.reviews)
+      .innerJoin(schema.recipes, eq(schema.reviews.recipeId, schema.recipes.id))
+      .where(published)
+      .groupBy(schema.recipes.creatorId),
+  ]);
+
+  const cookedBy = new Map(cooked.map((r) => [r.creatorId, r.n]));
+  const ratingBy = new Map(ratings.map((r) => [r.creatorId, { average: r.average, count: r.n }]));
+
+  return creators
+    .map((c) => {
+      const own = covers.filter((r) => r.creatorId === c.id);
+      return {
+        ...toCreator(c),
+        recipeCount: own.length,
+        cookedCount: cookedBy.get(c.id) ?? 0,
+        rating: ratingBy.get(c.id) ?? { average: 0, count: 0 },
+        dishes: own.slice(0, 2).map((r) => ({ url: r.url, alt: r.alt ?? r.title })),
+      };
+    })
+    .sort(
+      (a, b) =>
+        Number(b.isFoundingCreator) - Number(a.isFoundingCreator) ||
+        b.cookedCount - a.cookedCount ||
+        b.recipeCount - a.recipeCount ||
+        a.name.localeCompare(b.name),
+    );
+}
