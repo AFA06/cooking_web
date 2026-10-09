@@ -5,6 +5,8 @@ import { Container } from "@/components/ui/Container";
 import { Badge } from "@/components/ui/Badge";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { getCreatorBySlug, getRecipesByCreator } from "@/server/recipes";
+import { getCurrentUser } from "@/server/auth";
+import { getSavedRecipeIds } from "@/server/user-data";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -27,7 +29,9 @@ export default async function CreatorPage({ params }: Props) {
   const { slug } = await params;
   const creator = await getCreatorBySlug(slug);
   if (!creator) notFound();
-  const recipes = await getRecipesByCreator(creator.slug);
+  const user = await getCurrentUser();
+  const [recipes, savedList] = await Promise.all([getRecipesByCreator(creator.slug), user ? getSavedRecipeIds(user.id) : []]);
+  const savedIds = new Set(savedList);
 
   return (
     <Container size="lg" className="py-12 sm:py-16">
@@ -47,7 +51,7 @@ export default async function CreatorPage({ params }: Props) {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {recipes.map((r) => (
-            <RecipeCard key={r.id} recipe={r} />
+            <RecipeCard key={r.id} recipe={r} isLoggedIn={!!user} saved={savedIds.has(r.id)} />
           ))}
         </div>
       )}

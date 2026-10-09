@@ -1,17 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Fraunces } from "next/font/google";
+import { Literata, Onest } from "next/font/google";
+import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
-const inter = Inter({
+const onest = Onest({
   subsets: ["latin", "latin-ext", "cyrillic"],
-  variable: "--font-inter",
+  variable: "--font-onest",
   display: "swap",
 });
 
-const fraunces = Fraunces({
-  subsets: ["latin", "latin-ext"],
-  axes: ["opsz", "SOFT", "WONK"],
-  variable: "--font-fraunces",
+const literata = Literata({
+  subsets: ["latin", "latin-ext", "cyrillic"],
+  variable: "--font-literata",
   display: "swap",
 });
 
@@ -31,11 +31,11 @@ export const metadata: Metadata = {
     address: false,
     telephone: false,
   },
-  metadataBase: new URL("https://damda.uz"),
+  metadataBase: new URL(SITE_URL),
   openGraph: {
     type: "website",
     locale: "uz_UZ",
-    url: "https://damda.uz",
+    url: SITE_URL,
     siteName: "Damda",
     title: "Damda — sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
     description:
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { color: "#fbf7f0" },
+    { color: "#fdfbf7" },
   ],
   width: "device-width",
   initialScale: 1,
@@ -76,7 +76,7 @@ export default function RootLayout({
   return (
     <html
       lang="uz"
-      className={`${inter.variable} ${fraunces.variable} h-full antialiased`}
+      className={`${onest.variable} ${literata.variable} h-full antialiased`}
     >
       <head>
         <link rel="preconnect" href="https://images.unsplash.com" />

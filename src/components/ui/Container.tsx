@@ -9,7 +9,7 @@ const sizes = {
   sm: "max-w-3xl",
   md: "max-w-5xl",
   lg: "max-w-7xl",
-  xl: "max-w-[90rem]",
+  xl: "max-w-[84rem]",
   full: "max-w-full",
 };
 

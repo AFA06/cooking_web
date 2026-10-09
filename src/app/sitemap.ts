@@ -1,12 +1,13 @@
 import { MetadataRoute } from "next";
 import { PLATFORM_CONFIG } from "@/lib/constants";
+import { SITE_URL } from "@/lib/site-url";
 import { listCreators, listPublishedRecipes } from "@/server/recipes";
 
 export const dynamic = "force-dynamic";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const [RECIPES, CREATORS] = await Promise.all([listPublishedRecipes(), listCreators()]);
-  const baseUrl = "https://damda.uz";
+  const baseUrl = SITE_URL;
 
   return [
     {

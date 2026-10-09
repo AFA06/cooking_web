@@ -1,91 +1,74 @@
 "use client";
 
 import * as React from "react";
-import Link from "next/link";
-import { RecipesFilters } from "@/components/recipe/RecipesFilters";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
+import { RecipesFilters } from "@/components/recipe/RecipesFilters";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
-import { ALL, CUISINES, DIFFICULTIES, DIFFICULTY_BY_LABEL, PRICE_FILTERS } from "@/lib/filters";
+import { DIFFICULTIES, EMPTY_FILTERS, PRICE_FILTERS, TIME_FILTERS, filterRecipes, type RecipeFilters } from "@/lib/filters";
 import type { Recipe } from "@/types/recipe";
 
-export function RecipesBrowser({ recipes }: { recipes: Recipe[] }) {
-  const [query, setQuery] = React.useState("");
-  const [cuisine, setCuisine] = React.useState<string>(ALL);
-  const [difficulty, setDifficulty] = React.useState<string>(ALL);
-  const [price, setPrice] = React.useState<string>(ALL);
+interface Props {
+  recipes: Recipe[];
+  initialFilters: RecipeFilters;
+  isLoggedIn: boolean;
+  savedIds: string[];
+}
 
-  const hasActiveFilters = query !== "" || cuisine !== ALL || difficulty !== ALL || price !== ALL;
-  const clear = () => {
-    setQuery("");
-    setCuisine(ALL);
-    setDifficulty(ALL);
-    setPrice(ALL);
-  };
+export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }: Props) {
+  const [filters, setFilters] = React.useState<RecipeFilters>(initialFilters);
+  const set = (patch: Partial<RecipeFilters>) => setFilters((f) => ({ ...f, ...patch }));
+  const clear = () => setFilters(EMPTY_FILTERS);
 
-  const filtered = React.useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return recipes.filter((r) => {
-      if (q && !(
-        r.title.toLowerCase().includes(q) ||
-        r.description.toLowerCase().includes(q) ||
-        r.creator.name.toLowerCase().includes(q) ||
-        r.tags.some((t) => t.toLowerCase().includes(q)) ||
-        r.ingredients.some((i) => i.name.toLowerCase().includes(q))
-      )) return false;
-      if (cuisine !== ALL && !r.tags.includes(cuisine)) return false;
-      if (difficulty !== ALL && r.difficulty !== DIFFICULTY_BY_LABEL[difficulty]) return false;
-      if (price === "Bepul" && r.isPremium) return false;
-      if (price === "Premium" && !r.isPremium) return false;
-      return true;
-    });
-  }, [recipes, query, cuisine, difficulty, price]);
+  const saved = React.useMemo(() => new Set(savedIds), [savedIds]);
+  const filtered = React.useMemo(() => filterRecipes(recipes, filters), [recipes, filters]);
+  const hasActiveFilters = JSON.stringify(filters) !== JSON.stringify(EMPTY_FILTERS);
 
   return (
-    <>
-      <section className="border-b border-amber-200 py-10 sm:py-14">
-        <Container size="xl">
-          <h1 className="text-4xl font-medium text-amber-950 sm:text-6xl">Retseptlar</h1>
-          <p className="mt-3 max-w-2xl text-lg text-amber-900">Kundalik taomlardan bayram dasturxonigacha — ishonchli ijodkorlardan.</p>
-          <div className="mt-8">
-            <RecipesFilters
-              searchQuery={query} onSearchChange={setQuery}
-              cuisines={CUISINES} selectedCuisine={cuisine} onCuisineChange={setCuisine}
-              difficulties={DIFFICULTIES} selectedDifficulty={difficulty} onDifficultyChange={setDifficulty}
-              prices={PRICE_FILTERS} selectedPrice={price} onPriceChange={setPrice}
-              onClearFilters={clear} hasActiveFilters={hasActiveFilters}
+    <Container size="xl" className="py-10 sm:py-14">
+      <h1 className="text-[2.75rem] font-medium leading-[1.05] text-amber-950 sm:text-6xl">Retseptlar</h1>
+      <p className="mt-3 max-w-2xl text-lg text-amber-900">Kundalik taomlardan bayram dasturxonigacha — ishonchli ijodkorlardan.</p>
+
+      <div className="mt-8 border-b border-amber-200 pb-8">
+        <RecipesFilters
+          query={filters.query}
+          onQueryChange={(query) => set({ query })}
+          onClear={clear}
+          hasActiveFilters={hasActiveFilters}
+          groups={[
+            { label: "Vaqt", options: TIME_FILTERS.map((t) => t.label), selected: filters.time, onChange: (time) => set({ time }) },
+            { label: "Murakkablik", options: DIFFICULTIES, selected: filters.difficulty, onChange: (difficulty) => set({ difficulty }) },
+            { label: "Narx", options: PRICE_FILTERS, selected: filters.price, onChange: (price) => set({ price }) },
+          ]}
+        />
+      </div>
+
+      <p className="mt-8 text-sm text-amber-600" aria-live="polite">
+        {hasActiveFilters ? `${filtered.length} ta retsept topildi` : `${recipes.length} ta retsept`}
+      </p>
+
+      {recipes.length === 0 ? (
+        <p className="py-20 text-center text-amber-900">Hozircha retseptlar yo‘q. Tez orada qo‘shiladi.</p>
+      ) : filtered.length === 0 ? (
+        <div className="py-20 text-center">
+          <h2 className="text-3xl font-medium text-amber-950">Hech narsa topilmadi</h2>
+          <p className="mt-2 text-amber-900">Qidiruv so‘zini yoki filtrlarni o‘zgartirib ko‘ring.</p>
+          <Button className="mt-6" variant="outline" onClick={clear}>Filtrlarni tozalash</Button>
+        </div>
+      ) : (
+        <div className="mt-6 grid grid-cols-1 gap-x-7 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+          {filtered.map((recipe, i) => (
+            <RecipeCard
+              key={recipe.id}
+              recipe={recipe}
+              isLoggedIn={isLoggedIn}
+              saved={saved.has(recipe.id)}
+              priority={i < 4}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
             />
-          </div>
-        </Container>
-      </section>
-
-      <section className="py-10 sm:py-14">
-        <Container size="xl">
-          <p className="mb-8 text-sm text-amber-600" aria-live="polite">
-            {recipes.length} ta retseptdan {filtered.length} tasi ko‘rsatilmoqda
-          </p>
-          {recipes.length === 0 ? (
-            <p className="py-16 text-center text-amber-900">Hozircha retseptlar yo‘q. Tez orada qo‘shiladi.</p>
-          ) : filtered.length === 0 ? (
-            <div className="py-16 text-center">
-              <h2 className="text-2xl font-medium text-amber-950">Hech narsa topilmadi</h2>
-              <p className="mt-2 text-amber-900">Qidiruv yoki filtrlarni o‘zgartirib ko‘ring.</p>
-              <Button className="mt-6" variant="outline" onClick={clear}>Filtrlarni tozalash</Button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-x-8 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((r) => <RecipeCard key={r.id} recipe={r} />)}
-            </div>
-          )}
-        </Container>
-      </section>
-
-      <section className="border-t border-amber-200 bg-amber-100/60 py-14">
-        <Container size="xl" className="flex flex-col items-start justify-between gap-6 sm:flex-row sm:items-center">
-          <h2 className="max-w-xl text-2xl font-medium text-amber-950 sm:text-3xl">O‘z retseptlaringiz bormi? Ularni Damda’da nashr eting.</h2>
-          <Button size="lg" asChild><Link href="/creators/join">Ijodkor bo‘lish</Link></Button>
-        </Container>
-      </section>
-    </>
+          ))}
+        </div>
+      )}
+    </Container>
   );
 }

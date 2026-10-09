@@ -26,6 +26,7 @@ export type SupportedLocale = (typeof PLATFORM_CONFIG.supportedLocales)[number];
 
 export const NAVIGATION_LINKS = {
   public: [
+    { label: "Bosh sahifa", href: "/" },
     { label: "Retseptlar", href: PLATFORM_CONFIG.urls.recipes },
     { label: "Ijodkorlar", href: PLATFORM_CONFIG.urls.creators },
     { label: "Ijodkor bo‘lish", href: PLATFORM_CONFIG.urls.becomeCreator },

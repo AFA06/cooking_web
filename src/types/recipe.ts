@@ -56,6 +56,8 @@ export interface Recipe {
   media: RecipeMedia[];
   tags: string[];
   publishedAt: string;
+  /** Completed guided-cooking sessions. */
+  cookedCount: number;
 }
 
 export interface RecipeCardProps {

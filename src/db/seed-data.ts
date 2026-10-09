@@ -115,6 +115,7 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.plov, "Lagan idishda o‘zbek oshi")],
     tags: ["O‘zbek", "Guruch", "Qo‘y go‘shti", "An’anaviy"],
     publishedAt: PUBLISHED,
+    cookedCount: 0,
   },
   {
     id: "2",
@@ -150,6 +151,7 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.lagman, "Go‘sht va sabzavotli lag‘mon")],
     tags: ["O‘zbek", "Lag‘mon", "Mol go‘shti", "Sho‘rva"],
     publishedAt: PUBLISHED,
+    cookedCount: 0,
   },
   {
     id: "3",
@@ -183,6 +185,7 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.dumplings, "Yog‘och likopchada manti")],
     tags: ["O‘zbek", "Manti", "Qo‘y go‘shti"],
     publishedAt: PUBLISHED,
+    cookedCount: 0,
   },
   {
     id: "4",
@@ -213,6 +216,7 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.platter, "Tilla rang pishgan somsalar")],
     tags: ["O‘zbek", "Xamir taom", "Qo‘y go‘shti"],
     publishedAt: PUBLISHED,
+    cookedCount: 0,
   },
   {
     id: "5",
@@ -245,6 +249,7 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.pasta, "Go‘sht va sabzavotli lag‘mon")],
     tags: ["Xorazm", "Lag‘mon", "Mol go‘shti"],
     publishedAt: PUBLISHED,
+    cookedCount: 0,
   },
   {
     id: "6",
@@ -273,5 +278,6 @@ export const RECIPES: Recipe[] = [
     media: [cover(PHOTOS.veg, "To‘g‘ralgan yangi pomidor va sabzavotlar")],
     tags: ["O‘zbek", "Salat", "Go‘shtsiz"],
     publishedAt: PUBLISHED,
+    cookedCount: 0,
   },
 ];

@@ -1,33 +1,49 @@
 @import "tailwindcss";
 
 /*
- * Design tokens. The "amber" scale is the product's warm neutral/terracotta palette:
- * 50 paper · 100 sand · 200 line · 600 muted text · 700 primary (terracotta) · 950 ink.
+ * Design tokens — "grandmother's kitchen, redesigned".
+ * amber: warm paper neutrals (50 paper … 950 charcoal ink); 700 is the clay primary.
+ * sage:  the quiet secondary for calm surfaces and "free / good" states.
+ * clay:  decorative terracotta; use amber-700 where text or buttons need contrast.
  */
 @theme inline {
-  --font-sans: var(--font-inter);
-  --font-serif: var(--font-fraunces);
+  --font-sans: var(--font-onest);
+  --font-serif: var(--font-literata);
 
-  --color-amber-50: #fbf7f0;
-  --color-amber-100: #f3eadc;
-  --color-amber-200: #e6d8c3;
-  --color-amber-300: #d3bd9d;
-  --color-amber-400: #b89a76;
-  --color-amber-500: #8f7860;
-  --color-amber-600: #6f5a48;
-  --color-amber-700: #9a3412;
-  --color-amber-800: #5b3a27;
-  --color-amber-900: #3b2415;
-  --color-amber-950: #261710;
+  --color-amber-50: #fdfbf7;
+  --color-amber-100: #f6f0e6;
+  --color-amber-200: #ebe2d3;
+  --color-amber-300: #d9ccb7;
+  --color-amber-400: #b5a690;
+  --color-amber-500: #8d8070;
+  --color-amber-600: #6b6157;
+  --color-amber-700: #ad5236;
+  --color-amber-800: #8e4129;
+  --color-amber-900: #47403a;
+  --color-amber-950: #2c2825;
 
-  --color-emerald-100: #dcf3e8;
-  --color-emerald-700: #0b6b4a;
-  --color-emerald-800: #085339;
-  --color-rose-100: #fde4e1;
-  --color-rose-800: #9f1239;
-  --color-red-600: #dc2626;
-  --color-red-700: #b91c1c;
-  --color-red-800: #991b1b;
+  --color-sage-50: #f2f4ef;
+  --color-sage-100: #e2e7dd;
+  --color-sage-200: #c9d2c2;
+  --color-sage-500: #6b7a63;
+  --color-sage-600: #566350;
+  --color-sage-700: #434d3e;
+  --color-sage-900: #2a3027;
+
+  --color-clay-100: #f7e4dc;
+  --color-clay-400: #c86d51;
+
+  --color-emerald-100: #e2e7dd;
+  --color-emerald-700: #566350;
+  --color-emerald-800: #434d3e;
+  --color-rose-100: #f7e4dc;
+  --color-rose-800: #8e4129;
+  --color-red-600: #c0392b;
+  --color-red-700: #a12d21;
+  --color-red-800: #84241a;
+
+  --radius-photo: 1.25rem;
+  --shadow-soft: 0 1px 2px rgb(44 40 37 / 0.04), 0 12px 32px -12px rgb(44 40 37 / 0.18);
 }
 
 :root {
@@ -63,16 +79,8 @@ h1,
 h2,
 h3 {
   font-family: var(--font-serif), Georgia, serif;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.015em;
   text-wrap: balance;
-}
-
-/* Fraunces switches to its "wonky" alternates at display sizes; keep the upright forms. */
-.font-serif,
-h1,
-h2,
-h3 {
-  font-variation-settings: "WONK" 0, "SOFT" 0;
 }
 
 p {
@@ -80,7 +88,7 @@ p {
 }
 
 ::selection {
-  background-color: var(--color-amber-200);
+  background-color: var(--color-clay-100);
 }
 
 :focus-visible {
@@ -98,4 +106,12 @@ select {
 
 button:disabled {
   cursor: not-allowed;
+}
+
+/* Horizontal rails scroll without a visible scrollbar. */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }

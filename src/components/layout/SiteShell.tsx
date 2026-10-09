@@ -1,14 +1,14 @@
-import { Navigation } from "@/components/landing/Navigation";
-import { Footer } from "@/components/landing/Footer";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { SiteHeader } from "@/components/layout/SiteHeader";
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Navigation />
-      <main id="main-content" className="flex-1 pt-16">
+      <SiteHeader />
+      <main id="main-content" className="flex-1">
         {children}
       </main>
-      <Footer />
+      <SiteFooter />
     </>
   );
 }

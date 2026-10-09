@@ -1,5 +1,5 @@
 import "server-only";
-import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import type { Recipe, RecipeCreator } from "@/types/recipe";
 
@@ -22,6 +22,7 @@ function toRecipe(
   creator: CreatorRow,
   ingredients: (typeof schema.recipeIngredients.$inferSelect)[],
   steps: (typeof schema.recipeSteps.$inferSelect)[],
+  cookedCount: number,
 ): Recipe {
   const ingredientByPosition = new Map(ingredients.map((i) => [i.position, i.id]));
   const cover = { id: `${r.id}-cover`, type: "image" as const, url: r.coverUrl, alt: r.coverAlt ?? r.title, order: 1 };
@@ -61,22 +62,30 @@ function toRecipe(
     media: [cover],
     tags: r.tags,
     publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
+    cookedCount,
   };
 }
 
 async function hydrate(rows: { recipe: RecipeRow; creator: CreatorRow }[]): Promise<Recipe[]> {
   if (rows.length === 0) return [];
   const ids = rows.map((r) => r.recipe.id);
-  const [ingredients, steps] = await Promise.all([
+  const [ingredients, steps, cooked] = await Promise.all([
     db.select().from(schema.recipeIngredients).where(inArray(schema.recipeIngredients.recipeId, ids)),
     db.select().from(schema.recipeSteps).where(inArray(schema.recipeSteps.recipeId, ids)),
+    db
+      .select({ recipeId: schema.cookingSessions.recipeId, n: count() })
+      .from(schema.cookingSessions)
+      .where(and(inArray(schema.cookingSessions.recipeId, ids), eq(schema.cookingSessions.status, "completed")))
+      .groupBy(schema.cookingSessions.recipeId),
   ]);
+  const cookedByRecipe = new Map(cooked.map((c) => [c.recipeId, c.n]));
   return rows.map(({ recipe, creator }) =>
     toRecipe(
       recipe,
       creator,
       ingredients.filter((i) => i.recipeId === recipe.id),
       steps.filter((s) => s.recipeId === recipe.id),
+      cookedByRecipe.get(recipe.id) ?? 0,
     ),
   );
 }

@@ -1,5 +1,5 @@
 import "server-only";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gt } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { getRecipesByIds } from "@/server/recipes";
 import type { Recipe } from "@/types/recipe";
@@ -48,4 +48,29 @@ export async function getCookingHistory(userId: string, limit = 20): Promise<His
     .where(eq(schema.cookingSessions.userId, userId))
     .orderBy(desc(schema.cookingSessions.startedAt))
     .limit(limit);
+}
+
+export async function getSavedRecipeIds(userId: string): Promise<string[]> {
+  const rows = await db.select({ id: schema.savedRecipes.recipeId }).from(schema.savedRecipes).where(eq(schema.savedRecipes.userId, userId));
+  return rows.map((r) => r.id);
+}
+
+/** The most recent unfinished cooking session from the last 12 hours, if any. */
+export async function getActiveCooking(userId: string): Promise<{ slug: string; title: string; coverUrl: string } | null> {
+  const since = new Date(Date.now() - 12 * 60 * 60 * 1000);
+  const [row] = await db
+    .select({ slug: schema.recipes.slug, title: schema.recipes.title, coverUrl: schema.recipes.coverUrl })
+    .from(schema.cookingSessions)
+    .innerJoin(schema.recipes, eq(schema.cookingSessions.recipeId, schema.recipes.id))
+    .where(
+      and(
+        eq(schema.cookingSessions.userId, userId),
+        eq(schema.cookingSessions.status, "in_progress"),
+        gt(schema.cookingSessions.startedAt, since),
+        eq(schema.recipes.status, "published"),
+      ),
+    )
+    .orderBy(desc(schema.cookingSessions.startedAt))
+    .limit(1);
+  return row ?? null;
 }

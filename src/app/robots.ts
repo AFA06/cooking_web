@@ -1,12 +1,13 @@
-import { MetadataRoute } from "next";
+import type { MetadataRoute } from "next";
+import { SITE_URL } from "@/lib/site-url";
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/auth/", "/creator/", "/admin/", "/api/"],
+      disallow: ["/auth/", "/account", "/dashboard", "/admin"],
     },
-    sitemap: "https://damda.uz/sitemap.xml",
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }
