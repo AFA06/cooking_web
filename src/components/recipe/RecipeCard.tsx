@@ -23,7 +23,7 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
   const { creator } = recipe;
 
   return (
-    <article className="group relative">
+    <article className="group relative flex h-full flex-col">
       <div className={cn("relative overflow-hidden rounded-[1.25rem] bg-amber-100", shape === "portrait" ? "aspect-[4/5]" : "aspect-[4/3]")}>
         <Image
           src={recipe.coverMedia.url}
@@ -35,11 +35,17 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
         />
         <span
           className={cn(
-            "absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm",
+            "absolute left-3 top-3 flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.8rem] font-semibold tracking-wide shadow-sm backdrop-blur-sm",
             recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-white",
           )}
         >
           {recipe.isPremium ? "Premium" : "Bepul"}
+          {price && (
+            <>
+              <span className="h-3 w-px bg-amber-50/40" aria-hidden="true" />
+              <span className="text-clay-100">{price}</span>
+            </>
+          )}
         </span>
         {recipe.cookedCount > 0 && (
           <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-amber-50/95 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm">
@@ -50,31 +56,26 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
         <BookmarkButton recipeId={recipe.id} slug={recipe.slug} initialSaved={saved} isLoggedIn={isLoggedIn} className="absolute right-3 top-3 z-10" />
       </div>
 
-      <div className="mt-5">
-        <h3 className="line-clamp-2 min-h-[2.5em] text-2xl font-medium leading-tight text-amber-950 break-words">
+      <div className="mt-5 flex flex-1 flex-col">
+        <h3 className="line-clamp-2 text-2xl font-medium leading-tight text-amber-950 break-words">
           <Link href={`/recipes/${recipe.slug}`} className="after:absolute after:inset-0 after:rounded-[1.25rem] group-hover:text-amber-700">
             {recipe.title}
           </Link>
         </h3>
 
-        <div className="mt-3 flex items-center justify-between gap-4">
-          <p className="flex min-w-0 items-center gap-2.5 text-[0.95rem] text-amber-900">
-            {creator.avatarUrl ? (
-              <Image src={creator.avatarUrl} alt="" width={28} height={28} className="h-7 w-7 shrink-0 rounded-full object-cover" />
-            ) : (
-              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sage-100 font-serif text-sm text-sage-700" aria-hidden="true">
-                {creator.name.slice(0, 1).toUpperCase()}
-              </span>
-            )}
-            <span className="truncate">{creator.name}</span>
-          </p>
-          <p className={cn("shrink-0 font-serif text-[1.35rem] font-semibold leading-none", recipe.isPremium ? "text-amber-700" : "text-sage-600")}>
-            <span className="sr-only">Narxi: </span>
-            {recipe.isPremium ? (price ?? "Premium") : "Bepul"}
-          </p>
-        </div>
+        <p className="mt-3 flex items-center gap-2.5 text-[0.95rem] text-amber-900">
+          {creator.avatarUrl ? (
+            <Image src={creator.avatarUrl} alt="" width={28} height={28} className="h-7 w-7 shrink-0 rounded-full object-cover" />
+          ) : (
+            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sage-100 font-serif text-sm text-sage-700" aria-hidden="true">
+              {creator.name.slice(0, 1).toUpperCase()}
+            </span>
+          )}
+          <span className="truncate">{creator.name}</span>
+        </p>
+        <div className="h-4 shrink-0" aria-hidden="true" />
 
-        <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-amber-200 pt-4 text-[0.95rem] font-medium text-amber-950">
+        <dl className="mt-auto flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-amber-200 pt-4 text-[0.95rem] font-medium text-amber-950">
           <div className="flex items-center gap-2">
             <dt className="sr-only">Umumiy vaqt</dt>
             <span className="flex h-8 w-8 items-center justify-center rounded-full bg-clay-100 text-amber-700" aria-hidden="true">
