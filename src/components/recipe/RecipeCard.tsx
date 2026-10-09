@@ -39,7 +39,7 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
             recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-white",
           )}
         >
-          {recipe.isPremium ? (price ? `Premium · ${price}` : "Premium") : "Bepul"}
+          {recipe.isPremium ? "Premium" : "Bepul"}
         </span>
         <BookmarkButton recipeId={recipe.id} slug={recipe.slug} initialSaved={saved} isLoggedIn={isLoggedIn} className="absolute right-3 top-3 z-10" />
       </div>
@@ -51,33 +51,45 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
           </Link>
         </h3>
 
-        <p className="mt-3 flex items-center gap-2.5 text-[0.95rem] text-amber-900">
-          {creator.avatarUrl ? (
-            <Image src={creator.avatarUrl} alt="" width={28} height={28} className="h-7 w-7 shrink-0 rounded-full object-cover" />
-          ) : (
-            <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sage-100 font-serif text-sm text-sage-700" aria-hidden="true">
-              {creator.name.slice(0, 1).toUpperCase()}
-            </span>
-          )}
-          <span className="truncate">{creator.name}</span>
-        </p>
+        <div className="mt-3 flex items-center justify-between gap-4">
+          <p className="flex min-w-0 items-center gap-2.5 text-[0.95rem] text-amber-900">
+            {creator.avatarUrl ? (
+              <Image src={creator.avatarUrl} alt="" width={28} height={28} className="h-7 w-7 shrink-0 rounded-full object-cover" />
+            ) : (
+              <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sage-100 font-serif text-sm text-sage-700" aria-hidden="true">
+                {creator.name.slice(0, 1).toUpperCase()}
+              </span>
+            )}
+            <span className="truncate">{creator.name}</span>
+          </p>
+          <p className={cn("shrink-0 font-serif text-[1.35rem] font-semibold leading-none", recipe.isPremium ? "text-amber-700" : "text-sage-600")}>
+            <span className="sr-only">Narxi: </span>
+            {recipe.isPremium ? (price ?? "Premium") : "Bepul"}
+          </p>
+        </div>
 
-        <dl className="mt-3.5 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-amber-200 pt-3.5 text-sm text-amber-600">
-          <div className="flex items-center gap-1.5">
+        <dl className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-amber-200 pt-4 text-[0.95rem] font-medium text-amber-950">
+          <div className="flex items-center gap-2">
             <dt className="sr-only">Umumiy vaqt</dt>
-            <Clock className="h-4 w-4 text-amber-500" strokeWidth={1.75} aria-hidden="true" />
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-clay-100 text-amber-700" aria-hidden="true">
+              <Clock className="h-4 w-4" strokeWidth={2} />
+            </span>
             <dd>{formatMinutes(total)}</dd>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <dt className="sr-only">Murakkablik</dt>
-            <ChefHat className="h-4 w-4 text-amber-500" strokeWidth={1.75} aria-hidden="true" />
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sage-100 text-sage-700" aria-hidden="true">
+              <ChefHat className="h-4 w-4" strokeWidth={2} />
+            </span>
             <dd>{DIFFICULTY_LABEL[recipe.difficulty]}</dd>
           </div>
           {recipe.cookedCount > 0 && (
-            <div className="flex items-center gap-1.5 text-sage-600">
+            <div className="flex items-center gap-2">
               <dt className="sr-only">Pishirilgan</dt>
-              <Flame className="h-4 w-4" strokeWidth={1.75} aria-hidden="true" />
-              <dd>{formatNumber(recipe.cookedCount)} marta pishirilgan</dd>
+              <span className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 text-amber-900" aria-hidden="true">
+                <Flame className="h-4 w-4" strokeWidth={2} />
+              </span>
+              <dd>{formatNumber(recipe.cookedCount)}× pishirilgan</dd>
             </div>
           )}
         </dl>
