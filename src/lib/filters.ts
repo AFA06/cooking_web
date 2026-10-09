@@ -48,3 +48,20 @@ export function filterRecipes(recipes: Recipe[], f: RecipeFilters): Recipe[] {
     return true;
   });
 }
+
+export const SORTS = [
+  { key: "newest", label: "Yangilari" },
+  { key: "quickest", label: "Eng tez tayyor bo‘ladigan" },
+  { key: "mostCooked", label: "Ko‘p pishirilgan" },
+] as const;
+
+export type SortKey = (typeof SORTS)[number]["key"];
+
+export function sortRecipes(recipes: Recipe[], sort: SortKey): Recipe[] {
+  const total = (r: Recipe) => r.prepTimeMinutes + r.cookTimeMinutes;
+  const sorted = [...recipes];
+  if (sort === "quickest") sorted.sort((a, b) => total(a) - total(b));
+  else if (sort === "mostCooked") sorted.sort((a, b) => b.cookedCount - a.cookedCount);
+  else sorted.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
+  return sorted;
+}

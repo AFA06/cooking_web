@@ -18,6 +18,7 @@ interface Props {
 
 export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = "portrait", sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw", priority }: Props) {
   const total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
+  const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency) : null;
 
   return (
     <article className="group relative">
@@ -30,11 +31,14 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
           priority={priority}
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
         />
-        {recipe.isPremium && (
-          <span className="absolute left-3 top-3 rounded-full bg-amber-950/85 px-3 py-1 text-xs font-medium tracking-wide text-amber-50 backdrop-blur-sm">
-            Premium
-          </span>
-        )}
+        <span
+          className={cn(
+            "absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-semibold tracking-wide backdrop-blur-sm",
+            recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-white",
+          )}
+        >
+          {recipe.isPremium ? (price ? `Premium · ${price}` : "Premium") : "Bepul"}
+        </span>
         <BookmarkButton recipeId={recipe.id} slug={recipe.slug} initialSaved={saved} isLoggedIn={isLoggedIn} className="absolute right-3 top-3 z-10" />
       </div>
 
@@ -47,15 +51,10 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
         <p className="mt-1.5 text-sm text-amber-600">
           {recipe.creator.name} · {formatMinutes(total)} · {DIFFICULTY_LABEL[recipe.difficulty]}
         </p>
-        {(recipe.isPremium || recipe.cookedCount > 0) && (
-          <p className="mt-1 text-sm">
-            {recipe.isPremium && recipe.price !== undefined && (
-              <span className="font-semibold text-amber-950">{formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency)}</span>
-            )}
-            {recipe.isPremium && recipe.cookedCount > 0 && <span className="text-amber-400"> · </span>}
-            {recipe.cookedCount > 0 && <span className="text-sage-600">{formatNumber(recipe.cookedCount)} marta pishirilgan</span>}
-          </p>
-        )}
+        <p className="mt-1 text-sm text-amber-600">
+          {recipe.isPremium ? "Masalliqlar va dastlabki qadamlar bepul" : "To‘liq ochiq · qadam-baqadam rejim bilan"}
+          {recipe.cookedCount > 0 && <span className="text-sage-600"> · {formatNumber(recipe.cookedCount)} marta pishirilgan</span>}
+        </p>
       </div>
     </article>
   );
