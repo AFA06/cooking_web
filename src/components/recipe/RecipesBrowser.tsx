@@ -173,7 +173,7 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
           </div>
         ) : (
           <>
-            <div className={cn(RECIPE_GRID_CLASSES, "mt-6 gap-x-6 gap-y-12 xl:gap-x-8")}>
+            <div className={cn(RECIPE_GRID_CLASSES, "mt-6 gap-x-6 gap-y-14 xl:gap-x-8")}>
               {visible.map((recipe, i) => (
                 <div key={recipe.id} className="rise" style={{ animationDelay: `${(i % pageSize) * 40}ms` }}>
                   <RecipeCard
@@ -181,7 +181,7 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
                     isLoggedIn={isLoggedIn}
                     saved={saved.has(recipe.id)}
                     priority={i < columns}
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, (max-width: 1536px) 25vw, 20vw"
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
                   />
                 </div>
               ))}
