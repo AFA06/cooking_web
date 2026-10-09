@@ -4,12 +4,12 @@ import * as React from "react";
 import { Button } from "@/components/ui/Button";
 import { becomeCreator, type ActionResult } from "@/app/dashboard/actions";
 
-const field = "mt-1 w-full min-h-12 px-3 py-2 border border-amber-300 bg-white text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-600";
+const field = "mt-1.5 w-full min-h-12 rounded-xl border border-amber-300 bg-white px-4 py-2.5 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
 
 export function CreatorProfileForm({ defaultName }: { defaultName: string }) {
   const [state, action, pending] = React.useActionState<ActionResult, FormData>(becomeCreator, {});
   return (
-    <form action={action} className="mt-8 space-y-5 max-w-md">
+    <form action={action} className="space-y-5">
       <div>
         <label htmlFor="name" className="text-sm font-medium text-amber-950">Ko‘rinadigan ism</label>
         <input id="name" name="name" required defaultValue={defaultName} maxLength={80} className={field} />
