@@ -2,6 +2,7 @@ import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { UserMenu } from "@/components/layout/UserMenu";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { getCurrentUser } from "@/server/auth";
 import { logout } from "@/app/auth/actions";
@@ -19,6 +20,7 @@ export async function SiteHeader() {
           ...(isCreator ? [{ label: "Retsept yaratish", href: "/dashboard/recipes/new" }, { label: "Ijodkor paneli", href: "/dashboard" }] : []),
           ...(isAdmin ? [{ label: "Admin paneli", href: "/admin" }] : []),
           { label: "Mening oshxonam", href: PLATFORM_CONFIG.urls.account },
+          { label: "Profil sozlamalari", href: "/account/settings" },
         ]
       : [{ label: "Ro‘yxatdan o‘tish", href: PLATFORM_CONFIG.urls.signup }]),
   ];
@@ -45,27 +47,12 @@ export async function SiteHeader() {
           <div className="ml-auto flex items-center gap-2">
             {user ? (
               <>
-                {isAdmin && (
-                  <Link href="/admin" className="hidden px-2 text-sm text-amber-600 hover:text-amber-950 lg:block">Admin</Link>
-                )}
                 {isCreator && (
                   <Button size="sm" asChild className="hidden sm:inline-flex">
                     <Link href="/dashboard/recipes/new"><Plus className="h-4 w-4" aria-hidden="true" />Retsept yaratish</Link>
                   </Button>
                 )}
-                <Link
-                  href={PLATFORM_CONFIG.urls.account}
-                  className="flex h-10 items-center gap-2 rounded-full pl-1 pr-3 text-sm font-medium text-amber-950 hover:bg-amber-100"
-                  aria-label="Mening oshxonam"
-                >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sage-500 font-serif text-sm font-semibold text-amber-50" aria-hidden="true">
-                    {user.name.slice(0, 1).toUpperCase()}
-                  </span>
-                  <span className="hidden max-w-28 truncate sm:block">{user.name.split(" ")[0]}</span>
-                </Link>
-                <form action={logout} className="hidden md:block">
-                  <button type="submit" className="h-10 px-2 text-sm text-amber-600 hover:text-amber-950">Chiqish</button>
-                </form>
+                <UserMenu name={user.name} email={user.email} isCreator={isCreator} isAdmin={isAdmin} />
               </>
             ) : (
               <>

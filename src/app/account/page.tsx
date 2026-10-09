@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Settings } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
@@ -8,7 +9,6 @@ import { SiteShell } from "@/components/layout/SiteShell";
 import { getCurrentUser } from "@/server/auth";
 import { getCookingHistory, getSavedRecipes } from "@/server/user-data";
 import { formatDate } from "@/lib/format";
-import { logout } from "@/app/auth/actions";
 
 export const metadata: Metadata = { title: "Mening oshxonam", robots: { index: false } };
 export const dynamic = "force-dynamic";
@@ -26,9 +26,9 @@ export default async function AccountPage() {
             <h1 className="text-3xl sm:text-5xl font-serif font-medium text-amber-950 break-words">{user.name}</h1>
             <p className="mt-2 text-amber-600">{user.email}</p>
           </div>
-          <form action={logout}>
-            <Button type="submit" variant="outline">Chiqish</Button>
-          </form>
+          <Button variant="outline" asChild>
+            <Link href="/account/settings"><Settings className="h-4 w-4" aria-hidden="true" />Profilni tahrirlash</Link>
+          </Button>
         </header>
 
         <section className="mt-12" aria-labelledby="saved-heading">

@@ -26,12 +26,16 @@ export const users = pgTable(
     id: uuid("id").primaryKey().defaultRandom(),
     email: text("email").notNull(),
     name: text("name").notNull(),
+    /** Optional public handle: lowercase letters, digits and underscores. */
+    username: text("username"),
+    /** Optional, stored in international form (+998…). */
+    phone: text("phone"),
     passwordHash: text("password_hash").notNull(),
     role: roleEnum("role").notNull().default("user"),
     locale: text("locale").notNull().default("uz"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("users_email_idx").on(t.email)],
+  (t) => [uniqueIndex("users_email_idx").on(t.email), uniqueIndex("users_username_idx").on(t.username)],
 );
 
 export const sessions = pgTable(

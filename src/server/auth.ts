@@ -2,7 +2,7 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { and, eq, gt } from "drizzle-orm";
+import { and, eq, gt, ne } from "drizzle-orm";
 import { db, schema } from "@/db";
 
 const COOKIE = "session";
@@ -48,3 +48,12 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     .limit(1);
   return row ?? null;
 });
+
+/** Signs the person out everywhere except the browser they are using now. */
+export async function destroyOtherSessions(userId: string) {
+  const token = (await cookies()).get(COOKIE)?.value;
+  const condition = token
+    ? and(eq(schema.sessions.userId, userId), ne(schema.sessions.tokenHash, hashToken(token)))
+    : eq(schema.sessions.userId, userId);
+  await db.delete(schema.sessions).where(condition);
+}
