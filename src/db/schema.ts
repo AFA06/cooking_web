@@ -69,6 +69,8 @@ export const recipes = pgTable(
     description: text("description").notNull(),
     coverUrl: text("cover_url").notNull(),
     coverAlt: text("cover_alt"),
+    /** Extra photos shown after the cover in the recipe gallery. */
+    galleryUrls: text("gallery_urls").array().notNull().default([]),
     servings: integer("servings").notNull(),
     prepTimeMinutes: integer("prep_time_minutes").notNull(),
     cookTimeMinutes: integer("cook_time_minutes").notNull(),

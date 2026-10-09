@@ -21,6 +21,8 @@ export interface EditorInitial {
   title: string;
   description: string;
   coverUrl: string;
+  /** One link per line. */
+  galleryUrls: string;
   servings: string;
   prepTimeMinutes: string;
   cookTimeMinutes: string;
@@ -38,6 +40,7 @@ export const EMPTY_RECIPE: EditorInitial = {
   title: "",
   description: "",
   coverUrl: "",
+  galleryUrls: "",
   servings: "4",
   prepTimeMinutes: "15",
   cookTimeMinutes: "30",
@@ -59,6 +62,7 @@ function toInput(v: EditorInitial): RecipeInput {
     title: v.title,
     description: v.description,
     coverUrl: v.coverUrl,
+    galleryUrls: v.galleryUrls.split("\n").map((line) => line.trim()).filter(Boolean),
     servings: Number(v.servings),
     prepTimeMinutes: Number(v.prepTimeMinutes),
     cookTimeMinutes: Number(v.cookTimeMinutes),
@@ -148,6 +152,11 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
           <label htmlFor="cover" className={label}>Muqova rasmi havolasi</label>
           <input id="cover" type="url" inputMode="url" placeholder="https://…" className={field} value={v.coverUrl} onChange={(e) => set("coverUrl", e.target.value)} />
           <p className="mt-1 text-xs text-amber-700">Rasm yuklash hozircha mavjud emas. O‘zingizga tegishli yoki foydalanish huquqingiz bor rasm havolasini kiriting.</p>
+        </div>
+        <div>
+          <label htmlFor="gallery" className={label}>Qo‘shimcha rasmlar (ixtiyoriy)</label>
+          <textarea id="gallery" rows={3} placeholder={"https://…\nhttps://…"} className={field} value={v.galleryUrls} onChange={(e) => set("galleryUrls", e.target.value)} />
+          <p className="mt-1 text-xs text-amber-700">Har bir qatorga bitta rasm havolasi, ko‘pi bilan 5 ta. Retsept sahifasida muqovadan keyin galereyada ko‘rinadi.</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>

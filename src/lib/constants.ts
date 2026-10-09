@@ -14,6 +14,10 @@ export const PLATFORM_CONFIG = {
     standardCommissionRate: 0.1,
     foundingCreatorCount: 10,
   },
+  premium: {
+    /** Steps of a premium recipe anyone can read before unlocking. */
+    freePreviewSteps: 3,
+  },
   pricing: {
     currency: "UZS",
     examples: [10000, 20000],

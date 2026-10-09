@@ -6,11 +6,15 @@ const optionalUrl = z
   .max(1000)
   .refine((v) => v === "" || /^https?:\/\//i.test(v), "Rasm havolasi http:// yoki https:// bilan boshlanishi kerak");
 
+/** Photos a recipe can have besides its cover. */
+export const MAX_GALLERY_PHOTOS = 5;
+
 export const recipeInputSchema = z
   .object({
     title: z.string().trim().min(3, "Sarlavha juda qisqa").max(120, "Sarlavha juda uzun"),
     description: z.string().trim().min(10, "Qisqacha tavsif qo‘shing").max(600),
     coverUrl: z.string().trim().regex(/^https?:\/\//i, "Muqova rasmi havolasini kiriting (http:// yoki https:// bilan boshlanadi)").max(1000),
+    galleryUrls: z.array(z.string().trim().regex(/^https?:\/\//i, "Rasm havolasi http:// yoki https:// bilan boshlanishi kerak").max(1000)).max(MAX_GALLERY_PHOTOS, `Ko‘pi bilan ${MAX_GALLERY_PHOTOS} ta qo‘shimcha rasm`),
     servings: z.coerce.number().int().min(1).max(100),
     prepTimeMinutes: z.coerce.number().int().min(0).max(2880),
     cookTimeMinutes: z.coerce.number().int().min(0).max(2880),

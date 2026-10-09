@@ -59,6 +59,7 @@ async function main() {
         description: "Sinov uchun namuna retsept. Qadamlari boshqa retseptdan olingan.",
         coverUrl: `https://images.unsplash.com/photo-${photo}?w=1200&q=80`,
         coverAlt: title,
+        galleryUrls: [1, 2].map((offset) => `https://images.unsplash.com/photo-${DISHES[(i + offset * 3) % DISHES.length][1]}?w=1200&q=80`).filter((url) => !url.includes(photo)),
         servings: 4,
         prepTimeMinutes: Math.round(minutes * 0.3),
         cookTimeMinutes: Math.round(minutes * 0.7),

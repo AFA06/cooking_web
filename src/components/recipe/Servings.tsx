@@ -2,10 +2,11 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Minus, Plus } from "lucide-react";
+import { Check, Minus, Plus } from "lucide-react";
 import { Button, type ButtonProps } from "@/components/ui/Button";
 import { formatMinutes } from "@/lib/format";
 import { MAX_SERVINGS, MIN_SERVINGS, clampServings, scaleQuantity, scaleTimes } from "@/lib/scaling";
+import { cn } from "@/lib/utils";
 import type { RecipeIngredient } from "@/types/recipe";
 
 interface ServingsState {
@@ -44,7 +45,7 @@ export function ServingsProvider({ base, initial, children }: { base: number; in
 
 export function ServingsStepper() {
   const { base, servings, step, reset } = useServings();
-  const round = "flex h-11 w-11 items-center justify-center rounded-full border border-amber-300 text-amber-950 transition-colors hover:border-amber-950 disabled:cursor-not-allowed disabled:opacity-40";
+  const round = "flex h-11 w-11 items-center justify-center rounded-full border border-sage-500/40 bg-white text-amber-950 transition-colors hover:border-amber-950 disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -69,16 +70,59 @@ export function ServingsStepper() {
   );
 }
 
+/** Ingredient list that follows the chosen servings; rows can be ticked off while gathering. */
 export function ScaledIngredients({ ingredients }: { ingredients: RecipeIngredient[] }) {
   const { factor } = useServings();
+  const [checked, setChecked] = React.useState<Set<string>>(() => new Set());
+  const toggle = (id: string) =>
+    setChecked((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+
   return (
-    <ul className="mt-4 divide-y divide-amber-200 border-t border-amber-200">
+    <ul className="mt-5">
+      {ingredients.map((i) => {
+        const done = checked.has(i.id);
+        return (
+          <li key={i.id} className="border-t border-sage-200 first:border-t-0">
+            <label className="flex min-h-[3.25rem] cursor-pointer items-center gap-3 py-2">
+              <input type="checkbox" checked={done} onChange={() => toggle(i.id)} className="peer sr-only" />
+              <span
+                className={cn(
+                  "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-amber-700 peer-focus-visible:ring-offset-2",
+                  done ? "border-sage-600 bg-sage-600 text-white" : "border-sage-500/50 bg-white",
+                )}
+                aria-hidden="true"
+              >
+                {done && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+              </span>
+              <span className={cn("flex-1 transition-colors", done ? "text-amber-500 line-through" : "text-amber-950")}>{i.name}</span>
+              <span className={cn("whitespace-nowrap font-semibold tabular-nums transition-colors", done ? "text-amber-500" : "text-amber-950")}>
+                {scaleQuantity(i.quantity, i.unit, factor)} <span className="font-normal text-amber-600">{i.unit}</span>
+              </span>
+            </label>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}
+
+/** Compact scaled amounts for the ingredients one step uses. */
+export function StepIngredients({ ingredients }: { ingredients: RecipeIngredient[] }) {
+  const { factor } = useServings();
+  if (ingredients.length === 0) return null;
+  return (
+    <ul className="flex flex-wrap gap-2" aria-label="Shu qadam uchun masalliqlar">
       {ingredients.map((i) => (
-        <li key={i.id} className="flex justify-between gap-4 py-3">
-          <span className="text-amber-950">{i.name}</span>
-          <span className="whitespace-nowrap font-medium text-amber-950 tabular-nums">
-            {scaleQuantity(i.quantity, i.unit, factor)} <span className="font-normal text-amber-600">{i.unit}</span>
-          </span>
+        <li key={i.id} className="rounded-full bg-sage-50 px-3 py-1.5 text-sm text-sage-900">
+          <span className="font-semibold tabular-nums">
+            {scaleQuantity(i.quantity, i.unit, factor)} {i.unit}
+          </span>{" "}
+          {i.name.toLowerCase()}
         </li>
       ))}
     </ul>

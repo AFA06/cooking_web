@@ -59,7 +59,7 @@ function toRecipe(
         tip: s.tip ?? undefined,
         ingredientIds: s.ingredientPositions.map((p) => ingredientByPosition.get(p)).filter((x): x is string => !!x),
       })),
-    media: [cover],
+    media: [cover, ...r.galleryUrls.map((url, i) => ({ id: `${r.id}-gallery-${i}`, type: "image" as const, url, alt: r.title, order: i + 2 }))],
     tags: r.tags,
     publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
     cookedCount,

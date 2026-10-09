@@ -1,0 +1,1 @@
+ALTER TABLE "recipes" ADD COLUMN "gallery_urls" text[] DEFAULT '{}' NOT NULL;

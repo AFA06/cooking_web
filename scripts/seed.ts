@@ -28,6 +28,8 @@ async function main() {
       description: r.description,
       coverUrl: r.coverMedia.url,
       coverAlt: r.coverMedia.alt,
+      // Demo gallery: the step photos that differ from the cover.
+      galleryUrls: [...new Set(r.steps.map((s) => s.mediaUrl).filter((url): url is string => !!url && !url.startsWith(r.coverMedia.url.split("?")[0])))].slice(0, 4),
       servings: r.servings,
       prepTimeMinutes: r.prepTimeMinutes,
       cookTimeMinutes: r.cookTimeMinutes,

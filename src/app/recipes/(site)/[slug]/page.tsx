@@ -2,9 +2,9 @@ import { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { trackEvent } from "@/server/analytics";
-import { getRecipeBySlug } from "@/server/recipes";
+import { getRecipeBySlug, getRecipesByCreator } from "@/server/recipes";
 import { getCurrentUser } from "@/server/auth";
-import { isRecipeSaved } from "@/server/user-data";
+import { getSavedRecipeIds } from "@/server/user-data";
 import { RecipeDetail } from "@/components/recipe/RecipeDetail";
 
 interface Props {
@@ -61,7 +61,9 @@ export default async function RecipePage({ params, searchParams }: Props) {
   after(() =>
     trackEvent({ name: "recipe_view", userId: user?.id, recipeId: recipe.id, creatorId: recipe.creator.id, source: src }),
   );
-  const isSaved = user ? await isRecipeSaved(user.id, recipe.id) : false;
+  const [byCreator, savedList] = await Promise.all([getRecipesByCreator(recipe.creator.slug), user ? getSavedRecipeIds(user.id) : []]);
+  const savedIds = new Set(savedList);
+  const moreRecipes = byCreator.filter((r) => r.id !== recipe.id).slice(0, 4);
 
-  return <RecipeDetail recipe={recipe} isLoggedIn={!!user} isSaved={isSaved} />;
+  return <RecipeDetail recipe={recipe} isLoggedIn={!!user} isSaved={savedIds.has(recipe.id)} moreRecipes={moreRecipes} savedIds={savedIds} />;
 }
