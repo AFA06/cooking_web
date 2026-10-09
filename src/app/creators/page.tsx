@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowUpRight, Plus, Star } from "lucide-react";
+import { ArrowDown, ArrowUpRight, Plus, Star } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { formatRating } from "@/components/reviews/RatingStars";
 import { PLATFORM_CONFIG } from "@/lib/constants";
@@ -17,8 +17,8 @@ export const metadata: Metadata = {
 export const dynamic = "force-dynamic";
 
 /** Every kitchen is a doorway: the arch frames the creator's leading dish. */
-const arch = "relative aspect-[4/5] overflow-hidden rounded-[50%_50%_1.75rem_1.75rem/40%_40%_1.75rem_1.75rem]";
-const stagger = "sm:even:mt-16 lg:even:mt-24";
+const arch = "relative aspect-[4/5] w-full overflow-hidden lg:aspect-auto lg:h-[min(46svh,30rem)] rounded-[50%_50%_1.75rem_1.75rem/40%_40%_1.75rem_1.75rem]";
+const stagger = "sm:even:mt-16";
 
 function CreatorDoor({ creator, index }: { creator: CreatorShowcase; index: number }) {
   const [first, second] = creator.dishes;
@@ -110,16 +110,14 @@ export default async function CreatorsPage() {
   ];
 
   return (
-    <div className="overflow-x-clip pb-24 lg:pb-32">
-      <Container size="xl" className="pt-12 lg:pt-20">
-        <header className="grid gap-10 border-b border-amber-200 pb-12 lg:grid-cols-[1.5fr_1fr] lg:items-end lg:gap-20 lg:pb-16">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Ijodkorlar</p>
-            <h1 className="mt-5 font-serif text-[2.75rem] font-medium leading-[1.02] text-amber-950 sm:text-7xl xl:text-[5.5rem]">
-              Har bir taom ortida — <em className="text-amber-700">bir oshxona.</em>
-            </h1>
-          </div>
-          <div>
+    <div className="overflow-x-clip">
+      <Container size="xl" className="flex min-h-[calc(100svh-4rem)] flex-col pb-8 pt-12 lg:pt-16">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Ijodkorlar</p>
+        <header className="grid flex-1 content-center gap-10 py-10 lg:grid-cols-[1.5fr_1fr] lg:items-end lg:gap-20">
+          <h1 className="font-serif text-[2.75rem] font-medium leading-[1.02] text-amber-950 sm:text-7xl xl:text-[6.5rem]">
+            Har bir taom ortida — <em className="text-amber-700">bir oshxona.</em>
+          </h1>
+          <div className="lg:pb-4">
             <p className="max-w-md text-lg leading-relaxed text-amber-900">
               Eshikni oching: har bir ijodkorning o‘z ta’mi, o‘z uslubi va qadam-baqadam yozilgan retseptlari bor.
             </p>
@@ -133,8 +131,29 @@ export default async function CreatorsPage() {
             </dl>
           </div>
         </header>
+        <a href="#oshxonalar" className="group flex items-center justify-between gap-6 border-t border-amber-200 pt-6 text-amber-950">
+          <span className="flex items-center">
+            {creators.slice(0, 5).map((c) =>
+              c.avatarUrl ? (
+                <Image key={c.id} src={c.avatarUrl} alt="" width={48} height={48} className="-ml-2.5 h-12 w-12 rounded-full object-cover ring-[3px] ring-amber-50 first:ml-0" />
+              ) : (
+                <span key={c.id} className="-ml-2.5 flex h-12 w-12 items-center justify-center rounded-full bg-amber-950 font-serif text-lg text-amber-50 ring-[3px] ring-amber-50 first:ml-0" aria-hidden="true">
+                  {c.name.slice(0, 1).toUpperCase()}
+                </span>
+              ),
+            )}
+          </span>
+          <span className="flex items-center gap-3 text-[0.95rem] font-semibold">
+            Oshxonalarga kirish
+            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-amber-950 text-amber-50 transition-transform duration-300 group-hover:translate-y-1">
+              <ArrowDown className="h-5 w-5" aria-hidden="true" />
+            </span>
+          </span>
+        </a>
+      </Container>
 
-        <ul className="mt-12 grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:mt-16 lg:grid-cols-4 lg:gap-x-10 lg:gap-y-20">
+      <Container id="oshxonalar" size="xl" className="scroll-mt-16 pb-24 pt-10 lg:pb-32 lg:pt-12">
+        <ul className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10 lg:gap-y-20">
           {creators.map((c, i) => (
             <CreatorDoor key={c.id} creator={c} index={i} />
           ))}
