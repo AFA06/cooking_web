@@ -58,21 +58,22 @@ function roundForKitchen(amount: number, kind: UnitKind): number {
     case "largeMetric":
       return Math.max(0.05, roundTo(amount, 0.05));
     case "spoon":
-      return Math.max(0.25, roundTo(amount, 0.25));
+      // Below one spoon a quarter is still measurable; above it, halves are precise enough.
+      if (amount >= 1) return roundTo(amount, 0.5);
+      return amount < 0.375 ? 0.25 : amount < 0.75 ? 0.5 : 1;
     case "count":
       return Math.max(0.5, roundTo(amount, 0.5));
   }
 }
 
-const GLYPH_BY_PART: Record<string, string> = { "0.25": "¼", "0.5": "½", "0.75": "¾" };
+/** Amounts below one are written as words, the way a cook would say them. */
+const WORD_BY_PART: Record<string, string> = { "0.25": "chorak", "0.5": "yarim" };
 
 function formatAmount(amount: number, kind: UnitKind): string {
-  const whole = Math.floor(amount + 1e-9);
-  const part = Number((amount - whole).toFixed(2));
-  if (part === 0) return whole.toLocaleString("ru-RU");
+  if (Number.isInteger(amount)) return amount.toLocaleString("ru-RU");
   if (kind === "spoon" || kind === "count") {
-    const glyph = GLYPH_BY_PART[String(part)];
-    if (glyph) return whole === 0 ? glyph : `${whole}${glyph}`;
+    const word = WORD_BY_PART[String(amount)];
+    if (word) return word;
   }
   return amount.toFixed(2).replace(/0+$/, "").replace(".", ",");
 }
