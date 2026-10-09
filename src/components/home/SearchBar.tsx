@@ -13,7 +13,7 @@ export function SearchBar({ defaultValue, autoFocus }: { defaultValue?: string; 
         defaultValue={defaultValue}
         autoFocus={autoFocus}
         placeholder="Osh, lag‘mon yoki masalliq nomi…"
-        className="h-[3.75rem] w-full rounded-2xl border border-amber-300 bg-white pl-14 pr-32 text-lg text-amber-950 shadow-[0_1px_2px_rgb(44_40_37/0.04)] placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
+        className="h-[3.75rem] w-full rounded-2xl border border-amber-300 bg-amber-100 pl-14 pr-32 text-lg text-amber-950 shadow-[0_1px_2px_rgb(44_40_37/0.04)] placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
       />
       <button type="submit" className="absolute right-2 top-1/2 h-11 -translate-y-1/2 rounded-xl bg-amber-950 px-5 text-[0.95rem] font-semibold text-amber-50 transition-colors hover:bg-amber-900">
         Qidirish

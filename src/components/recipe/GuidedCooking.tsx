@@ -60,7 +60,7 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
     return (
       <div className="mx-auto max-w-xl px-4 py-16 text-center">
         <h1 className="text-3xl font-serif text-amber-950">{recipe.title}</h1>
-        <p className="mt-4 text-amber-800">
+        <p className="mt-4 text-amber-900">
           Premium retseptlar uchun qadam-baqadam rejim pullik versiyaga kiradi. To‘lov tizimi hozircha ulanmagan,
           shuning uchun bu retseptni ochib bo‘lmaydi.
         </p>
@@ -156,7 +156,7 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
       )}
 
       {stepIngredients.length > 0 && (
-        <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-amber-800" aria-label="Shu qadam uchun masalliqlar">
+        <ul className="mt-6 flex flex-wrap gap-x-6 gap-y-1 text-amber-900" aria-label="Shu qadam uchun masalliqlar">
           {stepIngredients.map((i) => (
             <li key={i.id}>
               <span className="font-medium">{scaleQuantity(i.quantity, i.unit, factor)} {i.unit}</span> {i.name}
@@ -177,7 +177,7 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
         </div>
       ) : null}
 
-      {step.tip && <p className="mt-6 border-l-2 border-amber-600 pl-4 text-amber-800">Maslahat: {step.tip}</p>}
+      {step.tip && <p className="mt-6 border-l-2 border-amber-600 pl-4 text-amber-900">Maslahat: {step.tip}</p>}
 
       <div className="mt-10 flex gap-3">
         <Button size="xl" variant="outline" onClick={prev} disabled={index === 0} className="flex-1 sm:flex-none">

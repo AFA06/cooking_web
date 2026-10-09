@@ -45,7 +45,7 @@ export function ServingsProvider({ base, initial, children }: { base: number; in
 
 export function ServingsStepper() {
   const { base, servings, step, reset } = useServings();
-  const round = "flex h-11 w-11 items-center justify-center rounded-full border border-sage-500/40 bg-white text-amber-950 transition-colors hover:border-amber-950 disabled:cursor-not-allowed disabled:opacity-40";
+  const round = "flex h-11 w-11 items-center justify-center rounded-full border border-sage-500/40 bg-amber-100 text-amber-950 transition-colors hover:border-amber-950 disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
@@ -93,7 +93,7 @@ export function ScaledIngredients({ ingredients }: { ingredients: RecipeIngredie
               <span
                 className={cn(
                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-full border transition-colors peer-focus-visible:ring-2 peer-focus-visible:ring-amber-700 peer-focus-visible:ring-offset-2",
-                  done ? "border-sage-600 bg-sage-600 text-white" : "border-sage-500/50 bg-white",
+                  done ? "border-sage-600 bg-sage-600 text-amber-50" : "border-sage-500/50 bg-amber-100",
                 )}
                 aria-hidden="true"
               >

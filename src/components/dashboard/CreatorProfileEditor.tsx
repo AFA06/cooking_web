@@ -8,7 +8,7 @@ import { SocialIcon } from "@/components/creator/SocialLinks";
 import { updateCreatorProfile } from "@/app/dashboard/actions";
 import { SOCIAL_PLATFORMS, normalizeSocialUrl, type SocialLinks, type SocialPlatform } from "@/lib/social";
 
-const field = "mt-1.5 w-full min-h-12 rounded-xl border border-amber-300 bg-white px-4 py-2.5 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
+const field = "mt-1.5 w-full min-h-12 rounded-xl border border-amber-300 bg-amber-100 px-4 py-2.5 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
 const label = "text-sm font-medium text-amber-950";
 
 interface Props {
@@ -113,7 +113,7 @@ export function CreatorProfileEditor({ initial }: Props) {
                     setDraft("");
                     setLinkError(null);
                   }}
-                  className={`flex h-11 items-center gap-2 rounded-full border px-4 text-[0.95rem] font-medium transition-colors ${adding === p.key ? "border-amber-950 bg-amber-950 text-amber-50" : "border-amber-300 bg-white text-amber-950 hover:border-amber-950"}`}
+                  className={`flex h-11 items-center gap-2 rounded-full border px-4 text-[0.95rem] font-medium transition-colors ${adding === p.key ? "border-amber-950 bg-amber-950 text-amber-50" : "border-amber-300 bg-amber-100 text-amber-950 hover:border-amber-950"}`}
                 >
                   <SocialIcon platform={p.key} />
                   {p.label}
@@ -136,7 +136,7 @@ export function CreatorProfileEditor({ initial }: Props) {
                       }
                     }}
                     placeholder={addingConfig.placeholder}
-                    className="min-h-12 flex-1 rounded-xl border border-amber-300 bg-white px-4 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
+                    className="min-h-12 flex-1 rounded-xl border border-amber-300 bg-amber-100 px-4 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
                   />
                   <Button type="button" onClick={addLink}>
                     <Plus className="h-4 w-4" aria-hidden="true" />

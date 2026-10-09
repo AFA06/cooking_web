@@ -24,7 +24,7 @@ export default async function AccountPage() {
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl sm:text-5xl font-serif font-medium text-amber-950 break-words">{user.name}</h1>
-            <p className="mt-2 text-amber-700">{user.email}</p>
+            <p className="mt-2 text-amber-600">{user.email}</p>
           </div>
           <form action={logout}>
             <Button type="submit" variant="outline">Chiqish</Button>
@@ -34,7 +34,7 @@ export default async function AccountPage() {
         <section className="mt-12" aria-labelledby="saved-heading">
           <h2 id="saved-heading" className="text-2xl font-serif text-amber-950">Saqlangan retseptlar</h2>
           {saved.length === 0 ? (
-            <p className="mt-4 text-amber-700">
+            <p className="mt-4 text-amber-600">
               Hali hech narsa saqlanmagan. <Link href="/recipes" className="underline">Retseptlarni ko‘ring</Link> va pishirmoqchi bo‘lganlaringizni saqlang.
             </p>
           ) : (
@@ -49,7 +49,7 @@ export default async function AccountPage() {
         <section className="mt-14" aria-labelledby="history-heading">
           <h2 id="history-heading" className="text-2xl font-serif text-amber-950">Pishirish tarixi</h2>
           {history.length === 0 ? (
-            <p className="mt-4 text-amber-700">
+            <p className="mt-4 text-amber-600">
               Hali hech narsa pishirmadingiz. Bepul retseptni oching va “Pishirishni boshlash”ni bosing.
             </p>
           ) : (
@@ -59,7 +59,7 @@ export default async function AccountPage() {
                   <Link href={`/recipes/${h.recipeSlug}`} className="font-medium text-amber-950 hover:underline break-words">
                     {h.recipeTitle}
                   </Link>
-                  <span className="text-sm text-amber-700">
+                  <span className="text-sm text-amber-600">
                     {h.status === "completed" ? "Tugatilgan" : "Boshlangan"} · {formatDate(h.completedAt ?? h.startedAt)}
                   </span>
                 </li>

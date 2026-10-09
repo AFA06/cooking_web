@@ -1,15 +1,66 @@
 @import "tailwindcss";
 
 /*
- * Design tokens — "grandmother's kitchen, redesigned".
- * amber: warm paper neutrals (50 paper … 950 charcoal ink); 700 is the clay primary.
+ * Design tokens — one dark kitchen: charcoal table, cream type, terracotta accents.
+ * amber: the neutral scale, written by role so the same class works in both themes:
+ *        50 page · 100 raised surface · 200 hairline · 300 strong border · 400–600 muted text
+ *        700 clay primary · 800 primary hover · 900 body text · 950 headings.
  * sage:  the quiet secondary for calm surfaces and "free / good" states.
- * clay:  decorative terracotta; use amber-700 where text or buttons need contrast.
+ * clay:  decorative terracotta.
+ * ink / paper: fixed charcoal and cream for things laid over photographs.
+ * Add class "theme-light" to a block to render it as a cream sheet on the dark page.
  */
 @theme inline {
   --font-sans: var(--font-onest);
   --font-serif: var(--font-literata);
+}
 
+@theme {
+  --color-ink: #2c2825;
+  --color-paper: #fdfbf7;
+
+  --color-amber-50: #2c2825;
+  --color-amber-100: #37322e;
+  --color-amber-200: #48413b;
+  --color-amber-300: #5e554d;
+  --color-amber-400: #857a6d;
+  --color-amber-500: #a39786;
+  --color-amber-600: #bfb19d;
+  --color-amber-700: #c86d51;
+  --color-amber-800: #db8a6f;
+  --color-amber-900: #ebe2d3;
+  --color-amber-950: #fdfbf7;
+
+  --color-sage-50: #30352d;
+  --color-sage-100: #3c4338;
+  --color-sage-200: #4e5848;
+  --color-sage-500: #8fa085;
+  --color-sage-600: #a6b59d;
+  --color-sage-700: #bcc8b4;
+  --color-sage-900: #e2e7dd;
+
+  --color-clay-100: #4d3027;
+  --color-clay-400: #c86d51;
+
+  --color-emerald-100: #3c4338;
+  --color-emerald-700: #a6b59d;
+  --color-emerald-800: #bcc8b4;
+  --color-rose-100: #4d3027;
+  --color-rose-800: #e6a48e;
+  --color-red-600: #c0392b;
+  --color-red-700: #f0897a;
+  --color-red-800: #f4a79b;
+
+  --radius-photo: 1.25rem;
+  --shadow-soft: 0 1px 2px rgb(0 0 0 / 0.2), 0 12px 32px -12px rgb(0 0 0 / 0.55);
+}
+
+:root {
+  color-scheme: dark;
+}
+
+.theme-light {
+  color-scheme: light;
   --color-amber-50: #fdfbf7;
   --color-amber-100: #f6f0e6;
   --color-amber-200: #ebe2d3;
@@ -21,7 +72,6 @@
   --color-amber-800: #8e4129;
   --color-amber-900: #47403a;
   --color-amber-950: #2c2825;
-
   --color-sage-50: #f2f4ef;
   --color-sage-100: #e2e7dd;
   --color-sage-200: #c9d2c2;
@@ -29,25 +79,15 @@
   --color-sage-600: #566350;
   --color-sage-700: #434d3e;
   --color-sage-900: #2a3027;
-
   --color-clay-100: #f7e4dc;
-  --color-clay-400: #c86d51;
-
   --color-emerald-100: #e2e7dd;
   --color-emerald-700: #566350;
   --color-emerald-800: #434d3e;
   --color-rose-100: #f7e4dc;
   --color-rose-800: #8e4129;
-  --color-red-600: #c0392b;
   --color-red-700: #a12d21;
   --color-red-800: #84241a;
-
-  --radius-photo: 1.25rem;
-  --shadow-soft: 0 1px 2px rgb(44 40 37 / 0.04), 0 12px 32px -12px rgb(44 40 37 / 0.18);
-}
-
-:root {
-  color-scheme: light;
+  color: var(--color-amber-950);
 }
 
 html {

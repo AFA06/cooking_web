@@ -52,7 +52,7 @@ export function Panel({
   flush?: boolean;
 }) {
   return (
-    <section className={cn("min-w-0 rounded-lg border border-amber-200 bg-white", className)}>
+    <section className={cn("min-w-0 rounded-lg border border-amber-200 bg-amber-100", className)}>
       {title && (
         <div className="flex flex-wrap items-start justify-between gap-3 border-b border-amber-100 px-5 py-4 sm:px-6">
           <div>
@@ -118,7 +118,7 @@ export function StatTile({
   hint?: string;
 }) {
   return (
-    <div className="flex flex-col rounded-lg border border-amber-200 bg-white p-5 sm:p-6">
+    <div className="flex flex-col rounded-lg border border-amber-200 bg-amber-100 p-5 sm:p-6">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">{label}</p>
       <p className="mt-3 font-serif text-4xl font-medium tabular-nums text-amber-950 sm:text-[2.75rem] sm:leading-none">
         {value}
@@ -174,7 +174,7 @@ export function BarList({
 
 export function SegmentedLinks({ items, label }: { items: { href: string; label: string; active: boolean }[]; label: string }) {
   return (
-    <nav aria-label={label} className="inline-flex rounded-md border border-amber-200 bg-white p-0.5">
+    <nav aria-label={label} className="inline-flex rounded-md border border-amber-200 bg-amber-100 p-0.5">
       {items.map((i) => (
         <Link
           key={i.href}
@@ -204,7 +204,7 @@ export function SearchForm({ action, defaultValue, placeholder, hidden }: { acti
         name="q"
         defaultValue={defaultValue}
         placeholder={placeholder}
-        className="h-11 w-full rounded-md border border-amber-200 bg-white pl-9 pr-3 text-sm text-amber-950 placeholder:text-amber-500 focus:border-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-700/20"
+        className="h-11 w-full rounded-md border border-amber-200 bg-amber-100 pl-9 pr-3 text-sm text-amber-950 placeholder:text-amber-500 focus:border-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-700/20"
       />
     </form>
   );
@@ -213,7 +213,7 @@ export function SearchForm({ action, defaultValue, placeholder, hidden }: { acti
 export function Pagination({ page, total, pageSize, hrefFor }: { page: number; total: number; pageSize: number; hrefFor: (page: number) => string }) {
   const pages = Math.max(1, Math.ceil(total / pageSize));
   if (pages <= 1) return null;
-  const linkCls = "inline-flex h-10 items-center gap-1 rounded-md border border-amber-200 bg-white px-3 text-sm text-amber-950 hover:bg-amber-100";
+  const linkCls = "inline-flex h-10 items-center gap-1 rounded-md border border-amber-200 bg-amber-100 px-3 text-sm text-amber-950 hover:bg-amber-100";
   const disabledCls = "inline-flex h-10 items-center gap-1 rounded-md border border-amber-100 px-3 text-sm text-amber-400";
   return (
     <nav aria-label="Sahifalar" className="flex items-center justify-between gap-4 border-t border-amber-100 px-5 py-4 sm:px-6">
@@ -250,10 +250,10 @@ export function StatusPill({ tone, children }: { tone: "good" | "neutral" | "acc
   const tones = {
     good: "bg-emerald-100 text-emerald-800",
     neutral: "bg-amber-100 text-amber-900",
-    accent: "bg-amber-700 text-white",
+    accent: "bg-amber-700 text-amber-50",
     warn: "bg-rose-100 text-rose-800",
   };
-  const dots = { good: "bg-emerald-700", neutral: "bg-amber-500", accent: "bg-white", warn: "bg-rose-800" };
+  const dots = { good: "bg-emerald-700", neutral: "bg-amber-500", accent: "bg-amber-100", warn: "bg-rose-800" };
   return (
     <span className={cn("inline-flex items-center gap-1.5 whitespace-nowrap rounded-full px-2.5 py-0.5 text-xs font-medium", tones[tone])}>
       <span className={cn("h-1.5 w-1.5 rounded-full", dots[tone])} aria-hidden="true" />
@@ -286,7 +286,7 @@ export function EmptyState({ title, text, action }: { title: string; text?: stri
 }
 
 const fieldCls =
-  "mt-1.5 w-full min-h-11 rounded-md border border-amber-200 bg-white px-3 py-2 text-amber-950 placeholder:text-amber-500 focus:border-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-700/20";
+  "mt-1.5 w-full min-h-11 rounded-md border border-amber-200 bg-amber-100 px-3 py-2 text-amber-950 placeholder:text-amber-500 focus:border-amber-700 focus:outline-none focus:ring-2 focus:ring-amber-700/20";
 
 export function Field({ label, hint, htmlFor, children }: { label: string; hint?: string; htmlFor: string; children: React.ReactNode }) {
   return (

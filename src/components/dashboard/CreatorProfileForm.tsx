@@ -4,7 +4,7 @@ import * as React from "react";
 import { Button } from "@/components/ui/Button";
 import { becomeCreator, type ActionResult } from "@/app/dashboard/actions";
 
-const field = "mt-1.5 w-full min-h-12 rounded-xl border border-amber-300 bg-white px-4 py-2.5 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
+const field = "mt-1.5 w-full min-h-12 rounded-xl border border-amber-300 bg-amber-100 px-4 py-2.5 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
 
 export function CreatorProfileForm({ defaultName }: { defaultName: string }) {
   const [state, action, pending] = React.useActionState<ActionResult, FormData>(becomeCreator, {});

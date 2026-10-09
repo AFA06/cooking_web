@@ -58,7 +58,7 @@ export async function SiteHeader() {
                   className="flex h-10 items-center gap-2 rounded-full pl-1 pr-3 text-sm font-medium text-amber-950 hover:bg-amber-100"
                   aria-label="Mening oshxonam"
                 >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sage-500 font-serif text-sm font-semibold text-white" aria-hidden="true">
+                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-sage-500 font-serif text-sm font-semibold text-amber-50" aria-hidden="true">
                     {user.name.slice(0, 1).toUpperCase()}
                   </span>
                   <span className="hidden max-w-28 truncate sm:block">{user.name.split(" ")[0]}</span>

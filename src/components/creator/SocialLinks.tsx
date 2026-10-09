@@ -41,7 +41,7 @@ export function SocialIcon({ platform, className }: { platform: SocialPlatform; 
 
 const HOVER: Record<SocialPlatform, string> = {
   instagram: "hover:border-[#c13584] hover:bg-[#c13584]",
-  tiktok: "hover:border-amber-950 hover:bg-amber-950",
+  tiktok: "hover:border-[#fe2c55] hover:bg-[#fe2c55]",
   telegram: "hover:border-[#229ed9] hover:bg-[#229ed9]",
   youtube: "hover:border-[#d93025] hover:bg-[#d93025]",
 };
@@ -61,7 +61,7 @@ export function SocialLinks({ links, canEdit = false }: { links: Links; canEdit?
                 rel="noopener noreferrer nofollow"
                 title={p.label}
                 aria-label={`${p.label} sahifasi`}
-                className={cn(shape, "border-amber-300 bg-white text-amber-950 transition-colors duration-200 hover:text-white", HOVER[p.key])}
+                className={cn(shape, "border-amber-300 bg-amber-100 text-amber-950 transition-colors duration-200 hover:text-white", HOVER[p.key])}
               >
                 <SocialIcon platform={p.key} className="h-[1.35rem] w-[1.35rem]" />
               </a>

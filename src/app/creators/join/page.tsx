@@ -33,15 +33,15 @@ const STEPS = [
   { title: "Havolani ulashing", text: "Odamlar videoni ortga qaytarmasdan, ekrandagi qadamlar bo‘yicha pishiradi." },
 ];
 
-const primaryCta = "inline-flex h-14 items-center justify-center gap-2.5 rounded-full bg-clay-400 px-6 text-base sm:px-8 sm:text-lg font-semibold text-amber-950 transition-colors duration-200 hover:bg-amber-50";
-const quietCta = "inline-flex h-14 items-center justify-center rounded-full border border-amber-50/25 px-8 text-lg font-semibold text-amber-50 transition-colors duration-200 hover:border-amber-50";
+const primaryCta = "inline-flex h-14 items-center justify-center gap-2.5 rounded-full bg-clay-400 px-6 text-base sm:px-8 sm:text-lg font-semibold text-amber-50 transition-colors duration-200 hover:bg-amber-950";
+const quietCta = "inline-flex h-14 items-center justify-center rounded-full border border-amber-950/25 px-8 text-lg font-semibold text-amber-950 transition-colors duration-200 hover:border-amber-950";
 
 /** A real recipe shown the way cooks will see it: one step at a time. */
 function StepDeck({ recipe }: { recipe: Recipe }) {
   const steps = recipe.steps.slice(0, 3);
   const tilt = ["rotate-[-3deg]", "translate-x-[7%] translate-y-[5%] rotate-[4deg]", "translate-x-[13%] translate-y-[10%] rotate-[9deg]"];
   return (
-    <div className="relative mx-auto aspect-[4/5] w-full max-w-[22rem] lg:mx-0 lg:h-[min(66svh,36rem)] lg:w-auto lg:max-w-none" aria-hidden="true">
+    <div className="theme-light relative mx-auto aspect-[4/5] w-full max-w-[22rem] lg:mx-0 lg:h-[min(66svh,36rem)] lg:w-auto lg:max-w-none" aria-hidden="true">
       {steps
         .map((step, i) => (
           <div
@@ -90,7 +90,7 @@ export default async function JoinPage() {
   const sample = featured ?? (await listPublishedRecipes())[0];
 
   return (
-    <div className="overflow-x-clip bg-amber-950 text-amber-50">
+    <div className="overflow-x-clip bg-amber-50 text-amber-950">
       <section className="relative">
         <span className="pointer-events-none absolute -right-40 top-1/2 h-[70rem] w-[70rem] -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,109,81,0.28),transparent)]" aria-hidden="true" />
         <Container size="xl" className="relative flex min-h-[calc(100svh-4rem)] flex-col pb-7 pt-10 lg:pt-12">
@@ -100,7 +100,7 @@ export default async function JoinPage() {
               <h1 className="mt-6 font-serif text-[2.75rem] font-medium leading-[1.02] sm:text-7xl xl:text-[6rem]">
                 Retseptingiz endi — <em className="text-clay-400">qo‘llanma.</em>
               </h1>
-              <p className="mt-7 max-w-xl text-lg leading-relaxed text-amber-200">
+              <p className="mt-7 max-w-xl text-lg leading-relaxed text-amber-900">
                 Retseptlaringizni masalliq, taymer va maslahatlar bilan qadam-baqadam nashr eting, bitta havolani auditoriyangizga ulashing va premium
                 retseptlar taklif qiling.
               </p>
@@ -125,38 +125,38 @@ export default async function JoinPage() {
             </header>
             {sample && sample.steps.length > 0 && <StepDeck recipe={sample} />}
           </div>
-          <p className="mt-10 border-t border-amber-50/15 pt-6 text-sm text-amber-300">
+          <p className="mt-10 border-t border-amber-950/15 pt-6 text-sm text-amber-600">
             O‘ngdagi karta — haqiqiy retseptning birinchi qadami. Sizning retseptingiz ham xuddi shunday ochiladi.
           </p>
         </Container>
       </section>
 
-      <section aria-label="Shartlar" className="border-t border-amber-50/15">
+      <section aria-label="Shartlar" className="border-t border-amber-950/15">
         <Container size="xl" className="grid gap-12 py-20 md:grid-cols-3 md:gap-10 lg:py-28">
           {TERMS.map((t) => (
             <div key={t.title}>
               <p className="font-serif text-[5.5rem] leading-none text-clay-400 lg:text-[8rem]">{t.figure}</p>
               <h2 className="mt-6 font-serif text-2xl font-medium">{t.title}</h2>
-              <p className="mt-2.5 max-w-sm leading-relaxed text-amber-200">{t.text}</p>
+              <p className="mt-2.5 max-w-sm leading-relaxed text-amber-900">{t.text}</p>
             </div>
           ))}
         </Container>
       </section>
 
-      <section aria-labelledby="how-heading" className="border-t border-amber-50/15">
+      <section aria-labelledby="how-heading" className="border-t border-amber-950/15">
         <Container size="xl" className="grid gap-12 py-20 lg:grid-cols-[1fr_2fr] lg:gap-20 lg:py-28">
           <h2 id="how-heading" className="font-serif text-4xl font-medium leading-tight sm:text-5xl">
             Uch qadam, <em className="text-clay-400">xuddi retseptdek.</em>
           </h2>
           <ol>
             {STEPS.map((s, i) => (
-              <li key={s.title} className="grid grid-cols-[3.5rem_1fr] gap-4 border-t border-amber-50/15 py-7 first:border-t-0 first:pt-0 sm:grid-cols-[5rem_1fr]">
+              <li key={s.title} className="grid grid-cols-[3.5rem_1fr] gap-4 border-t border-amber-950/15 py-7 first:border-t-0 first:pt-0 sm:grid-cols-[5rem_1fr]">
                 <span className="font-serif text-3xl text-clay-400" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div>
                   <h3 className="font-serif text-2xl font-medium">{s.title}</h3>
-                  <p className="mt-2 max-w-xl leading-relaxed text-amber-200">{s.text}</p>
+                  <p className="mt-2 max-w-xl leading-relaxed text-amber-900">{s.text}</p>
                 </div>
               </li>
             ))}
@@ -166,7 +166,7 @@ export default async function JoinPage() {
 
       <section id="boshlash" className="scroll-mt-16 pb-20 lg:pb-28">
         <Container size="xl">
-          <div className="grid gap-10 rounded-[2rem] bg-amber-50 p-7 text-amber-950 sm:p-12 lg:grid-cols-2 lg:gap-20 lg:p-16">
+          <div className="theme-light grid gap-10 rounded-[2rem] bg-amber-50 p-7 text-amber-950 sm:p-12 lg:grid-cols-2 lg:gap-20 lg:p-16">
             <div>
               <h2 className="font-serif text-4xl font-medium leading-tight sm:text-5xl">Oshxonangiz eshigini oching.</h2>
               <p className="mt-5 max-w-md leading-relaxed text-amber-900">

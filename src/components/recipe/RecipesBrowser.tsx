@@ -74,7 +74,7 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
                 value={filters.query}
                 onChange={(e) => set({ query: e.target.value })}
                 placeholder="Osh, lag‘mon yoki masalliq nomi…"
-                className="h-16 w-full rounded-2xl border border-amber-300 bg-white pl-14 pr-5 text-lg text-amber-950 shadow-[0_1px_2px_rgb(44_40_37/0.04)] placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
+                className="h-16 w-full rounded-2xl border border-amber-300 bg-amber-100 pl-14 pr-5 text-lg text-amber-950 shadow-[0_1px_2px_rgb(44_40_37/0.04)] placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
               />
             </div>
           </div>
@@ -108,7 +108,7 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
                   onClick={() => set({ price })}
                   className={cn(
                     "flex h-10 items-center gap-2 rounded-full px-4 text-[0.95rem] transition-colors",
-                    active ? "bg-white font-semibold text-amber-950 shadow-sm" : "text-amber-600 hover:text-amber-950",
+                    active ? "bg-amber-100 font-semibold text-amber-950 shadow-sm" : "text-amber-600 hover:text-amber-950",
                   )}
                 >
                   {price}

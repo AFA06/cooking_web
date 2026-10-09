@@ -134,7 +134,7 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
         </div>
       </Panel>
 
-      <details className="mt-6 rounded-lg border border-amber-200 bg-white">
+      <details className="mt-6 rounded-lg border border-amber-200 bg-amber-100">
         <summary className="px-5 py-4 font-serif text-xl font-medium text-amber-950 sm:px-6">Kunlik ma’lumotlar jadvali</summary>
         <div className={cn(table.wrap, "border-t border-amber-100")}>
           <table className={table.root}>

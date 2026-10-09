@@ -21,12 +21,12 @@ export default async function DashboardPage() {
     <Container size="lg" className="py-12 sm:py-16">
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm text-amber-700">Ijodkor paneli</p>
+          <p className="text-sm text-amber-600">Ijodkor paneli</p>
           <h1 className="text-3xl sm:text-5xl font-serif font-medium text-amber-950 break-words">{creator.name}</h1>
-          <Link href={`/creators/${creator.slug}`} className="mt-2 inline-block text-sm text-amber-800 underline">
+          <Link href={`/creators/${creator.slug}`} className="mt-2 inline-block text-sm text-amber-900 underline">
             Ommaviy profilni ko‘rish
           </Link>
-          <Link href="/dashboard/profile" className="ml-5 mt-2 inline-block text-sm text-amber-800 underline">
+          <Link href="/dashboard/profile" className="ml-5 mt-2 inline-block text-sm text-amber-900 underline">
             Profil va ijtimoiy tarmoqlarni tahrirlash
           </Link>
         </div>
@@ -38,7 +38,7 @@ export default async function DashboardPage() {
       <section className="mt-12" aria-labelledby="recipes-heading">
         <h2 id="recipes-heading" className="text-2xl font-serif text-amber-950">Sizning retseptlaringiz</h2>
         {recipes.length === 0 ? (
-          <p className="mt-4 text-amber-700">
+          <p className="mt-4 text-amber-600">
             Hali retseptlaringiz yo‘q. <Link href="/dashboard/recipes/new" className="underline">Birinchi retseptni yarating</Link>.
           </p>
         ) : (
@@ -62,7 +62,7 @@ export default async function DashboardPage() {
                       {r.title}
                       {r.isPremium && <Badge variant="premium" className="ml-2">Premium</Badge>}
                     </td>
-                    <td className="py-3 pr-4 text-sm text-amber-800">{r.status === "published" ? "Nashr etilgan" : "Qoralama"}</td>
+                    <td className="py-3 pr-4 text-sm text-amber-900">{r.status === "published" ? "Nashr etilgan" : "Qoralama"}</td>
                     <td className="py-3 pr-4 text-right tabular-nums">{r.views}</td>
                     <td className="py-3 pr-4 text-right tabular-nums">{r.saves}</td>
                     <td className="py-3 pr-4 text-right tabular-nums">{r.cooks}</td>
@@ -90,7 +90,7 @@ export default async function DashboardPage() {
             </table>
           </div>
         )}
-        <p className="mt-4 text-xs text-amber-700">
+        <p className="mt-4 text-xs text-amber-600">
           Ko‘rishlar — retsept sahifasiga kirishlar soni. Havolaga <code>?src=instagram</code> qo‘shib ulashsangiz, qaysi kanal o‘quvchi keltirgani yozib boriladi (hisobot keyingi yangilanishda).
         </p>
       </section>

@@ -112,7 +112,7 @@ export function ReviewForm({ recipeId, initial, onDone }: Props) {
           value={comment}
           onChange={(e) => setComment(e.target.value)}
           placeholder="Taom qanday chiqdi? Nimani o‘zgartirdingiz?"
-          className="mt-1.5 w-full rounded-2xl border border-amber-300 bg-white px-4 py-3 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
+          className="mt-1.5 w-full rounded-2xl border border-amber-300 bg-amber-100 px-4 py-3 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
         />
       </div>
 

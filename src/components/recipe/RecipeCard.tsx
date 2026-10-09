@@ -41,7 +41,7 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
         <span
           className={cn(
             "absolute left-3 top-3 flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.8rem] font-semibold tracking-wide shadow-sm backdrop-blur-sm",
-            recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-white",
+            recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-amber-50",
           )}
         >
           {recipe.isPremium ? "Premium" : "Bepul"}

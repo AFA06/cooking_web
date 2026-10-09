@@ -19,7 +19,7 @@ export default async function CreatorProfilePage() {
       <h1 className="mt-3 text-4xl font-medium text-amber-950 sm:text-5xl">Profilni tahrirlash</h1>
       <p className="mt-3 text-amber-900">
         Ommaviy sahifangiz:{" "}
-        <Link href={`/creators/${creator.slug}`} className="font-medium text-amber-700 underline underline-offset-4">/creators/{creator.slug}</Link>
+        <Link href={`/creators/${creator.slug}`} className="font-medium text-amber-600 underline underline-offset-4">/creators/{creator.slug}</Link>
       </p>
       <div className="mt-10">
         <CreatorProfileEditor

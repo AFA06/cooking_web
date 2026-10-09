@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
-import { Container } from "@/components/ui/Container";
+import { AuthScreen } from "@/components/auth/AuthScreen";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { getCurrentUser } from "@/server/auth";
@@ -16,11 +16,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
 
   return (
     <SiteShell>
-      <Container size="sm" className="py-14 sm:py-20 max-w-md">
-        <h1 className="text-3xl font-serif font-medium text-amber-950">Hisob yaratish</h1>
-        <p className="mt-2 text-amber-800">Retseptlarni saqlang va pishirgan taomlaringizni kuzating.</p>
+      <AuthScreen eyebrow="Hisob yaratish" title={<>Dasturxonga <em className="text-clay-400">qo‘shiling.</em></>} note="Retseptlarni saqlang va pishirgan taomlaringizni kuzating.">
         <AuthForm mode="signup" action={signup} next={safe} />
-      </Container>
+      </AuthScreen>
     </SiteShell>
   );
 }

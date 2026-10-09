@@ -35,7 +35,7 @@ export function AdminShell({ userName, userEmail, logout, children }: Props) {
   }, [open]);
 
   const sidebar = (
-    <div className="flex h-full flex-col bg-amber-950 text-amber-100">
+    <div className="theme-light flex h-full flex-col bg-amber-950 text-amber-100">
       <div className="flex h-16 items-center justify-between px-6">
         <Link href="/admin" className="flex items-baseline gap-2" onClick={() => setOpen(false)}>
           <span className="font-serif text-2xl font-semibold text-white">Damda</span>
@@ -97,7 +97,7 @@ export function AdminShell({ userName, userEmail, logout, children }: Props) {
 
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden" role="dialog" aria-modal="true" aria-label="Admin menyusi">
-          <button type="button" className="absolute inset-0 bg-amber-950/60" aria-label="Menyuni yopish" onClick={() => setOpen(false)} />
+          <button type="button" className="absolute inset-0 bg-ink/60" aria-label="Menyuni yopish" onClick={() => setOpen(false)} />
           <div className="absolute inset-y-0 left-0 w-72 max-w-[85vw] shadow-2xl">{sidebar}</div>
         </div>
       )}

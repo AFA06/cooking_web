@@ -54,7 +54,7 @@ export const EMPTY_RECIPE: EditorInitial = {
 };
 
 const field =
-  "w-full min-h-12 px-3 py-2 border border-amber-300 bg-white text-amber-950 focus:outline-none focus:ring-2 focus:ring-amber-600";
+  "w-full min-h-12 rounded-xl border border-amber-300 bg-amber-100 px-4 py-2.5 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
 const label = "block text-sm font-medium text-amber-950";
 
 function toInput(v: EditorInitial): RecipeInput {
@@ -151,12 +151,12 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
         <div>
           <label htmlFor="cover" className={label}>Muqova rasmi havolasi</label>
           <input id="cover" type="url" inputMode="url" placeholder="https://…" className={field} value={v.coverUrl} onChange={(e) => set("coverUrl", e.target.value)} />
-          <p className="mt-1 text-xs text-amber-700">Rasm yuklash hozircha mavjud emas. O‘zingizga tegishli yoki foydalanish huquqingiz bor rasm havolasini kiriting.</p>
+          <p className="mt-1 text-xs text-amber-600">Rasm yuklash hozircha mavjud emas. O‘zingizga tegishli yoki foydalanish huquqingiz bor rasm havolasini kiriting.</p>
         </div>
         <div>
           <label htmlFor="gallery" className={label}>Qo‘shimcha rasmlar (ixtiyoriy)</label>
           <textarea id="gallery" rows={3} placeholder={"https://…\nhttps://…"} className={field} value={v.galleryUrls} onChange={(e) => set("galleryUrls", e.target.value)} />
-          <p className="mt-1 text-xs text-amber-700">Har bir qatorga bitta rasm havolasi, ko‘pi bilan 5 ta. Retsept sahifasida muqovadan keyin galereyada ko‘rinadi.</p>
+          <p className="mt-1 text-xs text-amber-600">Har bir qatorga bitta rasm havolasi, ko‘pi bilan 5 ta. Retsept sahifasida muqovadan keyin galereyada ko‘rinadi.</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
@@ -197,7 +197,7 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
           )}
         </div>
         {v.isPremium && (
-          <p className="text-xs text-amber-700">To‘lov tizimi hozircha ulanmagan, shuning uchun o‘quvchilar premium retseptlarni ocha olmaydi.</p>
+          <p className="text-xs text-amber-600">To‘lov tizimi hozircha ulanmagan, shuning uchun o‘quvchilar premium retseptlarni ocha olmaydi.</p>
         )}
       </section>
 
@@ -205,7 +205,7 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
         <h2 className="text-2xl font-serif text-amber-950">Masalliqlar</h2>
         {v.ingredients.map((ing, i) => (
           <div key={i} className="grid grid-cols-[1fr_5rem_5rem] sm:grid-cols-[2rem_1fr_6rem_6rem_auto] gap-2 items-end">
-            <span className="hidden sm:block pb-3 text-sm text-amber-700">{i + 1}</span>
+            <span className="hidden sm:block pb-3 text-sm text-amber-600">{i + 1}</span>
             <div className="col-span-3 sm:col-span-1">
               <label className="sr-only" htmlFor={`ing-name-${i}`}>{i + 1}-masalliq nomi</label>
               <input id={`ing-name-${i}`} className={field} placeholder="Nomi" value={ing.name} onChange={(e) => setIngredient(i, { name: e.target.value })} />
@@ -234,7 +234,7 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
         <h2 className="text-2xl font-serif text-amber-950">Qadamlar</h2>
         {v.steps.map((s, i) => (
           <fieldset key={i} className="border-t border-amber-200 pt-4 space-y-3">
-            <legend className="text-sm font-semibold text-amber-800 pr-2">Qadam {i + 1}</legend>
+            <legend className="text-sm font-semibold text-amber-900 pr-2">Qadam {i + 1}</legend>
             <div>
               <label className={label} htmlFor={`st-title-${i}`}>Sarlavha</label>
               <input id={`st-title-${i}`} className={field} value={s.title} onChange={(e) => setStep(i, { title: e.target.value })} />
@@ -282,7 +282,7 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
         </Button>
       </section>
 
-      <div className="sticky bottom-0 z-10 space-y-2 border-t border-amber-200 bg-white/95 py-4 backdrop-blur">
+      <div className="sticky bottom-0 z-10 space-y-2 border-t border-amber-200 bg-amber-50/95 py-4 backdrop-blur">
         {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
         {notice && <p role="status" className="text-sm text-emerald-800">{notice}</p>}
         <div className="flex flex-wrap gap-3">

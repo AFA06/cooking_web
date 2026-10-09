@@ -14,7 +14,7 @@ const base =
   "inline-flex items-center justify-center rounded-xl font-semibold whitespace-nowrap transition-[background-color,color,border-color,transform] duration-200 active:scale-[0.98] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2 focus-visible:ring-offset-amber-50 disabled:pointer-events-none disabled:opacity-50";
 
 const variants = {
-  primary: "bg-amber-700 text-white hover:bg-amber-800",
+  primary: "bg-amber-700 text-amber-50 hover:bg-amber-800",
   secondary: "bg-sage-100 text-sage-900 hover:bg-sage-200",
   outline: "border border-amber-300 bg-transparent text-amber-950 hover:border-amber-950",
   ghost: "text-amber-950 hover:bg-amber-100",

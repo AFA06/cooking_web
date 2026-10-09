@@ -58,7 +58,7 @@ export function CategoryRail() {
 export function LeadRecipe({ recipe, isLoggedIn, saved }: { recipe: Recipe; isLoggedIn: boolean; saved: boolean }) {
   const canCook = !recipe.isPremium;
   return (
-    <article className="relative min-w-0 overflow-hidden rounded-[1.75rem] bg-amber-950">
+    <article className="theme-light relative min-w-0 overflow-hidden rounded-[1.75rem] bg-amber-950">
       <div className="relative aspect-[4/5] sm:aspect-[16/11] lg:aspect-auto lg:h-full lg:min-h-[34rem]">
         <Image
           src={recipe.coverMedia.url}
@@ -84,7 +84,7 @@ export function LeadRecipe({ recipe, isLoggedIn, saved }: { recipe: Recipe; isLo
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             {canCook && (
-              <Button size="lg" asChild className="bg-amber-50 text-amber-950 hover:bg-white">
+              <Button size="lg" asChild className="bg-amber-50 text-amber-950 hover:bg-amber-100">
                 <Link href={`/recipes/${recipe.slug}/cook`}>Men bilan pishiring</Link>
               </Button>
             )}
@@ -227,7 +227,7 @@ export function CreatorInvite() {
             Dastlabki {PLATFORM_CONFIG.creator.foundingCreatorCount} ta ijodkor asoschi hamkor sifatida qo‘shiladi va asoschilik davrida komissiya to‘lamaydi.
           </p>
         </div>
-        <Button size="xl" asChild className="shrink-0 bg-amber-50 text-amber-950 hover:bg-white">
+        <Button size="xl" asChild className="shrink-0 bg-amber-50 text-amber-950 hover:bg-amber-100">
           <Link href={PLATFORM_CONFIG.urls.becomeCreator}>Ijodkor bo‘lish <ArrowUpRight className="h-5 w-5" aria-hidden="true" /></Link>
         </Button>
       </Container>

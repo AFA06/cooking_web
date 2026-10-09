@@ -54,7 +54,7 @@ export function RecipeTable({ recipes, showCreator = true }: { recipes: RecipeSt
                         aria-pressed={r.isFeatured}
                         aria-label={r.isFeatured ? "Tavsiyadan olib tashlash" : "Tavsiya qilish"}
                         title={r.isFeatured ? "Tavsiya etilgan" : "Tavsiya qilish"}
-                        className={cn("flex h-9 w-9 items-center justify-center rounded-md border", r.isFeatured ? "border-amber-700 bg-amber-700 text-white" : "border-amber-200 text-amber-500 hover:bg-amber-100")}
+                        className={cn("flex h-9 w-9 items-center justify-center rounded-md border", r.isFeatured ? "border-amber-700 bg-amber-700 text-amber-50" : "border-amber-200 text-amber-500 hover:bg-amber-100")}
                       >
                         <Star className="h-4 w-4" fill={r.isFeatured ? "currentColor" : "none"} aria-hidden="true" />
                       </button>

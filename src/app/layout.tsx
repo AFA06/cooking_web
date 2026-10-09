@@ -84,7 +84,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-amber-50 text-amber-950">
         <a
           href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-white focus:px-4 focus:py-2"
+          className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-amber-100 focus:px-4 focus:py-2"
         >
           Asosiy tarkibga o‘tish
         </a>

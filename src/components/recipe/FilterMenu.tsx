@@ -30,7 +30,7 @@ export function FilterMenu({ label, options, value, defaultValue, onChange, alig
       <DropdownMenu.Trigger
         className={cn(
           "group flex h-11 shrink-0 items-center gap-2 rounded-full border px-4 text-[0.95rem] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2 focus-visible:ring-offset-amber-50",
-          active ? "border-amber-950 bg-amber-950 text-amber-50" : "border-amber-300 bg-white text-amber-950 hover:border-amber-950",
+          active ? "border-amber-950 bg-amber-950 text-amber-50" : "border-amber-300 bg-amber-100 text-amber-950 hover:border-amber-950",
         )}
       >
         <span className={cn(!active && "text-amber-600")}>{label}</span>
@@ -42,7 +42,7 @@ export function FilterMenu({ label, options, value, defaultValue, onChange, alig
         <DropdownMenu.Content
           align={align}
           sideOffset={8}
-          className="menu-pop z-50 min-w-[14rem] rounded-2xl border border-amber-200 bg-white p-1.5 shadow-[0_1px_2px_rgb(44_40_37/0.04),0_16px_40px_-12px_rgb(44_40_37/0.25)]"
+          className="menu-pop z-50 min-w-[14rem] rounded-2xl border border-amber-200 bg-amber-100 p-1.5 shadow-[0_1px_2px_rgb(44_40_37/0.04),0_16px_40px_-12px_rgb(44_40_37/0.25)]"
         >
           <DropdownMenu.RadioGroup value={value} onValueChange={onChange}>
             {options.map((option) => (

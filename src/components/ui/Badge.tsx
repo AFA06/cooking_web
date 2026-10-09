@@ -7,7 +7,7 @@ export interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
 
 const variants = {
   default: "bg-amber-100 text-amber-900",
-  premium: "bg-amber-700 text-white",
+  premium: "bg-amber-700 text-amber-50",
   free: "bg-emerald-100 text-emerald-800",
   new: "bg-rose-100 text-rose-800",
   founding: "bg-amber-950 text-amber-50",

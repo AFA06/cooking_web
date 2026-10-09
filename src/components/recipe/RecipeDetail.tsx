@@ -133,7 +133,7 @@ export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedId
             <RecipeGallery
               photos={recipe.media.map((m) => ({ url: m.url, alt: m.alt ?? recipe.title }))}
               badge={
-                <span className={cn("flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-sm backdrop-blur-sm", recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-white")}>
+                <span className={cn("flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold shadow-sm backdrop-blur-sm", recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-amber-50")}>
                   {recipe.isPremium ? "Premium" : "Bepul"}
                   {price && (
                     <>

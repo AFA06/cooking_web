@@ -78,7 +78,7 @@ function Lightbox({ photos, index, onIndex, onClose }: { photos: Photo[]; index:
   const photo = photos[index];
 
   return (
-    <div role="dialog" aria-modal="true" aria-label="Rasmlar galereyasi" className="fixed inset-0 z-[100] flex flex-col bg-amber-950/95 backdrop-blur-sm">
+    <div role="dialog" aria-modal="true" aria-label="Rasmlar galereyasi" className="theme-light fixed inset-0 z-[100] flex flex-col bg-amber-950/95 backdrop-blur-sm">
       <div className="flex items-center justify-between gap-4 px-4 py-3 text-amber-50 sm:px-6">
         <p className="text-sm tabular-nums" aria-live="polite">
           {index + 1} / {photos.length}
@@ -175,7 +175,7 @@ export function RecipeGallery({ photos, badge }: { photos: Photo[]; badge?: Reac
             <button type="button" className={cn(roundButton, "absolute right-4 top-1/2 -translate-y-1/2 lg:opacity-0 lg:group-hover:opacity-100 lg:focus-visible:opacity-100")} onClick={() => go(1)} aria-label="Keyingi rasm">
               <ChevronRight className="h-5 w-5" aria-hidden="true" />
             </button>
-            <p className="absolute bottom-4 right-4 rounded-full bg-amber-950/75 px-3 py-1 text-xs font-medium tabular-nums text-amber-50 backdrop-blur-sm" aria-live="polite">
+            <p className="absolute bottom-4 right-4 rounded-full bg-ink/75 px-3 py-1 text-xs font-medium tabular-nums text-paper backdrop-blur-sm" aria-live="polite">
               {index + 1} / {photos.length}
             </p>
           </>
