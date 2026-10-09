@@ -52,7 +52,7 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
           {recipe.creator.name} · {formatMinutes(total)} · {DIFFICULTY_LABEL[recipe.difficulty]}
         </p>
         <p className="mt-1 text-sm text-amber-600">
-          {recipe.isPremium ? "Masalliqlar va dastlabki qadamlar bepul" : "To‘liq ochiq · qadam-baqadam rejim bilan"}
+          {recipe.isPremium ? "Dastlabki qadamlar bepul" : "To‘liq ochiq"}
           {recipe.cookedCount > 0 && <span className="text-sage-600"> · {formatNumber(recipe.cookedCount)} marta pishirilgan</span>}
         </p>
       </div>

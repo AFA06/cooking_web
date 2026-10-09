@@ -115,3 +115,25 @@ button:disabled {
 .no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
+/* Cards settle into place when a new set of rows appears. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+}
+.rise {
+  animation: rise 0.5s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@keyframes menu-pop {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+.menu-pop {
+  transform-origin: var(--radix-dropdown-menu-content-transform-origin);
+  animation: menu-pop 0.16s ease-out;
+}
