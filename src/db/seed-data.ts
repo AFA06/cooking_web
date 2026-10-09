@@ -8,6 +8,7 @@ export const CREATORS: RecipeCreator[] = [
     avatarUrl: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=200&q=80",
     bio: "Avloddan avlodga o‘tib kelgan o‘zbek taomlari. Uy oshxonasini hamma uchun yaqin qilamiz.",
     isFoundingCreator: true,
+    socialLinks: {},
   },
   {
     id: "c2",
@@ -16,6 +17,7 @@ export const CREATORS: RecipeCreator[] = [
     avatarUrl: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&q=80",
     bio: "Markaziy Osiyo klassikalari zamonaviy talqinda. Restoran sirlarini uy oshpazlari bilan bo‘lishaman.",
     isFoundingCreator: true,
+    socialLinks: {},
   },
   {
     id: "c3",
@@ -24,6 +26,7 @@ export const CREATORS: RecipeCreator[] = [
     avatarUrl: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200&q=80",
     bio: "Go‘shtsiz va yengil o‘zbek taomlari. O‘simlik asosidagi ovqat ham to‘yimli va mazali bo‘lishi mumkin.",
     isFoundingCreator: true,
+    socialLinks: {},
   },
 ];
 
@@ -116,6 +119,7 @@ export const RECIPES: Recipe[] = [
     tags: ["O‘zbek", "Guruch", "Qo‘y go‘shti", "An’anaviy"],
     publishedAt: PUBLISHED,
     cookedCount: 0,
+    rating: { average: 0, count: 0 },
   },
   {
     id: "2",
@@ -152,6 +156,7 @@ export const RECIPES: Recipe[] = [
     tags: ["O‘zbek", "Lag‘mon", "Mol go‘shti", "Sho‘rva"],
     publishedAt: PUBLISHED,
     cookedCount: 0,
+    rating: { average: 0, count: 0 },
   },
   {
     id: "3",
@@ -186,6 +191,7 @@ export const RECIPES: Recipe[] = [
     tags: ["O‘zbek", "Manti", "Qo‘y go‘shti"],
     publishedAt: PUBLISHED,
     cookedCount: 0,
+    rating: { average: 0, count: 0 },
   },
   {
     id: "4",
@@ -217,6 +223,7 @@ export const RECIPES: Recipe[] = [
     tags: ["O‘zbek", "Xamir taom", "Qo‘y go‘shti"],
     publishedAt: PUBLISHED,
     cookedCount: 0,
+    rating: { average: 0, count: 0 },
   },
   {
     id: "5",
@@ -250,6 +257,7 @@ export const RECIPES: Recipe[] = [
     tags: ["Xorazm", "Lag‘mon", "Mol go‘shti"],
     publishedAt: PUBLISHED,
     cookedCount: 0,
+    rating: { average: 0, count: 0 },
   },
   {
     id: "6",
@@ -279,5 +287,6 @@ export const RECIPES: Recipe[] = [
     tags: ["O‘zbek", "Salat", "Go‘shtsiz"],
     publishedAt: PUBLISHED,
     cookedCount: 0,
+    rating: { average: 0, count: 0 },
   },
 ];

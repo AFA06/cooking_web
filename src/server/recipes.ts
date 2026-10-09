@@ -1,6 +1,8 @@
 import "server-only";
 import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
+import { cleanSocialLinks } from "@/lib/social";
+import { getRatingsForRecipes } from "@/server/reviews";
 import type { Recipe, RecipeCreator } from "@/types/recipe";
 
 type RecipeRow = typeof schema.recipes.$inferSelect;
@@ -14,6 +16,7 @@ function toCreator(c: CreatorRow): RecipeCreator {
     avatarUrl: c.avatarUrl ?? undefined,
     bio: c.bio ?? undefined,
     isFoundingCreator: c.isFoundingCreator,
+    socialLinks: cleanSocialLinks(c.socialLinks),
   };
 }
 
@@ -23,6 +26,7 @@ function toRecipe(
   ingredients: (typeof schema.recipeIngredients.$inferSelect)[],
   steps: (typeof schema.recipeSteps.$inferSelect)[],
   cookedCount: number,
+  rating: Recipe["rating"],
 ): Recipe {
   const ingredientByPosition = new Map(ingredients.map((i) => [i.position, i.id]));
   const cover = { id: `${r.id}-cover`, type: "image" as const, url: r.coverUrl, alt: r.coverAlt ?? r.title, order: 1 };
@@ -63,13 +67,14 @@ function toRecipe(
     tags: r.tags,
     publishedAt: (r.publishedAt ?? r.createdAt).toISOString(),
     cookedCount,
+    rating,
   };
 }
 
 async function hydrate(rows: { recipe: RecipeRow; creator: CreatorRow }[]): Promise<Recipe[]> {
   if (rows.length === 0) return [];
   const ids = rows.map((r) => r.recipe.id);
-  const [ingredients, steps, cooked] = await Promise.all([
+  const [ingredients, steps, cooked, ratings] = await Promise.all([
     db.select().from(schema.recipeIngredients).where(inArray(schema.recipeIngredients.recipeId, ids)),
     db.select().from(schema.recipeSteps).where(inArray(schema.recipeSteps.recipeId, ids)),
     db
@@ -77,6 +82,7 @@ async function hydrate(rows: { recipe: RecipeRow; creator: CreatorRow }[]): Prom
       .from(schema.cookingSessions)
       .where(and(inArray(schema.cookingSessions.recipeId, ids), eq(schema.cookingSessions.status, "completed")))
       .groupBy(schema.cookingSessions.recipeId),
+    getRatingsForRecipes(ids),
   ]);
   const cookedByRecipe = new Map(cooked.map((c) => [c.recipeId, c.n]));
   return rows.map(({ recipe, creator }) =>
@@ -86,6 +92,7 @@ async function hydrate(rows: { recipe: RecipeRow; creator: CreatorRow }[]): Prom
       ingredients.filter((i) => i.recipeId === recipe.id),
       steps.filter((s) => s.recipeId === recipe.id),
       cookedByRecipe.get(recipe.id) ?? 0,
+      ratings.get(recipe.id) ?? { average: 0, count: 0 },
     ),
   );
 }

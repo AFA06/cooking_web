@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ChefHat, Clock, Flame, Users } from "lucide-react";
+import { ChefHat, Clock, Flame, Star, Users } from "lucide-react";
 import { BookmarkButton } from "@/components/recipe/BookmarkButton";
 import { DIFFICULTY_LABEL, formatMinutes, formatNumber, formatPrice } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
@@ -52,11 +52,23 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
             </>
           )}
         </span>
-        {recipe.cookedCount > 0 && (
-          <span className="absolute bottom-3 left-3 flex items-center gap-1.5 rounded-full bg-amber-50/95 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm">
-            <Flame className="h-3.5 w-3.5 text-amber-700" strokeWidth={2} aria-hidden="true" />
-            {formatNumber(recipe.cookedCount)} marta pishirilgan
-          </span>
+        {(recipe.rating.count > 0 || recipe.cookedCount > 0) && (
+          <p className="absolute bottom-3 left-3 flex items-center gap-3 rounded-full bg-amber-50/95 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm">
+            {recipe.rating.count > 0 && (
+              <span className="flex items-center gap-1">
+                <Star className="h-3.5 w-3.5 fill-clay-400 text-clay-400" aria-hidden="true" />
+                <span className="sr-only">Baho: </span>
+                {recipe.rating.average.toFixed(1).replace(".", ",")}
+                <span className="font-normal text-amber-600">({formatNumber(recipe.rating.count)})</span>
+              </span>
+            )}
+            {recipe.cookedCount > 0 && (
+              <span className="flex items-center gap-1">
+                <Flame className="h-3.5 w-3.5 text-amber-700" strokeWidth={2} aria-hidden="true" />
+                {formatNumber(recipe.cookedCount)} marta pishirilgan
+              </span>
+            )}
+          </p>
         )}
         <BookmarkButton recipeId={recipe.id} slug={recipe.slug} initialSaved={saved} isLoggedIn={isLoggedIn} className="absolute right-3 top-3 z-10" />
       </div>

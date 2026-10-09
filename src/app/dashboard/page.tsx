@@ -26,6 +26,9 @@ export default async function DashboardPage() {
           <Link href={`/creators/${creator.slug}`} className="mt-2 inline-block text-sm text-amber-800 underline">
             Ommaviy profilni ko‘rish
           </Link>
+          <Link href="/dashboard/profile" className="ml-5 mt-2 inline-block text-sm text-amber-800 underline">
+            Profil va ijtimoiy tarmoqlarni tahrirlash
+          </Link>
         </div>
         <Button asChild size="lg">
           <Link href="/dashboard/recipes/new">Yangi retsept</Link>

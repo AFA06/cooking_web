@@ -11,6 +11,10 @@ import { ShareButton } from "@/components/recipe/ShareButton";
 import { DIFFICULTY_LABEL, formatMinutes, formatNumber, formatPrice, toIsoDuration } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { RatingStars, formatRating } from "@/components/reviews/RatingStars";
+import { ReviewForm } from "@/components/reviews/ReviewForm";
+import { RatingOverview, ReviewList } from "@/components/reviews/ReviewList";
+import type { RatingSummary, Review, ReviewEligibility } from "@/server/reviews";
 import type { Recipe, RecipeStep } from "@/types/recipe";
 
 function recipeJsonLd(recipe: Recipe) {
@@ -28,6 +32,9 @@ function recipeJsonLd(recipe: Recipe) {
     totalTime: toIsoDuration(recipe.prepTimeMinutes + recipe.cookTimeMinutes),
     recipeYield: `${recipe.servings} porsiya`,
     keywords: recipe.tags.join(", "),
+    ...(recipe.rating.count > 0 && {
+      aggregateRating: { "@type": "AggregateRating", ratingValue: recipe.rating.average.toFixed(1), ratingCount: recipe.rating.count },
+    }),
     recipeIngredient: recipe.ingredients.map((i) => `${i.quantity} ${i.unit} ${i.name}`),
     recipeInstructions: recipe.steps.map((s) => ({ "@type": "HowToStep", name: s.title, text: s.instruction })),
   };
@@ -95,9 +102,13 @@ interface Props {
   /** Other recipes by the same creator. */
   moreRecipes: Recipe[];
   savedIds: Set<string>;
+  reviews: Review[];
+  rating: RatingSummary;
+  /** Null for visitors who are not signed in. */
+  eligibility: ReviewEligibility | null;
 }
 
-export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds }: Props) {
+export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds, reviews, rating, eligibility }: Props) {
   const { creator } = recipe;
   const times = { prepMinutes: recipe.prepTimeMinutes, cookMinutes: recipe.cookTimeMinutes };
   const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency) : null;
@@ -140,6 +151,13 @@ export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedId
               )}
               <h1 className="mt-4 text-[2.6rem] font-medium leading-[1.04] text-amber-950 break-words sm:text-6xl">{recipe.title}</h1>
               <p className="mt-5 max-w-xl text-lg leading-relaxed text-amber-900">{recipe.description}</p>
+              {rating.count > 0 && (
+                <a href="#reviews-heading" className="mt-4 flex w-fit items-center gap-2 text-sm text-amber-900 hover:text-amber-700">
+                  <RatingStars value={rating.average} />
+                  <span className="font-semibold text-amber-950">{formatRating(rating.average)}</span>
+                  <span className="underline underline-offset-4">{formatNumber(rating.count)} ta baho</span>
+                </a>
+              )}
 
               <Link href={`/creators/${creator.slug}`} className="group mt-7 flex w-fit items-center gap-3">
                 {creator.avatarUrl ? (
@@ -286,6 +304,36 @@ export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedId
               </div>
             )}
           </section>
+        </Container>
+
+        <Container size="xl" className="mt-20 border-t border-amber-200 pt-14 lg:mt-28">
+          <h2 id="reviews-heading" className="scroll-mt-24 text-[1.9rem] font-medium leading-tight text-amber-950 sm:text-[2.4rem]">Pishirganlar fikri</h2>
+          <div className="mt-8 grid items-start gap-12 lg:grid-cols-[23rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[26rem_minmax(0,1fr)] xl:gap-20">
+            <div>
+              {rating.count > 0 ? (
+                <RatingOverview rating={rating} />
+              ) : (
+                <p className="text-amber-900">Hali baholar yo‘q. Bu retseptni faqat uni oxirigacha pishirgan odamlar baholay oladi.</p>
+              )}
+            </div>
+            <div className="min-w-0 space-y-10">
+              {eligibility?.canReview && (
+                <div className="rounded-[1.75rem] bg-amber-100 p-6 sm:p-8">
+                  <h3 className="text-2xl font-medium text-amber-950">{eligibility.existing ? "Bahoyingizni yangilang" : "Siz buni pishirdingiz — qanday chiqdi?"}</h3>
+                  <p className="mb-5 mt-1 text-amber-900">Bahoyingiz boshqalarga va ijodkorga yordam beradi.</p>
+                  <ReviewForm recipeId={recipe.id} initial={eligibility.existing} />
+                </div>
+              )}
+              {!eligibility?.canReview && !recipe.isPremium && (
+                <p className="rounded-2xl bg-sage-50 px-5 py-4 text-sage-900">
+                  {isLoggedIn
+                    ? "Baho qoldirish uchun retseptni “Men bilan pishiring” rejimida oxirigacha pishiring."
+                    : "Baho qoldirish uchun tizimga kiring va retseptni “Men bilan pishiring” rejimida oxirigacha pishiring."}
+                </p>
+              )}
+              {reviews.length > 0 && <ReviewList reviews={reviews} />}
+            </div>
+          </div>
         </Container>
 
         {moreRecipes.length > 0 && (

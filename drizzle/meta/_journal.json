@@ -15,6 +15,13 @@
       "when": 1791548290379,
       "tag": "0001_narrow_shiver_man",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791549838526,
+      "tag": "0002_keen_marvex",
+      "breakpoints": true
     }
   ]
 }

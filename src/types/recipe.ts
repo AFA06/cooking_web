@@ -1,3 +1,5 @@
+import type { SocialLinks } from "@/lib/social";
+
 export interface RecipeIngredient {
   id: string;
   name: string;
@@ -35,6 +37,7 @@ export interface RecipeCreator {
   avatarUrl?: string;
   bio?: string;
   isFoundingCreator: boolean;
+  socialLinks: SocialLinks;
 }
 
 export interface Recipe {
@@ -58,6 +61,8 @@ export interface Recipe {
   publishedAt: string;
   /** Completed guided-cooking sessions. */
   cookedCount: number;
+  /** Average of cook reviews; `count` is 0 when nobody has rated it yet. */
+  rating: { average: number; count: number };
 }
 
 export interface RecipeCardProps {

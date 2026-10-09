@@ -9,6 +9,7 @@ import { getCurrentUser } from "@/server/auth";
 import { getCurrentCreator } from "@/server/creator";
 import { persistRecipe } from "@/server/recipe-write";
 import { recipeInputSchema, slugify, type RecipeInput } from "@/lib/recipe-schema";
+import { cleanSocialLinks } from "@/lib/social";
 
 export interface ActionResult {
   error?: string;
@@ -75,4 +76,35 @@ export async function setRecipeStatus(recipeId: string, status: "draft" | "publi
     .where(and(eq(schema.recipes.id, recipeId), eq(schema.recipes.creatorId, ctx.creator.id)));
   revalidatePath("/dashboard");
   revalidatePath("/recipes");
+}
+
+const creatorProfileSchema = z.object({
+  name: z.string().trim().min(2, "Ism juda qisqa").max(80),
+  bio: z.string().trim().max(500, "Tanishtiruv 500 ta belgidan oshmasligi kerak"),
+  avatarUrl: z
+    .string()
+    .trim()
+    .max(1000)
+    .refine((v) => v === "" || /^https?:\/\//i.test(v), "Rasm havolasi http:// yoki https:// bilan boshlanishi kerak"),
+});
+
+/** Saves the creator's public profile: name, bio, photo and social accounts. */
+export async function updateCreatorProfile(input: { name: string; bio: string; avatarUrl: string; socialLinks: Record<string, string> }): Promise<ActionResult & { ok?: true }> {
+  const ctx = await getCurrentCreator();
+  if (!ctx) return { error: "Ijodkor profili topilmadi." };
+  const parsed = creatorProfileSchema.safeParse(input);
+  if (!parsed.success) return { error: parsed.error.issues[0].message };
+
+  const socialLinks = cleanSocialLinks(input.socialLinks);
+  const rejected = Object.keys(input.socialLinks).filter((key) => input.socialLinks[key].trim() !== "" && !(key in socialLinks));
+  if (rejected.length > 0) return { error: "Ijtimoiy tarmoq havolasi noto‘g‘ri. Profil havolasini yoki foydalanuvchi nomini kiriting." };
+
+  await db
+    .update(schema.creators)
+    .set({ name: parsed.data.name, bio: parsed.data.bio || null, avatarUrl: parsed.data.avatarUrl || null, socialLinks })
+    .where(eq(schema.creators.id, ctx.creator.id));
+  revalidatePath(`/creators/${ctx.creator.slug}`);
+  revalidatePath("/creators");
+  revalidatePath("/dashboard");
+  return { ok: true };
 }

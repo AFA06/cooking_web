@@ -1,7 +1,9 @@
 import {
   boolean,
+  check,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
   primaryKey,
@@ -10,6 +12,7 @@ import {
   uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 export const roleEnum = pgEnum("user_role", ["user", "creator", "admin"]);
 export const difficultyEnum = pgEnum("difficulty", ["easy", "medium", "hard"]);
@@ -52,6 +55,8 @@ export const creators = pgTable(
     name: text("name").notNull(),
     bio: text("bio"),
     avatarUrl: text("avatar_url"),
+    /** Profile links keyed by platform, e.g. { instagram: "https://instagram.com/…" }. */
+    socialLinks: jsonb("social_links").$type<Record<string, string>>().notNull().default({}),
     isFoundingCreator: boolean("is_founding_creator").notNull().default(false),
     isFeatured: boolean("is_featured").notNull().default(false),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -140,6 +145,38 @@ export const cookingSessions = pgTable(
     completedAt: timestamp("completed_at", { withTimezone: true }),
   },
   (t) => [index("cooking_sessions_user_idx").on(t.userId)],
+);
+
+/** One review per person per recipe; only people who finished cooking it may write one. */
+export const reviews = pgTable(
+  "reviews",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    recipeId: uuid("recipe_id").notNull().references(() => recipes.id, { onDelete: "cascade" }),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    rating: integer("rating").notNull(),
+    comment: text("comment").notNull().default(""),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("reviews_recipe_user_idx").on(t.recipeId, t.userId),
+    index("reviews_recipe_idx").on(t.recipeId),
+    check("reviews_rating_range", sql`${t.rating} between 1 and 5`),
+  ],
+);
+
+/** Result photo for a review, kept apart so listing reviews never loads image data. */
+export const reviewPhotos = pgTable(
+  "review_photos",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    reviewId: uuid("review_id").notNull().references(() => reviews.id, { onDelete: "cascade" }),
+    mime: text("mime").notNull(),
+    /** Base64-encoded image, resized in the browser before upload. */
+    data: text("data").notNull(),
+  },
+  (t) => [uniqueIndex("review_photos_review_idx").on(t.reviewId)],
 );
 
 export const purchases = pgTable(

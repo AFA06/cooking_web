@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { StepTimer } from "@/components/recipe/StepTimer";
 import { finishCookingSession, startCookingSession } from "@/app/recipes/actions";
+import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { scaleQuantity } from "@/lib/scaling";
 import type { Recipe } from "@/types/recipe";
 
@@ -13,6 +14,9 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
   const factor = servings / recipe.servings;
   const [index, setIndex] = React.useState(0);
   const [finished, setFinished] = React.useState(false);
+  /** True once the finished session is stored, which is what makes a review allowed. */
+  const [recorded, setRecorded] = React.useState(false);
+  const [reviewed, setReviewed] = React.useState(false);
   const sessionId = React.useRef<Promise<string | null> | null>(null);
   const total = recipe.steps.length;
 
@@ -35,7 +39,7 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
     if (index === total - 1) {
       setFinished(true);
       ensureSession()?.then((id) => {
-          if (id) return finishCookingSession(id);
+          if (id) return finishCookingSession(id).then(() => setRecorded(true));
         }).catch(() => undefined);
     }
     else setIndex((i) => i + 1);
@@ -74,17 +78,37 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
 
   if (finished) {
     return (
-      <div className="mx-auto max-w-xl px-4 py-16 text-center">
-        <h1 className="text-3xl sm:text-4xl font-serif text-amber-950">Yoqimli ishtaha!</h1>
-        <p className="mt-4 text-amber-800">{recipe.title}: barcha {total} qadam bajarildi.</p>
-        {!isLoggedIn && (
-          <p className="mt-2 text-sm text-amber-700">
-            <Link href="/auth/signup" className="underline">Hisob yarating</Link> va pishirgan taomlaringiz tarixini saqlang.
+      <div className="mx-auto max-w-xl px-5 py-14">
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Tayyor!</p>
+        <h1 className="mt-3 text-4xl font-medium leading-tight text-amber-950 sm:text-5xl">Siz buni pishirdingiz.</h1>
+        <p className="mt-3 text-lg text-amber-900">
+          {recipe.title} — barcha {total} qadam bajarildi. Yoqimli ishtaha!
+        </p>
+
+        {isLoggedIn ? (
+          <div className="mt-9 rounded-[1.75rem] bg-amber-100 p-6 sm:p-8">
+            {reviewed ? (
+              <p role="status" className="font-medium text-sage-700">Rahmat! Bahoyingiz saqlandi va ijodkor sahifasida ko‘rinadi.</p>
+            ) : (
+              <>
+                <h2 className="text-2xl font-medium text-amber-950">Qanday chiqdi?</h2>
+                <p className="mb-5 mt-1 text-amber-900">Baho bering, natija rasmini qo‘shing — boshqa oshpazlarga yordam beradi.</p>
+                {recorded ? <ReviewForm recipeId={recipe.id} onDone={() => setReviewed(true)} /> : <p className="text-amber-600">Pishirish natijasi saqlanmoqda…</p>}
+              </>
+            )}
+          </div>
+        ) : (
+          <p className="mt-8 rounded-2xl bg-sage-50 px-5 py-4 text-sage-900">
+            <Link href={`/auth/signup?next=${encodeURIComponent(`/recipes/${recipe.slug}`)}`} className="font-medium underline underline-offset-4">Hisob yarating</Link>
+            {" "}— pishirgan taomlaringiz tarixi saqlanadi va retseptlarni baholay olasiz.
           </p>
         )}
-        <div className="mt-8 flex justify-center gap-3">
-          <Button onClick={() => { sessionId.current = null; setIndex(0); setFinished(false); ensureSession(); }}>Qayta pishirish</Button>
+
+        <div className="mt-8 flex flex-wrap gap-3">
           <Button variant="outline" asChild>
+            <Link href={`/recipes/${recipe.slug}`}>Retseptga qaytish</Link>
+          </Button>
+          <Button variant="ghost" asChild>
             <Link href="/recipes">Boshqa retseptlar</Link>
           </Button>
         </div>
