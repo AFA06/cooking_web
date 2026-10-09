@@ -16,9 +16,88 @@ export const metadata: Metadata = {
 
 export const dynamic = "force-dynamic";
 
-/** Every kitchen is a doorway: the arch frames the creator's leading dish. */
-const arch = "relative aspect-[4/5] w-full overflow-hidden lg:aspect-auto lg:h-[min(46svh,30rem)] rounded-[50%_50%_1.75rem_1.75rem/40%_40%_1.75rem_1.75rem]";
 const stagger = "sm:even:mt-16";
+const plateShadow = "shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] ring-1 ring-amber-50/15";
+
+/** One kitchen on the table: the creator's leading dish as a slowly turning plate. */
+function CreatorPlate({ creator, index }: { creator: CreatorShowcase; index: number }) {
+  const [first, second] = creator.dishes;
+  const initial = creator.name.slice(0, 1).toUpperCase();
+  const facts = [
+    `${formatNumber(creator.recipeCount)} ta retsept`,
+    creator.cookedCount > 0 ? `${formatNumber(creator.cookedCount)} marta pishirilgan` : null,
+  ].filter(Boolean);
+
+  return (
+    <li className={`rise ${stagger}`} style={{ animationDelay: `${index * 70}ms` }}>
+      <Link href={`/creators/${creator.slug}`} className="group block rounded-[1.75rem] focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-amber-50">
+        <div className="relative mx-auto max-w-[24rem] lg:max-w-[min(100%,46svh)]">
+          <span className="absolute left-0 top-0 z-10 font-serif text-lg text-clay-400" aria-hidden="true">
+            {String(index + 1).padStart(2, "0")}
+          </span>
+          <div className="transition-transform duration-700 ease-out group-hover:scale-[1.04]">
+            <div
+              className={`plate-turn relative aspect-square overflow-hidden rounded-full bg-amber-900 ${plateShadow}`}
+              style={{ animationDuration: `${130 + index * 20}s`, animationDirection: index % 2 ? "reverse" : "normal" }}
+            >
+              {first ? (
+                <>
+                  <Image src={first.url} alt={first.alt} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="object-cover" />
+                  {second && (
+                    <Image
+                      src={second.url}
+                      alt=""
+                      fill
+                      sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+                      className="object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-100"
+                    />
+                  )}
+                </>
+              ) : (
+                <span className="flex h-full items-center justify-center font-serif text-8xl text-amber-300" aria-hidden="true">
+                  {initial}
+                </span>
+              )}
+            </div>
+          </div>
+          {creator.avatarUrl ? (
+            <Image
+              src={creator.avatarUrl}
+              alt=""
+              width={96}
+              height={96}
+              className="absolute bottom-0 right-[4%] z-10 h-[27%] w-[27%] rounded-full object-cover ring-[5px] ring-amber-950 transition-transform duration-500 group-hover:-translate-y-1"
+            />
+          ) : (
+            <span
+              className="absolute bottom-0 right-[4%] z-10 flex h-[27%] w-[27%] items-center justify-center rounded-full bg-amber-800 font-serif text-3xl text-amber-50 ring-[5px] ring-amber-950 transition-transform duration-500 group-hover:-translate-y-1"
+              aria-hidden="true"
+            >
+              {initial}
+            </span>
+          )}
+          {creator.rating.count > 0 && (
+            <span className="absolute bottom-1 left-0 z-10 flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-950">
+              <Star className="h-4 w-4 fill-amber-700 text-amber-700" aria-hidden="true" />
+              {formatRating(creator.rating.average)}
+              <span className="sr-only">o‘rtacha baho</span>
+            </span>
+          )}
+        </div>
+
+        <div className="mt-7 px-1">
+          {creator.isFoundingCreator && <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">Asoschi ijodkor</p>}
+          <h2 className="mt-2 flex items-start justify-between gap-3 font-serif text-[1.7rem] font-medium leading-tight text-amber-50">
+            <span className="min-w-0 break-words">{creator.name}</span>
+            <ArrowUpRight className="mt-1.5 h-5 w-5 shrink-0 text-amber-400 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-clay-400" aria-hidden="true" />
+          </h2>
+          {creator.bio && <p className="mt-2.5 line-clamp-2 leading-relaxed text-amber-200">{creator.bio}</p>}
+          <p className="mt-4 border-t border-amber-50/15 pt-3.5 text-sm font-medium text-amber-300">{facts.join(" · ")}</p>
+        </div>
+      </Link>
+    </li>
+  );
+}
 
 /** Where each plate sits on the hero table; the first is the centrepiece. */
 const PLATE_SPOTS = [
@@ -28,87 +107,6 @@ const PLATE_SPOTS = [
   "bottom-0 left-[3%] z-10 w-[28%]",
   "-right-[5%] bottom-[2%] z-10 w-[33%]",
 ];
-
-function CreatorDoor({ creator, index }: { creator: CreatorShowcase; index: number }) {
-  const [first, second] = creator.dishes;
-  const facts = [
-    `${formatNumber(creator.recipeCount)} ta retsept`,
-    creator.cookedCount > 0 ? `${formatNumber(creator.cookedCount)} marta pishirilgan` : null,
-  ].filter(Boolean);
-
-  return (
-    <li className={`rise ${stagger}`} style={{ animationDelay: `${index * 70}ms` }}>
-      <Link href={`/creators/${creator.slug}`} className="group block rounded-[1.75rem] focus-visible:outline-2 focus-visible:outline-offset-8 focus-visible:outline-amber-950">
-        <div className="relative">
-          <span className="absolute left-0 top-0 z-10 font-serif text-lg text-amber-600" aria-hidden="true">
-            {String(index + 1).padStart(2, "0")}
-          </span>
-          <div className={`${arch} bg-sage-100`}>
-            {first ? (
-              <>
-                <Image
-                  src={first.url}
-                  alt={first.alt}
-                  fill
-                  sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                  priority={index < 4}
-                  className="object-cover transition-transform duration-[1200ms] ease-out group-hover:scale-105"
-                />
-                {second && (
-                  <Image
-                    src={second.url}
-                    alt=""
-                    fill
-                    sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
-                    className="object-cover opacity-0 transition-opacity duration-700 group-hover:opacity-100"
-                  />
-                )}
-                <span className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-amber-950/45 to-transparent" aria-hidden="true" />
-              </>
-            ) : (
-              <span className="flex h-full items-center justify-center font-serif text-8xl text-sage-600" aria-hidden="true">
-                {creator.name.slice(0, 1).toUpperCase()}
-              </span>
-            )}
-            {creator.rating.count > 0 && (
-              <span className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-full bg-amber-50 px-3 py-1.5 text-sm font-semibold text-amber-950">
-                <Star className="h-4 w-4 fill-amber-700 text-amber-700" aria-hidden="true" />
-                {formatRating(creator.rating.average)}
-                <span className="sr-only">o‘rtacha baho</span>
-              </span>
-            )}
-          </div>
-          {creator.avatarUrl ? (
-            <Image
-              src={creator.avatarUrl}
-              alt=""
-              width={96}
-              height={96}
-              className="absolute -bottom-9 left-5 h-[4.5rem] w-[4.5rem] rounded-full object-cover ring-[5px] ring-amber-50 transition-transform duration-500 group-hover:-translate-y-1 sm:h-24 sm:w-24"
-            />
-          ) : (
-            <span
-              className="absolute -bottom-9 left-5 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-amber-950 font-serif text-3xl text-amber-50 ring-[5px] ring-amber-50 transition-transform duration-500 group-hover:-translate-y-1 sm:h-24 sm:w-24"
-              aria-hidden="true"
-            >
-              {creator.name.slice(0, 1).toUpperCase()}
-            </span>
-          )}
-        </div>
-
-        <div className="mt-14 px-1">
-          {creator.isFoundingCreator && <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Asoschi ijodkor</p>}
-          <h2 className="mt-2 flex items-start justify-between gap-3 font-serif text-[1.7rem] font-medium leading-tight text-amber-950">
-            <span className="min-w-0 break-words">{creator.name}</span>
-            <ArrowUpRight className="mt-1.5 h-5 w-5 shrink-0 text-amber-500 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-amber-950" aria-hidden="true" />
-          </h2>
-          {creator.bio && <p className="mt-2.5 line-clamp-2 leading-relaxed text-amber-900">{creator.bio}</p>}
-          <p className="mt-4 border-t border-amber-200 pt-3.5 text-sm font-medium text-amber-800">{facts.join(" · ")}</p>
-        </div>
-      </Link>
-    </li>
-  );
-}
 
 export default async function CreatorsPage() {
   const creators = await listCreatorShowcase();
@@ -152,7 +150,7 @@ export default async function CreatorsPage() {
               {plates.map((p, i) => (
                 <div key={p.url} className={`rise absolute ${PLATE_SPOTS[i]}`} style={{ animationDelay: `${150 + i * 110}ms` }}>
                   <div
-                    className="plate-turn relative aspect-square overflow-hidden rounded-full shadow-[0_30px_60px_-20px_rgba(0,0,0,0.7)] ring-1 ring-amber-50/15"
+                    className={`plate-turn relative aspect-square overflow-hidden rounded-full ${plateShadow}`}
                     style={{ animationDuration: `${110 + i * 25}s`, animationDirection: i % 2 ? "reverse" : "normal" }}
                   >
                     <Image src={p.url} alt="" fill sizes="(min-width: 1024px) 30vw, 60vw" priority={i === 0} className="object-cover" />
@@ -187,28 +185,31 @@ export default async function CreatorsPage() {
         </Container>
       </section>
 
-      <Container id="oshxonalar" size="xl" className="scroll-mt-16 pb-24 pt-12 lg:pb-32 lg:pt-14">
-        <ul className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-10 lg:gap-y-20">
-          {creators.map((c, i) => (
-            <CreatorDoor key={c.id} creator={c} index={i} />
-          ))}
-          <li className={stagger}>
-            <Link
-              href={PLATFORM_CONFIG.urls.becomeCreator}
-              className={`${arch} group flex flex-col items-center justify-center border-2 border-dashed border-amber-300 px-8 text-center transition-colors duration-300 hover:border-amber-950 hover:bg-amber-100`}
-            >
-              <span className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-950 text-amber-50 transition-transform duration-500 group-hover:rotate-90">
-                <Plus className="h-6 w-6" aria-hidden="true" />
-              </span>
-              <span className="mt-6 font-serif text-2xl font-medium leading-tight text-amber-950">Keyingi eshik — sizniki</span>
-              <span className="mt-3 text-amber-900">Retseptlaringizni qadam-baqadam nashr eting.</span>
-              <span className="mt-5 text-sm font-semibold text-amber-700 underline underline-offset-4">Ijodkor bo‘lish</span>
-            </Link>
-          </li>
-        </ul>
+      <section id="oshxonalar" className="scroll-mt-16 bg-amber-950 text-amber-50">
+        <Container size="xl" className="pb-24 pt-12 lg:pb-32 lg:pt-14">
+          <ul className="grid gap-x-8 gap-y-16 sm:grid-cols-2 lg:grid-cols-4 lg:gap-x-12 lg:gap-y-24">
+            {creators.map((c, i) => (
+              <CreatorPlate key={c.id} creator={c} index={i} />
+            ))}
+            <li className={stagger}>
+              <Link href={PLATFORM_CONFIG.urls.becomeCreator} className="group block">
+                <span className="mx-auto flex aspect-square max-w-[24rem] flex-col items-center justify-center rounded-full border-2 border-dashed border-amber-50/25 px-8 text-center transition-colors duration-300 group-hover:border-clay-400 lg:max-w-[min(100%,46svh)]">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-50 text-amber-950 transition-transform duration-500 group-hover:rotate-90">
+                    <Plus className="h-6 w-6" aria-hidden="true" />
+                  </span>
+                  <span className="mt-5 font-serif text-2xl font-medium leading-tight">Keyingi likopcha — sizniki</span>
+                </span>
+                <span className="mt-7 block px-1">
+                  <span className="block leading-relaxed text-amber-200">Retseptlaringizni qadam-baqadam nashr eting va dasturxonga qo‘shiling.</span>
+                  <span className="mt-4 block border-t border-amber-50/15 pt-3.5 text-sm font-semibold text-clay-400">Ijodkor bo‘lish</span>
+                </span>
+              </Link>
+            </li>
+          </ul>
 
-        <p className="mt-20 text-sm text-amber-600">Ayrim profillar namuna sifatida ko‘rsatilgan.</p>
-      </Container>
+          <p className="mt-20 text-sm text-amber-400">Ayrim profillar namuna sifatida ko‘rsatilgan.</p>
+        </Container>
+      </section>
     </div>
   );
 }
