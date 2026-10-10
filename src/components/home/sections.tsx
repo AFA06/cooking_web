@@ -7,7 +7,7 @@ import { BookmarkButton } from "@/components/recipe/BookmarkButton";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { DIFFICULTY_LABEL, formatMinutes } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
-import type { Recipe, RecipeCreator } from "@/types/recipe";
+import type { Recipe } from "@/types/recipe";
 
 const totalMinutes = (r: Recipe) => r.prepTimeMinutes + r.cookTimeMinutes;
 
@@ -117,7 +117,7 @@ export function LatestRecipes({ recipes, isLoggedIn, savedIds }: { recipes: Reci
   return (
     <section aria-labelledby="latest-heading" className="min-w-0">
       <SectionHeading id="latest-heading" title="Yangi retseptlar" note="Ijodkorlar yaqinda qo‘shgan taomlar" href={PLATFORM_CONFIG.urls.recipes} linkLabel="Barcha retseptlar" />
-      <div className="grid grid-cols-1 gap-x-7 gap-y-11 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-x-7 gap-y-11 sm:grid-cols-2 lg:grid-cols-3">
         {recipes.map((r) => (
           <RecipeCard key={r.id} recipe={r} isLoggedIn={isLoggedIn} saved={savedIds.has(r.id)} shape="landscape" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 32vw" />
         ))}
@@ -125,60 +125,6 @@ export function LatestRecipes({ recipes, isLoggedIn, savedIds }: { recipes: Reci
       <Link href={PLATFORM_CONFIG.urls.recipes} className="mt-8 inline-flex items-center gap-1.5 font-medium text-amber-950 sm:hidden">
         Barcha retseptlar <ArrowRight className="h-4 w-4" aria-hidden="true" />
       </Link>
-    </section>
-  );
-}
-
-/** An editorial sidebar: the quickest recipes as a numbered list rather than more cards. */
-export function QuickList({ recipes }: { recipes: Recipe[] }) {
-  return (
-    <section aria-labelledby="quick-heading" className="min-w-0 lg:sticky lg:top-24 lg:self-start">
-      <h2 id="quick-heading" className="text-2xl font-medium text-amber-950">Tez tayyor bo‘ladi</h2>
-      <p className="mt-1 text-sm text-amber-600">Vaqt kam bo‘lganda</p>
-      <ol className="mt-5 border-t border-amber-950">
-        {recipes.map((r, i) => (
-          <li key={r.id} className="border-b border-amber-200">
-            <Link href={`/recipes/${r.slug}`} className="group flex items-center gap-4 py-4">
-              <span className="w-7 shrink-0 font-serif text-2xl text-clay-400 tabular-nums">{i + 1}</span>
-              <span className="min-w-0 flex-1">
-                <span className="block font-serif text-lg font-medium leading-snug text-amber-950 group-hover:text-amber-700">{r.title}</span>
-                <span className="mt-0.5 block text-sm text-amber-600">{formatMinutes(totalMinutes(r))} · {r.creator.name}</span>
-              </span>
-              <span className="relative h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-amber-100">
-                <Image src={r.coverMedia.url} alt="" fill sizes="64px" className="object-cover" />
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ol>
-    </section>
-  );
-}
-
-export function CreatorsStrip({ creators }: { creators: (RecipeCreator & { recipeCount: number })[] }) {
-  return (
-    <section aria-labelledby="creators-heading">
-      <SectionHeading id="creators-heading" title="Ijodkorlar" note="Retseptlar ortidagi oshpazlar" href={PLATFORM_CONFIG.urls.creators} linkLabel="Barcha ijodkorlar" />
-      <ul className="grid gap-x-10 gap-y-8 border-t border-amber-200 pt-8 sm:grid-cols-2 lg:grid-cols-3">
-        {creators.map((c) => (
-          <li key={c.id}>
-            <Link href={`/creators/${c.slug}`} className="group flex items-start gap-4">
-              {c.avatarUrl ? (
-                <Image src={c.avatarUrl} alt="" width={64} height={64} className="h-16 w-16 shrink-0 rounded-full object-cover" />
-              ) : (
-                <span className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-sage-100 font-serif text-2xl text-sage-700" aria-hidden="true">
-                  {c.name.slice(0, 1).toUpperCase()}
-                </span>
-              )}
-              <span className="min-w-0">
-                <span className="block font-serif text-xl font-medium text-amber-950 group-hover:text-amber-700">{c.name}</span>
-                <span className="block text-sm text-amber-600">{c.recipeCount} ta retsept</span>
-                {c.bio && <span className="mt-1.5 line-clamp-2 block text-sm text-amber-900">{c.bio}</span>}
-              </span>
-            </Link>
-          </li>
-        ))}
-      </ul>
     </section>
   );
 }

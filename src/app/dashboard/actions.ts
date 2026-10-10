@@ -39,7 +39,6 @@ export async function becomeCreator(_: ActionResult, formData: FormData): Promis
 
   await db.insert(schema.creators).values({ userId: user.id, slug, name: parsed.data.name, bio: parsed.data.bio || null });
   if (user.role === "user") await db.update(schema.users).set({ role: "creator" }).where(eq(schema.users.id, user.id));
-  revalidatePath("/creators");
   redirect("/dashboard");
 }
 
@@ -104,7 +103,6 @@ export async function updateCreatorProfile(input: { name: string; bio: string; a
     .set({ name: parsed.data.name, bio: parsed.data.bio || null, avatarUrl: parsed.data.avatarUrl || null, socialLinks })
     .where(eq(schema.creators.id, ctx.creator.id));
   revalidatePath(`/creators/${ctx.creator.slug}`);
-  revalidatePath("/creators");
   revalidatePath("/dashboard");
   return { ok: true };
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { RecipesBrowser } from "@/components/recipe/RecipesBrowser";
+import { parseCategories } from "@/lib/categories";
 import { ALL, DIFFICULTIES, PRICE_FILTERS, TIME_FILTERS } from "@/lib/filters";
 import { getCurrentUser } from "@/server/auth";
 import { listPublishedRecipes } from "@/server/recipes";
@@ -18,6 +19,7 @@ interface SearchParams {
   price?: string;
   time?: string;
   difficulty?: string;
+  category?: string;
 }
 
 const oneOf = (value: string | undefined, allowed: readonly string[]) => (value && allowed.includes(value) ? value : ALL);
@@ -37,6 +39,7 @@ export default async function RecipesPage({ searchParams }: { searchParams: Prom
         difficulty: oneOf(sp.difficulty, DIFFICULTIES),
         price: oneOf(sp.price, PRICE_FILTERS),
         time: TIME_FILTERS.find((t) => String(t.max) === sp.time)?.label ?? ALL,
+        categories: parseCategories(sp.category),
       }}
     />
   );

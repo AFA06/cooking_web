@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ChefHat, Clock, Flame, Star, Users } from "lucide-react";
+import { ChefHat, Clock, Star, Users } from "lucide-react";
+import { CaloriesBadge } from "@/components/recipe/NutritionFacts";
 import { BookmarkButton } from "@/components/recipe/BookmarkButton";
 import { DIFFICULTY_LABEL, formatMinutes, formatNumber, formatPrice } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
@@ -22,9 +23,9 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
   const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency) : null;
   const { creator } = recipe;
   const facts = [
-    { label: "Vaqt", value: formatMinutes(total), icon: Clock, tone: "text-amber-700" },
-    { label: "Porsiya", value: `${recipe.servings} kishilik`, icon: Users, tone: "text-sage-600" },
-    { label: "Qiyinligi", value: DIFFICULTY_LABEL[recipe.difficulty], icon: ChefHat, tone: "text-amber-700" },
+    { label: "Vaqt", value: formatMinutes(total), icon: Clock },
+    { label: "Porsiya", value: `${recipe.servings} kishilik`, icon: Users },
+    { label: "Qiyinligi", value: DIFFICULTY_LABEL[recipe.difficulty], icon: ChefHat },
   ];
 
   return (
@@ -52,35 +53,39 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
             </>
           )}
         </span>
-        {(recipe.rating.count > 0 || recipe.cookedCount > 0) && (
-          <p className="absolute bottom-3 left-3 flex items-center gap-3 rounded-full bg-amber-50/95 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm">
-            {recipe.rating.count > 0 && (
-              <span className="flex items-center gap-1">
-                <Star className="h-3.5 w-3.5 fill-clay-400 text-clay-400" aria-hidden="true" />
-                <span className="sr-only">Baho: </span>
-                {recipe.rating.average.toFixed(1).replace(".", ",")}
-                <span className="font-normal text-amber-600">({formatNumber(recipe.rating.count)})</span>
-              </span>
-            )}
-            {recipe.cookedCount > 0 && (
-              <span className="flex items-center gap-1">
-                <Flame className="h-3.5 w-3.5 text-amber-700" strokeWidth={2} aria-hidden="true" />
-                {formatNumber(recipe.cookedCount)} marta pishirilgan
-              </span>
-            )}
-          </p>
-        )}
+        {/* One row along the bottom edge, so the rating pill and the calories can never sit on top of each other. */}
+        <div className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-2">
+          {(recipe.rating.count > 0 || recipe.cookedCount > 0) && (
+            <p className="flex min-w-0 flex-wrap items-center gap-x-3 gap-y-0.5 rounded-2xl bg-amber-50/95 px-3 py-1.5 text-xs font-semibold text-amber-950 shadow-sm">
+              {recipe.rating.count > 0 && (
+                <span className="flex items-center gap-1">
+                  <Star className="h-3.5 w-3.5 fill-clay-400 text-clay-400" aria-hidden="true" />
+                  <span className="sr-only">Baho: </span>
+                  {recipe.rating.average.toFixed(1).replace(".", ",")}
+                  <span className="font-normal text-amber-600">({formatNumber(recipe.rating.count)})</span>
+                </span>
+              )}
+              {recipe.cookedCount > 0 && (
+                <span className="flex items-center gap-1">
+                  <ChefHat className="h-3.5 w-3.5 text-amber-700" strokeWidth={2} aria-hidden="true" />
+                  {formatNumber(recipe.cookedCount)} marta pishirilgan
+                </span>
+              )}
+            </p>
+          )}
+          {recipe.nutrition && <CaloriesBadge calories={recipe.nutrition.calories} className="ml-auto" />}
+        </div>
         <BookmarkButton recipeId={recipe.id} slug={recipe.slug} initialSaved={saved} isLoggedIn={isLoggedIn} className="absolute right-3 top-3 z-10" />
       </div>
 
-      <div className="mt-5">
+      <div className="mt-4">
         <h3 className="line-clamp-2 text-2xl font-medium leading-tight text-amber-950 break-words">
           <Link href={`/recipes/${recipe.slug}`} className="after:absolute after:inset-0 after:rounded-[1.25rem] group-hover:text-amber-700">
             {recipe.title}
           </Link>
         </h3>
 
-        <p className="mt-3 flex items-center gap-2.5 text-[0.95rem] text-amber-900">
+        <p className="mt-2.5 flex items-center gap-2.5 text-[0.95rem] text-amber-900">
           {creator.avatarUrl ? (
             <Image src={creator.avatarUrl} alt="" width={28} height={28} className="h-7 w-7 shrink-0 rounded-full object-cover" />
           ) : (
@@ -91,17 +96,16 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
           <span className="truncate">{creator.name}</span>
         </p>
 
-        <dl className="mt-4 grid grid-cols-3 gap-3 border-t border-amber-200 pt-4">
-          {facts.map(({ label, value, icon: Icon, tone }) => (
-            <div key={label} className="min-w-0">
-              <dt className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-amber-600">
-                <Icon className={cn("h-4 w-4 shrink-0", tone)} strokeWidth={2} aria-hidden="true" />
-                {label}
-              </dt>
-              <dd className="mt-1 text-[0.95rem] font-semibold text-amber-950">{value}</dd>
-            </div>
+        <ul className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-amber-900">
+          {facts.map(({ label, value, icon: Icon }) => (
+            <li key={label} className="flex items-center gap-1.5">
+              <Icon className="h-4 w-4 shrink-0 text-amber-600" strokeWidth={2} aria-hidden="true" />
+              <span className="sr-only">{label}: </span>
+              {value}
+            </li>
           ))}
-        </dl>
+        </ul>
+
       </div>
     </article>
   );

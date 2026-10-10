@@ -41,6 +41,11 @@ function toRecipe(
     prepTimeMinutes: r.prepTimeMinutes,
     cookTimeMinutes: r.cookTimeMinutes,
     difficulty: r.difficulty,
+    category: r.category,
+    nutrition:
+      r.calories !== null && r.proteinGrams !== null && r.fatGrams !== null && r.carbGrams !== null
+        ? { calories: r.calories, proteinGrams: r.proteinGrams, fatGrams: r.fatGrams, carbGrams: r.carbGrams }
+        : undefined,
     isPremium: r.isPremium,
     price: r.priceAmount ?? undefined,
     currency: r.priceCurrency ?? undefined,

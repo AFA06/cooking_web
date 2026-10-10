@@ -13,6 +13,9 @@ export async function SiteHeader() {
   const isCreator = user?.role === "creator" || user?.role === "admin";
   const isAdmin = user?.role === "admin";
 
+  // Signed-in visitors get their own kitchen right in the bar, after the public links.
+  const barItems = [...NAVIGATION_LINKS.public, ...(user ? [{ label: "Mening oshxonam", href: PLATFORM_CONFIG.urls.account }] : [])];
+
   const mobileItems = [
     ...NAVIGATION_LINKS.public,
     ...(user
@@ -35,7 +38,7 @@ export async function SiteHeader() {
           </Link>
 
           <ul className="ml-4 hidden items-center gap-7 md:flex">
-            {NAVIGATION_LINKS.public.map((link) => (
+            {barItems.map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="text-[0.95rem] text-amber-900 transition-colors hover:text-amber-700">
                   {link.label}

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Star } from "lucide-react";
 import { RatingStars, formatRating } from "@/components/reviews/RatingStars";
 import { formatNumber, formatRelative } from "@/lib/format";
 import type { RatingSummary, Review } from "@/server/reviews";
@@ -26,6 +27,36 @@ export function RatingOverview({ rating }: { rating: RatingSummary }) {
           );
         })}
       </dl>
+    </div>
+  );
+}
+
+const photoUrl = (photoId: string) => `/api/review-photos/${photoId}`;
+
+/** The dishes people actually got, as a strip of photos: the quickest way to judge a recipe. */
+export function ResultPhotos({ reviews, className }: { reviews: Review[]; className?: string }) {
+  const withPhoto = reviews.filter((review) => review.photoId);
+  if (withPhoto.length === 0) return null;
+  return (
+    <div className={className}>
+      <h3 className="text-sm font-medium uppercase tracking-wider text-amber-600">Pishirganlarning natijalari · {withPhoto.length} ta rasm</h3>
+      <ul className="no-scrollbar -mx-5 mt-3 flex gap-3 overflow-x-auto px-5 sm:mx-0 sm:px-0">
+        {withPhoto.map((review) => (
+          <li key={review.id} className="shrink-0">
+            <a href={photoUrl(review.photoId!)} target="_blank" rel="noopener" className="relative block h-40 w-40 overflow-hidden rounded-2xl bg-amber-100 sm:h-48 sm:w-48" aria-label={`${review.userName} pishirgan taom rasmi, ${review.rating} yulduz`}>
+              {/* eslint-disable-next-line @next/next/no-img-element -- served by our own cached route */}
+              <img src={photoUrl(review.photoId!)} alt="" loading="lazy" className="h-full w-full object-cover" />
+              <span className="absolute inset-x-0 bottom-0 flex items-center justify-between gap-2 bg-gradient-to-t from-ink/85 to-transparent px-3 pb-2.5 pt-8 text-sm font-medium text-paper">
+                <span className="truncate">{review.userName}</span>
+                <span className="flex shrink-0 items-center gap-1 tabular-nums">
+                  <Star className="h-3.5 w-3.5 fill-clay-400 text-clay-400" aria-hidden="true" />
+                  {review.rating}
+                </span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -58,9 +89,9 @@ export function ReviewList({ reviews, showRecipe = false }: { reviews: Review[];
             )}
           </div>
           {review.photoId && (
-            <a href={`/api/review-photos/${review.photoId}`} target="_blank" rel="noopener" className="shrink-0" aria-label={`${review.userName} pishirgan taom rasmi`}>
+            <a href={photoUrl(review.photoId)} target="_blank" rel="noopener" className="shrink-0" aria-label={`${review.userName} pishirgan taom rasmi`}>
               {/* eslint-disable-next-line @next/next/no-img-element -- served by our own cached route */}
-              <img src={`/api/review-photos/${review.photoId}`} alt="" loading="lazy" className="h-24 w-24 rounded-2xl object-cover sm:h-32 sm:w-32" />
+              <img src={photoUrl(review.photoId)} alt="" loading="lazy" className="h-24 w-24 rounded-2xl object-cover sm:h-32 sm:w-32" />
             </a>
           )}
         </li>

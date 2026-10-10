@@ -3,7 +3,6 @@ export const PLATFORM_CONFIG = {
   tagline: "Sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
   urls: {
     recipes: "/recipes",
-    creators: "/creators",
     becomeCreator: "/creators/join",
     login: "/auth/login",
     signup: "/auth/signup",
@@ -32,14 +31,12 @@ export const NAVIGATION_LINKS = {
   public: [
     { label: "Bosh sahifa", href: "/" },
     { label: "Retseptlar", href: PLATFORM_CONFIG.urls.recipes },
-    { label: "Ijodkorlar", href: PLATFORM_CONFIG.urls.creators },
     { label: "Ijodkor bo‘lish", href: PLATFORM_CONFIG.urls.becomeCreator },
   ],
   footer: {
     product: [
       { label: "Retseptlar", href: PLATFORM_CONFIG.urls.recipes },
-      { label: "Ijodkorlar", href: PLATFORM_CONFIG.urls.creators },
-      { label: "Ijodkor bo‘lish", href: PLATFORM_CONFIG.urls.becomeCreator },
+        { label: "Ijodkor bo‘lish", href: PLATFORM_CONFIG.urls.becomeCreator },
     ],
     legal: [
       { label: "Foydalanish shartlari", href: "/terms" },

@@ -2,11 +2,12 @@
 
 import * as React from "react";
 import Image from "next/image";
-import { Search, X } from "lucide-react";
+import { ArrowRight, Check, Search, X } from "lucide-react";
 import { FilterMenu } from "@/components/recipe/FilterMenu";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
+import { CATEGORY_LABEL, RECIPE_CATEGORIES, type RecipeCategory } from "@/lib/categories";
 import { ALL, DIFFICULTIES, EMPTY_FILTERS, PRICE_FILTERS, SORTS, TIME_FILTERS, filterRecipes, sortRecipes, type RecipeFilters, type SortKey } from "@/lib/filters";
 import { RECIPE_GRID_CLASSES, useGridColumns } from "@/lib/use-grid-columns";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,44 @@ import type { Recipe } from "@/types/recipe";
 const ROWS_PER_PAGE = 4;
 
 const toOptions = (values: readonly string[]) => values.map((value) => ({ value, label: value }));
+
+/** Keeps the address bar in step with the filters, so a filtered list can be shared or reloaded. */
+function toSearch(f: RecipeFilters): string {
+  const params = new URLSearchParams();
+  if (f.query.trim()) params.set("q", f.query.trim());
+  if (f.categories.length > 0) params.set("category", f.categories.join(","));
+  if (f.price !== ALL) params.set("price", f.price);
+  const maxMinutes = TIME_FILTERS.find((t) => t.label === f.time)?.max;
+  if (maxMinutes) params.set("time", String(maxMinutes));
+  if (f.difficulty !== ALL) params.set("difficulty", f.difficulty);
+  const search = params.toString();
+  return search ? `?${search}` : "";
+}
+
+function CategoryChip({ label, count, checked, onClick, all }: { label: string; count: number; checked: boolean; onClick: () => void; all?: boolean }) {
+  return (
+    <button
+      type="button"
+      role={all ? undefined : "checkbox"}
+      aria-checked={all ? undefined : checked}
+      aria-pressed={all ? checked : undefined}
+      onClick={onClick}
+      className={cn(
+        "flex h-11 shrink-0 items-center gap-2.5 rounded-full border pl-3 pr-4 text-[0.95rem] outline-none transition-colors focus-visible:ring-2 focus-visible:ring-amber-700 focus-visible:ring-offset-2 focus-visible:ring-offset-amber-50",
+        checked ? "border-amber-950 bg-amber-950 font-medium text-amber-50" : "border-amber-300 bg-amber-100 text-amber-950 hover:border-amber-950",
+        all && "pl-4",
+      )}
+    >
+      {!all && (
+        <span className={cn("flex h-5 w-5 items-center justify-center rounded-md border", checked ? "border-amber-50 bg-amber-50 text-amber-950" : "border-amber-500")} aria-hidden="true">
+          {checked && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+        </span>
+      )}
+      {label}
+      <span className={cn("text-xs tabular-nums", checked ? "text-amber-300" : "text-amber-500")}>{count}</span>
+    </button>
+  );
+}
 
 interface Props {
   recipes: Recipe[];
@@ -30,6 +69,11 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
   const [pages, setPages] = React.useState(1);
   const columns = useGridColumns();
   const pageSize = ROWS_PER_PAGE * columns;
+  const resultsTop = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    window.history.replaceState(null, "", window.location.pathname + toSearch(filters));
+  }, [filters]);
 
   // Any change to what is listed starts again from the first rows.
   const set = (patch: Partial<RecipeFilters>) => {
@@ -47,11 +91,27 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
   const remaining = results.length - visible.length;
   const countFor = (price: string) => filterRecipes(recipes, { ...filters, price }).length;
 
+  const selected = filters.categories;
+  const toggleCategory = (key: RecipeCategory) =>
+    set({ categories: RECIPE_CATEGORIES.map((c) => c.key).filter((k) => (k === key ? !selected.includes(k) : selected.includes(k))) });
+  // Everything that passes the other filters, whatever its category: the counts on the chips and the "other categories" rows.
+  const anyCategory = React.useMemo(() => sortRecipes(filterRecipes(recipes, { ...filters, categories: [] }), sort), [recipes, filters, sort]);
+  const inCategory = (key: RecipeCategory) => anyCategory.filter((r) => r.category === key);
+  const otherGroups = RECIPE_CATEGORIES.filter((c) => !selected.includes(c.key))
+    .map((c) => ({ ...c, recipes: inCategory(c.key) }))
+    .filter((g) => g.recipes.length > 0);
+  const rowSize = Math.max(columns, 2);
+  const showOnly = (key: RecipeCategory) => {
+    set({ categories: [key] });
+    resultsTop.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
+
   const chips = [
     filters.query.trim() && { label: `“${filters.query.trim()}”`, remove: () => set({ query: "" }) },
     filters.time !== ALL && { label: filters.time, remove: () => set({ time: ALL }) },
     filters.difficulty !== ALL && { label: filters.difficulty, remove: () => set({ difficulty: ALL }) },
   ].filter((chip): chip is { label: string; remove: () => void } => Boolean(chip));
+  const hasFilters = chips.length > 0 || selected.length > 0 || filters.price !== ALL;
 
   // Three covers for the header collage; purely decorative.
   const covers = recipes.slice(0, 3);
@@ -94,45 +154,55 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
         </Container>
       </section>
 
+      <div ref={resultsTop} className="scroll-mt-16" />
       <div className="sticky top-16 z-40 border-b border-amber-200 bg-amber-50/85 backdrop-blur-md">
-        <Container size="xl" className="flex flex-col gap-3 py-3 lg:flex-row lg:items-center lg:justify-between">
-          <div role="tablist" aria-label="Retsept turi" className="flex w-fit rounded-full bg-amber-100 p-1">
-            {PRICE_FILTERS.map((price) => {
-              const active = filters.price === price;
-              return (
-                <button
-                  key={price}
-                  type="button"
-                  role="tab"
-                  aria-selected={active}
-                  onClick={() => set({ price })}
-                  className={cn(
-                    "flex h-10 items-center gap-2 rounded-full px-4 text-[0.95rem] transition-colors",
-                    active ? "bg-amber-100 font-semibold text-amber-950 shadow-sm" : "text-amber-600 hover:text-amber-950",
-                  )}
-                >
-                  {price}
-                  <span className={cn("text-xs tabular-nums", active ? "text-amber-600" : "text-amber-500")}>{countFor(price)}</span>
-                </button>
-              );
-            })}
+        <Container size="xl" className="flex flex-col gap-3 py-3">
+          <div role="group" aria-label="Toifalar" className="no-scrollbar -mx-5 flex gap-2 overflow-x-auto px-5 lg:mx-0 lg:flex-wrap lg:overflow-visible lg:px-0">
+            <CategoryChip all label="Barcha toifalar" count={anyCategory.length} checked={selected.length === 0} onClick={() => set({ categories: [] })} />
+            {RECIPE_CATEGORIES.map((c) => (
+              <CategoryChip key={c.key} label={c.label} count={inCategory(c.key).length} checked={selected.includes(c.key)} onClick={() => toggleCategory(c.key)} />
+            ))}
           </div>
 
-          <div className="no-scrollbar -mx-5 flex items-center gap-2 overflow-x-auto px-5 lg:mx-0 lg:overflow-visible lg:px-0">
-            <FilterMenu label="Vaqt" options={toOptions(TIME_FILTERS.map((t) => t.label))} value={filters.time} defaultValue={ALL} onChange={(time) => set({ time })} />
-            <FilterMenu label="Qiyinligi" options={toOptions(DIFFICULTIES)} value={filters.difficulty} defaultValue={ALL} onChange={(difficulty) => set({ difficulty })} />
-            <span className="mx-1 hidden h-6 w-px bg-amber-300 lg:block" aria-hidden="true" />
-            <FilterMenu
-              label="Saralash"
-              align="end"
-              options={SORTS.map((s) => ({ value: s.key, label: s.label }))}
-              value={sort}
-              defaultValue="newest"
-              onChange={(value) => {
-                setSort(value as SortKey);
-                setPages(1);
-              }}
-            />
+          <div className="no-scrollbar -mx-5 flex items-center gap-2 overflow-x-auto px-5 lg:mx-0 lg:justify-between lg:overflow-visible lg:px-0">
+            <div role="tablist" aria-label="Narxi" className="flex shrink-0 rounded-full border border-amber-300 p-1">
+              {PRICE_FILTERS.map((price) => {
+                const active = filters.price === price;
+                return (
+                  <button
+                    key={price}
+                    type="button"
+                    role="tab"
+                    aria-selected={active}
+                    onClick={() => set({ price })}
+                    className={cn(
+                      "flex h-9 items-center gap-2 rounded-full px-4 text-[0.95rem] transition-colors",
+                      active ? "bg-amber-950 font-semibold text-amber-50" : "text-amber-600 hover:text-amber-950",
+                    )}
+                  >
+                    {price}
+                    <span className={cn("text-xs tabular-nums", active ? "text-amber-300" : "text-amber-500")}>{countFor(price)}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <FilterMenu label="Vaqt" options={toOptions(TIME_FILTERS.map((t) => t.label))} value={filters.time} defaultValue={ALL} onChange={(time) => set({ time })} />
+              <FilterMenu label="Qiyinligi" options={toOptions(DIFFICULTIES)} value={filters.difficulty} defaultValue={ALL} onChange={(difficulty) => set({ difficulty })} />
+              <span className="mx-1 hidden h-6 w-px bg-amber-300 lg:block" aria-hidden="true" />
+              <FilterMenu
+                label="Saralash"
+                align="end"
+                options={SORTS.map((s) => ({ value: s.key, label: s.label }))}
+                value={sort}
+                defaultValue="newest"
+                onChange={(value) => {
+                  setSort(value as SortKey);
+                  setPages(1);
+                }}
+              />
+            </div>
           </div>
         </Container>
       </div>
@@ -156,15 +226,23 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
               <X className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
           ))}
-          {chips.length > 0 && (
+          {hasFilters && (
             <button type="button" onClick={clear} className="h-9 px-1 text-sm font-medium text-amber-700 underline underline-offset-4 hover:text-amber-800">
               Tozalash
             </button>
           )}
         </div>
 
+        {selected.length > 0 && (
+          <h2 className="mt-5 text-[1.9rem] font-medium leading-tight text-amber-950 sm:text-[2.4rem]">{selected.map((key) => CATEGORY_LABEL[key]).join(" · ")}</h2>
+        )}
+
         {recipes.length === 0 ? (
           <p className="py-24 text-center text-amber-900">Hozircha retseptlar yo‘q. Tez orada qo‘shiladi.</p>
+        ) : results.length === 0 && otherGroups.length > 0 ? (
+          <p className="mt-4 max-w-xl text-lg text-amber-900">
+            Bu tanlov bo‘yicha hozircha retsept yo‘q. Quyida boshqa toifalardagi mos retseptlar bor.
+          </p>
         ) : results.length === 0 ? (
           <div className="py-24 text-center">
             <h2 className="text-4xl font-medium text-amber-950">Hech narsa topilmadi</h2>
@@ -201,6 +279,37 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
               )}
             </div>
           </>
+        )}
+
+        {selected.length > 0 && remaining === 0 && otherGroups.length > 0 && (
+          <section aria-labelledby="other-categories-heading" className="mt-20 border-t border-amber-200 pt-12">
+            <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">Boshqa toifalar</p>
+            <h2 id="other-categories-heading" className="mt-3 text-[1.9rem] font-medium leading-tight text-amber-950 sm:text-[2.4rem]">Yana nima pishiramiz?</h2>
+            {otherGroups.map((group) => (
+              <div key={group.key} className="mt-12">
+                <div className="flex items-end justify-between gap-6">
+                  <h3 className="text-2xl font-medium text-amber-950">
+                    {group.label} <span className="ml-1 text-base font-normal text-amber-600 tabular-nums">{group.recipes.length}</span>
+                  </h3>
+                  <button type="button" onClick={() => showOnly(group.key)} className="group flex h-11 shrink-0 items-center gap-1.5 text-[0.95rem] font-medium text-amber-950 hover:text-amber-700">
+                    Faqat shu toifa
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" aria-hidden="true" />
+                  </button>
+                </div>
+                <div className={cn(RECIPE_GRID_CLASSES, "mt-6 gap-x-6 gap-y-14 xl:gap-x-8")}>
+                  {group.recipes.slice(0, rowSize).map((recipe) => (
+                    <RecipeCard
+                      key={recipe.id}
+                      recipe={recipe}
+                      isLoggedIn={isLoggedIn}
+                      saved={saved.has(recipe.id)}
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </section>
         )}
       </Container>
     </>

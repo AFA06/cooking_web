@@ -1,3 +1,4 @@
+import type { RecipeCategory } from "@/lib/categories";
 import type { Recipe } from "@/types/recipe";
 
 export const ALL = "Barchasi";
@@ -21,9 +22,11 @@ export interface RecipeFilters {
   difficulty: string;
   price: string;
   time: string;
+  /** Empty means every category. */
+  categories: RecipeCategory[];
 }
 
-export const EMPTY_FILTERS: RecipeFilters = { query: "", difficulty: ALL, price: ALL, time: ALL };
+export const EMPTY_FILTERS: RecipeFilters = { query: "", difficulty: ALL, price: ALL, time: ALL, categories: [] };
 
 export function filterRecipes(recipes: Recipe[], f: RecipeFilters): Recipe[] {
   const q = f.query.trim().toLowerCase();
@@ -41,6 +44,7 @@ export function filterRecipes(recipes: Recipe[], f: RecipeFilters): Recipe[] {
     ) {
       return false;
     }
+    if (f.categories.length > 0 && !f.categories.includes(r.category)) return false;
     if (f.difficulty !== ALL && r.difficulty !== DIFFICULTY_BY_LABEL[f.difficulty]) return false;
     if (f.price === "Bepul" && r.isPremium) return false;
     if (f.price === "Premium" && !r.isPremium) return false;

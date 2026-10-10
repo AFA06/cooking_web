@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { CATEGORY_KEYS } from "@/lib/categories";
 
 const optionalUrl = z
   .string()
@@ -19,6 +20,11 @@ export const recipeInputSchema = z
     prepTimeMinutes: z.coerce.number().int().min(0).max(2880),
     cookTimeMinutes: z.coerce.number().int().min(0).max(2880),
     difficulty: z.enum(["easy", "medium", "hard"]),
+    category: z.enum(CATEGORY_KEYS),
+    calories: z.coerce.number().int().min(0).max(5000).nullable(),
+    proteinGrams: z.coerce.number().int().min(0).max(500).nullable(),
+    fatGrams: z.coerce.number().int().min(0).max(500).nullable(),
+    carbGrams: z.coerce.number().int().min(0).max(1000).nullable(),
     isPremium: z.boolean(),
     priceAmount: z.coerce.number().int().min(0).max(100_000_000).nullable(),
     tags: z.array(z.string().trim().min(1).max(30)).max(10),
@@ -46,6 +52,10 @@ export const recipeInputSchema = z
       )
       .min(1, "Kamida bitta qadam qo‘shing")
       .max(60),
+  })
+  .refine((v) => new Set([v.calories, v.proteinGrams, v.fatGrams, v.carbGrams].map((n) => n === null)).size === 1, {
+    message: "Ozuqaviy qiymatning to‘rttasini ham to‘ldiring yoki hammasini bo‘sh qoldiring",
+    path: ["calories"],
   })
   .refine((v) => !v.isPremium || (v.priceAmount !== null && v.priceAmount > 0), {
     message: "Premium retsept uchun narx kerak",

@@ -1,9 +1,9 @@
 import { Container } from "@/components/ui/Container";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SearchBar } from "@/components/home/SearchBar";
-import { CategoryRail, ContinueCooking, CreatorInvite, CreatorsStrip, HowItCooks, LatestRecipes, LeadRecipe, QuickList } from "@/components/home/sections";
+import { CategoryRail, ContinueCooking, CreatorInvite, HowItCooks, LatestRecipes, LeadRecipe } from "@/components/home/sections";
 import { getCurrentUser } from "@/server/auth";
-import { listCreators, listPublishedRecipes } from "@/server/recipes";
+import { listPublishedRecipes } from "@/server/recipes";
 import { getActiveCooking, getSavedRecipeIds } from "@/server/user-data";
 
 export const dynamic = "force-dynamic";
@@ -18,9 +18,8 @@ function greeting(): string {
 
 export default async function HomePage() {
   const user = await getCurrentUser();
-  const [recipes, creators, savedList, activeCooking] = await Promise.all([
+  const [recipes, savedList, activeCooking] = await Promise.all([
     listPublishedRecipes(),
-    listCreators(),
     user ? getSavedRecipeIds(user.id) : [],
     user ? getActiveCooking(user.id) : null,
   ]);
@@ -29,8 +28,6 @@ export default async function HomePage() {
   // The cover story should be cookable right away, so prefer a free recipe.
   const lead = recipes.find((r) => !r.isPremium) ?? recipes[0];
   const rest = recipes.filter((r) => r.id !== lead?.id);
-  const quickest = [...recipes].sort((a, b) => a.prepTimeMinutes + a.cookTimeMinutes - (b.prepTimeMinutes + b.cookTimeMinutes)).slice(0, 4);
-  const activeCreators = creators.filter((c) => c.recipeCount > 0).slice(0, 6);
 
   return (
     <SiteShell>
@@ -63,19 +60,12 @@ export default async function HomePage() {
       </Container>
 
       {rest.length > 0 && (
-        <Container size="xl" className="grid gap-14 border-t border-amber-200 py-16 lg:grid-cols-[2fr_1fr] lg:gap-16 lg:py-24">
-          <LatestRecipes recipes={rest.slice(0, 4)} isLoggedIn={!!user} savedIds={savedIds} />
-          <QuickList recipes={quickest} />
+        <Container size="xl" className="border-t border-amber-200 py-16 lg:py-24">
+          <LatestRecipes recipes={rest.slice(0, 6)} isLoggedIn={!!user} savedIds={savedIds} />
         </Container>
       )}
 
       {!user && <HowItCooks />}
-
-      {activeCreators.length > 0 && (
-        <Container size="xl" className="py-16 lg:py-24">
-          <CreatorsStrip creators={activeCreators} />
-        </Container>
-      )}
 
       <CreatorInvite />
     </SiteShell>

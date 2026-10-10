@@ -3,7 +3,10 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { RECIPE_CATEGORIES, type RecipeCategory } from "@/lib/categories";
+import { estimateNutrition } from "@/lib/nutrition";
 import type { RecipeInput } from "@/lib/recipe-schema";
+import { cn } from "@/lib/utils";
 
 type Ingredient = { name: string; quantity: string; unit: string };
 type Step = {
@@ -27,6 +30,11 @@ export interface EditorInitial {
   prepTimeMinutes: string;
   cookTimeMinutes: string;
   difficulty: "easy" | "medium" | "hard";
+  category: RecipeCategory;
+  calories: string;
+  proteinGrams: string;
+  fatGrams: string;
+  carbGrams: string;
   isPremium: boolean;
   priceAmount: string;
   tags: string;
@@ -45,6 +53,11 @@ export const EMPTY_RECIPE: EditorInitial = {
   prepTimeMinutes: "15",
   cookTimeMinutes: "30",
   difficulty: "easy",
+  category: "main",
+  calories: "",
+  proteinGrams: "",
+  fatGrams: "",
+  carbGrams: "",
   isPremium: false,
   priceAmount: "",
   tags: "",
@@ -57,6 +70,13 @@ const field =
   "w-full min-h-12 rounded-xl border border-amber-300 bg-amber-100 px-4 py-2.5 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
 const label = "block text-sm font-medium text-amber-950";
 
+const NUTRITION_FIELDS = [
+  { key: "calories", text: "Kaloriya (kkal)" },
+  { key: "proteinGrams", text: "Oqsil (g)" },
+  { key: "fatGrams", text: "Yog‘ (g)" },
+  { key: "carbGrams", text: "Uglevod (g)" },
+] as const;
+
 function toInput(v: EditorInitial): RecipeInput {
   return {
     title: v.title,
@@ -67,6 +87,11 @@ function toInput(v: EditorInitial): RecipeInput {
     prepTimeMinutes: Number(v.prepTimeMinutes),
     cookTimeMinutes: Number(v.cookTimeMinutes),
     difficulty: v.difficulty,
+    category: v.category,
+    calories: v.calories === "" ? null : Number(v.calories),
+    proteinGrams: v.proteinGrams === "" ? null : Number(v.proteinGrams),
+    fatGrams: v.fatGrams === "" ? null : Number(v.fatGrams),
+    carbGrams: v.carbGrams === "" ? null : Number(v.carbGrams),
     isPremium: v.isPremium,
     priceAmount: v.isPremium && v.priceAmount ? Number(v.priceAmount) : null,
     tags: v.tags.split(",").map((t) => t.trim()).filter(Boolean),
@@ -107,6 +132,22 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
   const setIngredient = (i: number, patch: Partial<Ingredient>) =>
     set("ingredients", v.ingredients.map((x, n) => (n === i ? { ...x, ...patch } : x)));
   const setStep = (i: number, patch: Partial<Step>) => set("steps", v.steps.map((x, n) => (n === i ? { ...x, ...patch } : x)));
+  const [nutritionNote, setNutritionNote] = React.useState<string | null>(null);
+  const calculateNutrition = () => {
+    const { perServing, skipped } = estimateNutrition(v.ingredients, Number(v.servings));
+    if (!perServing) return setNutritionNote("Hisoblab bo‘lmadi: masalliqlarni miqdori va o‘lchovi bilan kiriting hamda porsiya sonini tekshiring.");
+    setV((p) => ({
+      ...p,
+      calories: String(perServing.calories),
+      proteinGrams: String(perServing.proteinGrams),
+      fatGrams: String(perServing.fatGrams),
+      carbGrams: String(perServing.carbGrams),
+    }));
+    setNutritionNote(
+      `Taxminiy hisob: ${v.servings} porsiyaga bo‘lindi.` +
+        (skipped.length > 0 ? ` Hisobga kirmadi: ${skipped.join(", ")} — kerak bo‘lsa, raqamlarni o‘zingiz to‘g‘rilang.` : " Raqamlarni tekshirib, kerak bo‘lsa to‘g‘rilang."),
+    );
+  };
   const move = <T,>(list: T[], i: number, dir: -1 | 1): T[] => {
     const j = i + dir;
     if (j < 0 || j >= list.length) return list;
@@ -180,9 +221,19 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
             </select>
           </div>
         </div>
-        <div>
-          <label htmlFor="tags" className={label}>Teglar (vergul bilan)</label>
-          <input id="tags" className={field} value={v.tags} placeholder="O‘zbek, Guruch, Qo‘y go‘shti" onChange={(e) => set("tags", e.target.value)} />
+        <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+          <div>
+            <label htmlFor="category" className={label}>Toifa</label>
+            <select id="category" className={field} value={v.category} onChange={(e) => set("category", e.target.value as RecipeCategory)}>
+              {RECIPE_CATEGORIES.map((c) => (
+                <option key={c.key} value={c.key}>{c.label}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="tags" className={label}>Teglar (vergul bilan)</label>
+            <input id="tags" className={field} value={v.tags} placeholder="O‘zbek, Guruch, Qo‘y go‘shti" onChange={(e) => set("tags", e.target.value)} />
+          </div>
         </div>
         <div className="flex flex-wrap items-end gap-6">
           <label className="flex items-center gap-2 text-amber-950 min-h-11">
@@ -228,6 +279,25 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
         <Button type="button" variant="outline" size="sm" onClick={() => set("ingredients", [...v.ingredients, { name: "", quantity: "", unit: "" }])}>
           Masalliq qo‘shish
         </Button>
+
+        <fieldset className="border-t border-amber-200 pt-4">
+          <legend className={cn(label, "pr-2")}>Ozuqaviy qiymati — 1 kishi uchun (ixtiyoriy)</legend>
+          <p className="text-xs text-amber-600">
+            Butun taomning qiymati porsiyalar soniga bo‘lingani, ya’ni bir kishi yeydigan miqdor. To‘ldirilsa, retsept kartochkasida va sahifasida ko‘rinadi.
+          </p>
+          <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
+            {NUTRITION_FIELDS.map(({ key, text }) => (
+              <div key={key}>
+                <label htmlFor={key} className="block text-xs text-amber-600">{text}</label>
+                <input id={key} type="number" min={0} className={field} value={v[key]} onChange={(e) => set(key, e.target.value)} />
+              </div>
+            ))}
+          </div>
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <Button type="button" variant="outline" size="sm" onClick={calculateNutrition}>Masalliqlardan hisoblash</Button>
+            {nutritionNote && <p className="text-xs text-amber-900" role="status">{nutritionNote}</p>}
+          </div>
+        </fieldset>
       </section>
 
       <section className="space-y-6">

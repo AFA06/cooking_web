@@ -16,6 +16,7 @@ import { sql } from "drizzle-orm";
 
 export const roleEnum = pgEnum("user_role", ["user", "creator", "admin"]);
 export const difficultyEnum = pgEnum("difficulty", ["easy", "medium", "hard"]);
+export const recipeCategoryEnum = pgEnum("recipe_category", ["soup", "main", "salad", "bakery", "dessert", "drink"]);
 export const recipeStatusEnum = pgEnum("recipe_status", ["draft", "published"]);
 export const sessionStatusEnum = pgEnum("cooking_session_status", ["in_progress", "completed", "abandoned"]);
 export const purchaseStatusEnum = pgEnum("purchase_status", ["pending", "paid", "failed", "refunded"]);
@@ -84,6 +85,12 @@ export const recipes = pgTable(
     prepTimeMinutes: integer("prep_time_minutes").notNull(),
     cookTimeMinutes: integer("cook_time_minutes").notNull(),
     difficulty: difficultyEnum("difficulty").notNull(),
+    category: recipeCategoryEnum("category").notNull().default("main"),
+    /** Per serving. Either all four are set or none. */
+    calories: integer("calories"),
+    proteinGrams: integer("protein_grams"),
+    fatGrams: integer("fat_grams"),
+    carbGrams: integer("carb_grams"),
     isPremium: boolean("is_premium").notNull().default(false),
     priceAmount: integer("price_amount"),
     priceCurrency: text("price_currency"),

@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { NutritionFacts } from "@/components/recipe/NutritionFacts";
 import { ChefHat, Clock, Flame, Lock, Thermometer, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -13,7 +14,7 @@ import { PLATFORM_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { RatingStars, formatRating } from "@/components/reviews/RatingStars";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
-import { RatingOverview, ReviewList } from "@/components/reviews/ReviewList";
+import { RatingOverview, ResultPhotos, ReviewList } from "@/components/reviews/ReviewList";
 import type { RatingSummary, Review, ReviewEligibility } from "@/server/reviews";
 import type { Recipe, RecipeStep } from "@/types/recipe";
 
@@ -32,6 +33,15 @@ function recipeJsonLd(recipe: Recipe) {
     totalTime: toIsoDuration(recipe.prepTimeMinutes + recipe.cookTimeMinutes),
     recipeYield: `${recipe.servings} porsiya`,
     keywords: recipe.tags.join(", "),
+    ...(recipe.nutrition && {
+      nutrition: {
+        "@type": "NutritionInformation",
+        calories: `${recipe.nutrition.calories} kcal`,
+        proteinContent: `${recipe.nutrition.proteinGrams} g`,
+        fatContent: `${recipe.nutrition.fatGrams} g`,
+        carbohydrateContent: `${recipe.nutrition.carbGrams} g`,
+      },
+    }),
     ...(recipe.rating.count > 0 && {
       aggregateRating: { "@type": "AggregateRating", ratingValue: recipe.rating.average.toFixed(1), ratingCount: recipe.rating.count },
     }),
@@ -155,7 +165,7 @@ export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedId
                 <a href="#reviews-heading" className="mt-4 flex w-fit items-center gap-2 text-sm text-amber-900 hover:text-amber-700">
                   <RatingStars value={rating.average} />
                   <span className="font-semibold text-amber-950">{formatRating(rating.average)}</span>
-                  <span className="underline underline-offset-4">{formatNumber(rating.count)} ta baho</span>
+                  <span className="underline underline-offset-4">{formatNumber(rating.count)} ta baho · pishirganlar fikrini o‘qish</span>
                 </a>
               )}
 
@@ -188,6 +198,7 @@ export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedId
                   </div>
                 ))}
               </dl>
+              {recipe.nutrition && <NutritionFacts nutrition={recipe.nutrition} className="mt-5" />}
               <p className="mt-3 text-sm text-amber-600">
                 Tayyorlash <ScaledTime {...times} part="prep" /> · Pishirish <ScaledTime {...times} part="cook" />
                 {recipe.cookedCount > 0 && (
@@ -308,6 +319,8 @@ export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedId
 
         <Container size="xl" className="mt-20 border-t border-amber-200 pt-14 lg:mt-28">
           <h2 id="reviews-heading" className="scroll-mt-24 text-[1.9rem] font-medium leading-tight text-amber-950 sm:text-[2.4rem]">Pishirganlar fikri</h2>
+          <p className="mt-2 max-w-2xl text-amber-900">Bu yerda faqat retseptni oxirigacha pishirgan odamlar yozadi: natijasi, bahosi va maslahati.</p>
+          <ResultPhotos reviews={reviews} className="mt-8" />
           <div className="mt-8 grid items-start gap-12 lg:grid-cols-[23rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[26rem_minmax(0,1fr)] xl:gap-20">
             <div>
               {rating.count > 0 ? (

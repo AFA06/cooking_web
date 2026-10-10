@@ -1,3 +1,4 @@
+import type { RecipeCategory } from "@/lib/categories";
 import type { SocialLinks } from "@/lib/social";
 
 export interface RecipeIngredient {
@@ -40,6 +41,14 @@ export interface RecipeCreator {
   socialLinks: SocialLinks;
 }
 
+/** Energy and macronutrients of one serving. */
+export interface RecipeNutrition {
+  calories: number;
+  proteinGrams: number;
+  fatGrams: number;
+  carbGrams: number;
+}
+
 export interface Recipe {
   id: string;
   slug: string;
@@ -51,6 +60,9 @@ export interface Recipe {
   prepTimeMinutes: number;
   cookTimeMinutes: number;
   difficulty: "easy" | "medium" | "hard";
+  category: RecipeCategory;
+  /** Missing when the author has not filled it in. */
+  nutrition?: RecipeNutrition;
   isPremium: boolean;
   price?: number;
   currency?: string;
