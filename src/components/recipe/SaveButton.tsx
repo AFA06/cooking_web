@@ -2,8 +2,10 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { Bookmark } from "lucide-react";
+import { SaveDialog } from "@/components/cookbooks/SaveDialog";
 import { Button } from "@/components/ui/Button";
-import { toggleSaveRecipe } from "@/app/recipes/actions";
+import { cn } from "@/lib/utils";
 
 interface Props {
   recipeId: string;
@@ -12,10 +14,10 @@ interface Props {
   isLoggedIn: boolean;
 }
 
+/** The recipe page's save button; opens the "save to…" sheet. */
 export function SaveButton({ recipeId, slug, initialSaved, isLoggedIn }: Props) {
   const [saved, setSaved] = React.useState(initialSaved);
-  const [error, setError] = React.useState<string | null>(null);
-  const [pending, startTransition] = React.useTransition();
+  const [open, setOpen] = React.useState(false);
 
   if (!isLoggedIn) {
     return (
@@ -26,28 +28,12 @@ export function SaveButton({ recipeId, slug, initialSaved, isLoggedIn }: Props) 
   }
 
   return (
-    <div>
-      <Button
-        size="lg"
-        variant="outline"
-        loading={pending}
-        aria-pressed={saved}
-        onClick={() =>
-          startTransition(async () => {
-            setError(null);
-            const result = await toggleSaveRecipe(recipeId, slug);
-            if ("error" in result) setError(result.error);
-            else setSaved(result.saved);
-          })
-        }
-      >
-        {saved ? "Saqlangan ✓" : "Retseptni saqlash"}
+    <>
+      <Button size="lg" variant="outline" aria-haspopup="dialog" onClick={() => setOpen(true)}>
+        <Bookmark className={cn("h-4 w-4", saved && "fill-amber-700 text-amber-700")} aria-hidden="true" />
+        {saved ? "Saqlangan" : "Retseptni saqlash"}
       </Button>
-      {error && (
-        <p role="alert" className="mt-2 text-sm text-red-700">
-          {error}
-        </p>
-      )}
-    </div>
+      <SaveDialog recipeId={recipeId} open={open} onOpenChange={setOpen} onKeptChange={setSaved} />
+    </>
   );
 }

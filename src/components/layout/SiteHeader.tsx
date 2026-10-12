@@ -13,8 +13,12 @@ export async function SiteHeader() {
   const isCreator = user?.role === "creator" || user?.role === "admin";
   const isAdmin = user?.role === "admin";
 
-  // Signed-in visitors get their own kitchen right in the bar, after the public links.
-  const barItems = [...NAVIGATION_LINKS.public, ...(user ? [{ label: "Mening oshxonam", href: PLATFORM_CONFIG.urls.account }] : [])];
+  const personalItems = [
+    { label: "Mening oshxonam", href: PLATFORM_CONFIG.urls.account },
+    { label: "Xaridlar", href: PLATFORM_CONFIG.urls.shopping },
+  ];
+  // Signed-in visitors get their own pages right in the bar, after the public links.
+  const barItems = [...NAVIGATION_LINKS.public, ...(user ? personalItems : [])];
 
   const mobileItems = [
     ...NAVIGATION_LINKS.public,
@@ -22,7 +26,7 @@ export async function SiteHeader() {
       ? [
           ...(isCreator ? [{ label: "Retsept yaratish", href: "/dashboard/recipes/new" }, { label: "Ijodkor paneli", href: "/dashboard" }] : []),
           ...(isAdmin ? [{ label: "Admin paneli", href: "/admin" }] : []),
-          { label: "Mening oshxonam", href: PLATFORM_CONFIG.urls.account },
+          ...personalItems,
           { label: "Profil sozlamalari", href: "/account/settings" },
         ]
       : [{ label: "Ro‘yxatdan o‘tish", href: PLATFORM_CONFIG.urls.signup }]),

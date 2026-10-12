@@ -12,6 +12,7 @@ import { ShareButton } from "@/components/recipe/ShareButton";
 import { DIFFICULTY_LABEL, formatMinutes, formatNumber, formatPrice, toIsoDuration } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { AddToShoppingList } from "@/components/shopping/AddToShoppingList";
 import { RatingStars, formatRating } from "@/components/reviews/RatingStars";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { RatingOverview, ResultPhotos, ReviewList } from "@/components/reviews/ReviewList";
@@ -116,9 +117,11 @@ interface Props {
   rating: RatingSummary;
   /** Null for visitors who are not signed in. */
   eligibility: ReviewEligibility | null;
+  /** Servings this recipe is on the visitor's shopping list for, if it is. */
+  shoppingServings: number | null;
 }
 
-export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds, reviews, rating, eligibility }: Props) {
+export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds, reviews, rating, eligibility, shoppingServings }: Props) {
   const { creator } = recipe;
   const times = { prepMinutes: recipe.prepTimeMinutes, cookMinutes: recipe.cookTimeMinutes };
   const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency) : null;
@@ -243,6 +246,9 @@ export function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedId
               <ServingsStepper />
             </div>
             <ScaledIngredients ingredients={recipe.ingredients} />
+            <div className="mt-5 border-t border-sage-200 pt-5">
+              <AddToShoppingList recipeId={recipe.id} slug={recipe.slug} isLoggedIn={isLoggedIn} listedServings={shoppingServings} />
+            </div>
           </section>
 
           <section aria-labelledby="steps-heading" className="min-w-0">

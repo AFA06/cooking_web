@@ -78,6 +78,12 @@ function formatAmount(amount: number, kind: UnitKind): string {
   return amount.toFixed(2).replace(/0+$/, "").replace(".", ",");
 }
 
+/** Writes an amount the way the ingredient lists do, rounded to what the unit can measure. */
+export function formatQuantity(amount: number, unit: string): string {
+  const kind = unitKind(unit);
+  return formatAmount(roundForKitchen(amount, kind), kind);
+}
+
 /**
  * Scales one ingredient quantity. Text that is not a number is returned unchanged,
  * and a factor of 1 always returns the creator's original text.
@@ -86,8 +92,7 @@ export function scaleQuantity(quantity: string, unit: string, factor: number): s
   if (factor === 1) return quantity;
   const amount = parseQuantity(quantity);
   if (amount === null) return quantity;
-  const kind = unitKind(unit);
-  return formatAmount(roundForKitchen(amount * factor, kind), kind);
+  return formatQuantity(amount * factor, unit);
 }
 
 const roundMinutes = (minutes: number) => (minutes <= 0 ? 0 : Math.max(5, roundTo(minutes, 5)));

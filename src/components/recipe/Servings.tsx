@@ -21,7 +21,7 @@ interface ServingsState {
 
 const ServingsContext = React.createContext<ServingsState | null>(null);
 
-function useServings(): ServingsState {
+export function useServings(): ServingsState {
   const value = React.useContext(ServingsContext);
   if (!value) throw new Error("Servings components must be rendered inside <ServingsProvider>.");
   return value;

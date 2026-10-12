@@ -6,6 +6,7 @@ import { getRecipeBySlug, getRecipesByCreator } from "@/server/recipes";
 import { getCurrentUser } from "@/server/auth";
 import { getSavedRecipeIds } from "@/server/user-data";
 import { getRecipeRating, getRecipeReviews, getReviewEligibility } from "@/server/reviews";
+import { getShoppingServings } from "@/server/shopping";
 import { RecipeDetail } from "@/components/recipe/RecipeDetail";
 
 interface Props {
@@ -62,15 +63,16 @@ export default async function RecipePage({ params, searchParams }: Props) {
   after(() =>
     trackEvent({ name: "recipe_view", userId: user?.id, recipeId: recipe.id, creatorId: recipe.creator.id, source: src }),
   );
-  const [byCreator, savedList, reviews, rating, eligibility] = await Promise.all([
+  const [byCreator, savedList, reviews, rating, eligibility, shoppingServings] = await Promise.all([
     getRecipesByCreator(recipe.creator.slug),
     user ? getSavedRecipeIds(user.id) : [],
     getRecipeReviews(recipe.id),
     getRecipeRating(recipe.id),
     user ? getReviewEligibility(user.id, recipe.id) : null,
+    user ? getShoppingServings(user.id, recipe.id) : null,
   ]);
   const savedIds = new Set(savedList);
   const moreRecipes = byCreator.filter((r) => r.id !== recipe.id).slice(0, 4);
 
-  return <RecipeDetail recipe={recipe} isLoggedIn={!!user} isSaved={savedIds.has(recipe.id)} moreRecipes={moreRecipes} savedIds={savedIds} reviews={reviews} rating={rating} eligibility={eligibility} />;
+  return <RecipeDetail recipe={recipe} isLoggedIn={!!user} isSaved={savedIds.has(recipe.id)} moreRecipes={moreRecipes} savedIds={savedIds} reviews={reviews} rating={rating} eligibility={eligibility} shoppingServings={shoppingServings} />;
 }

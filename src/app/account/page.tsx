@@ -7,6 +7,9 @@ import { Button } from "@/components/ui/Button";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { getCurrentUser } from "@/server/auth";
+import { CookbookCard } from "@/components/cookbooks/CookbookCard";
+import { NewCookbook } from "@/components/cookbooks/CookbookManage";
+import { getCookbooks } from "@/server/cookbooks";
 import { getCookingHistory, getSavedRecipes } from "@/server/user-data";
 import { formatDate } from "@/lib/format";
 
@@ -16,7 +19,7 @@ export const dynamic = "force-dynamic";
 export default async function AccountPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/login?next=/account");
-  const [saved, history] = await Promise.all([getSavedRecipes(user.id), getCookingHistory(user.id)]);
+  const [saved, history, cookbooks] = await Promise.all([getSavedRecipes(user.id), getCookingHistory(user.id), getCookbooks(user.id)]);
 
   return (
     <SiteShell>
@@ -31,7 +34,24 @@ export default async function AccountPage() {
           </Button>
         </header>
 
-        <section className="mt-12" aria-labelledby="saved-heading">
+        <section className="mt-12" aria-labelledby="cookbooks-heading">
+          <div className="flex flex-wrap items-end justify-between gap-4">
+            <div>
+              <h2 id="cookbooks-heading" className="text-2xl font-serif text-amber-950">Retsept kitoblarim</h2>
+              <p className="mt-1 text-amber-600">Sevimli retseptlaringizni o‘zingiz nomlagan kitoblarga ajrating.</p>
+            </div>
+            <NewCookbook />
+          </div>
+          {cookbooks.length > 0 && (
+            <div className="mt-6 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+              {cookbooks.map((cookbook) => (
+                <CookbookCard key={cookbook.id} cookbook={cookbook} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <section className="mt-14" aria-labelledby="saved-heading">
           <h2 id="saved-heading" className="text-2xl font-serif text-amber-950">Saqlangan retseptlar</h2>
           {saved.length === 0 ? (
             <p className="mt-4 text-amber-600">

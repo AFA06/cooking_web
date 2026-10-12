@@ -9,21 +9,6 @@ import { getReviewEligibility } from "@/server/reviews";
 
 const uuid = z.string().uuid();
 
-export async function toggleSaveRecipe(recipeId: string, slug: string): Promise<{ saved: boolean } | { error: string }> {
-  const user = await getCurrentUser();
-  if (!user) return { error: "Retseptni saqlash uchun tizimga kiring." };
-  if (!uuid.safeParse(recipeId).success) return { error: "Noto‘g‘ri retsept." };
-
-  const where = and(eq(schema.savedRecipes.userId, user.id), eq(schema.savedRecipes.recipeId, recipeId));
-  const [existing] = await db.select({ r: schema.savedRecipes.recipeId }).from(schema.savedRecipes).where(where).limit(1);
-  if (existing) await db.delete(schema.savedRecipes).where(where);
-  else await db.insert(schema.savedRecipes).values({ userId: user.id, recipeId });
-
-  revalidatePath(`/recipes/${slug}`);
-  revalidatePath("/account");
-  return { saved: !existing };
-}
-
 export async function startCookingSession(recipeId: string): Promise<{ sessionId: string } | null> {
   const user = await getCurrentUser();
   if (!user || !uuid.safeParse(recipeId).success) return null;

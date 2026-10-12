@@ -50,9 +50,17 @@ export async function getCookingHistory(userId: string, limit = 20): Promise<His
     .limit(limit);
 }
 
+/** Every recipe the person has kept anywhere: the general saved list or any of their cookbooks. */
 export async function getSavedRecipeIds(userId: string): Promise<string[]> {
-  const rows = await db.select({ id: schema.savedRecipes.recipeId }).from(schema.savedRecipes).where(eq(schema.savedRecipes.userId, userId));
-  return rows.map((r) => r.id);
+  const [saved, inCookbooks] = await Promise.all([
+    db.select({ id: schema.savedRecipes.recipeId }).from(schema.savedRecipes).where(eq(schema.savedRecipes.userId, userId)),
+    db
+      .select({ id: schema.cookbookRecipes.recipeId })
+      .from(schema.cookbookRecipes)
+      .innerJoin(schema.cookbooks, eq(schema.cookbookRecipes.cookbookId, schema.cookbooks.id))
+      .where(eq(schema.cookbooks.userId, userId)),
+  ]);
+  return [...new Set([...saved, ...inCookbooks].map((r) => r.id))];
 }
 
 /** The most recent unfinished cooking session from the last 12 hours, if any. */

@@ -7,6 +7,7 @@ export const PLATFORM_CONFIG = {
     login: "/auth/login",
     signup: "/auth/signup",
     account: "/account",
+    shopping: "/shopping",
   },
   creator: {
     foundingCommissionRate: 0,

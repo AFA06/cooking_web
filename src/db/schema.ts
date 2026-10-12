@@ -7,6 +7,7 @@ import {
   pgEnum,
   pgTable,
   primaryKey,
+  real,
   text,
   timestamp,
   uniqueIndex,
@@ -143,6 +144,59 @@ export const savedRecipes = pgTable(
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [primaryKey({ columns: [t.userId, t.recipeId] })],
+);
+
+/** A person's own named collection of recipes, alongside the general saved list. */
+export const cookbooks = pgTable(
+  "cookbooks",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("cookbooks_user_idx").on(t.userId)],
+);
+
+export const cookbookRecipes = pgTable(
+  "cookbook_recipes",
+  {
+    cookbookId: uuid("cookbook_id").notNull().references(() => cookbooks.id, { onDelete: "cascade" }),
+    recipeId: uuid("recipe_id").notNull().references(() => recipes.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.cookbookId, t.recipeId] })],
+);
+
+/** Recipes whose ingredients the person plans to buy, with the servings they chose. Separate from saved recipes. */
+export const shoppingRecipes = pgTable(
+  "shopping_recipes",
+  {
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    recipeId: uuid("recipe_id").notNull().references(() => recipes.id, { onDelete: "cascade" }),
+    servings: integer("servings").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.recipeId] })],
+);
+
+/** One ingredient to buy: a copy taken when the recipe was added, already scaled to the chosen servings. */
+export const shoppingItems = pgTable(
+  "shopping_items",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    recipeId: uuid("recipe_id").notNull().references(() => recipes.id, { onDelete: "cascade" }),
+    position: integer("position").notNull(),
+    name: text("name").notNull(),
+    /** The amount as text, shown when it is not a number ("ta’bga ko‘ra"). */
+    quantity: text("quantity").notNull(),
+    /** The amount as a number, so the same product from several recipes can be added up. */
+    amount: real("amount"),
+    unit: text("unit").notNull().default(""),
+    checked: boolean("checked").notNull().default(false),
+  },
+  (t) => [index("shopping_items_user_idx").on(t.userId)],
 );
 
 export const cookingSessions = pgTable(
