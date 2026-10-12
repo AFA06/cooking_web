@@ -14,7 +14,10 @@
   },
   "acct": {
     "emailUpdated": "Email yangilandi. Endi shu email bilan kirasiz.",
+    "emailVerified": "Email tasdiqlandi va yangilandi.",
     "err": {
+      "cannotUse": "Bu raqam yoki emaildan foydalanib bo‘lmaydi. Boshqasini kiriting.",
+      "deliveryDown": "Kod yuborish xizmati hozircha ishlamayapti.",
       "emailTaken": "Bu emaildan foydalanib bo‘lmaydi. Boshqasini kiriting.",
       "enterCurrentPw": "Joriy parolni kiriting",
       "locked": "Juda ko‘p noto‘g‘ri urinish. 15 daqiqadan so‘ng qayta urinib ko‘ring.",
@@ -25,11 +28,13 @@
       "pwMismatch": "Yangi parollar bir xil emas.",
       "pwSame": "Yangi parol eskisidan farq qilishi kerak.",
       "sameEmail": "Bu sizning hozirgi emailingiz.",
+      "sameNumber": "Bu sizning hozirgi raqamingiz.",
       "signedOut": "Sessiya tugagan. Qaytadan tizimga kiring.",
       "username": "Foydalanuvchi nomi 3–24 ta belgi: lotin harflari, raqamlar va “_”. Harf bilan boshlansin.",
       "usernameTaken": "Bu foydalanuvchi nomi band. Boshqasini tanlang.",
       "wrongPw": "Joriy parol noto‘g‘ri."
     },
+    "phoneUpdated": "Telefon raqami tasdiqlandi va yangilandi.",
     "pwUpdated": "Parol yangilandi. Boshqa qurilmalardagi sessiyalar yopildi."
   },
   "adm": {
@@ -227,6 +232,28 @@
     "welcome": "Xush kelibsiz, {name}"
   },
   "auth": {
+    "a": {
+      "badCode": "Kod noto‘g‘ri yoki muddati tugagan.",
+      "codeExpiredRestart": "Kod muddati tugagan. Qaytadan boshlang.",
+      "codeSent": "Kod yuborildi.",
+      "genericSent": "Agar hisob mavjud bo‘lsa, kod yuborildi.",
+      "identBad": "Telefon raqamingizni yoki emailingizni to‘g‘ri kiriting.",
+      "loginWrong": "Telefon yoki email, yoki parol noto‘g‘ri.",
+      "newCodeSent": "Yangi kod yuborildi.",
+      "phoneExists": "Bu raqam bilan hisob allaqachon mavjud. Tizimga kiring.",
+      "pwMismatch": "Parollar bir xil emas.",
+      "sendFailed": "Kod yuborib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.",
+      "tooMany": "Juda ko‘p urinish. Birozdan so‘ng qayta urinib ko‘ring.",
+      "unavailable": "SMS xizmati hozircha ishlamayapti. Birozdan so‘ng qayta urinib ko‘ring.",
+      "waitRetry": "Biroz kuting, so‘ng qayta urinib ko‘ring.",
+      "wrongBrowser": "Bu so‘rov boshqa qurilmadan boshlangan. Hisob yaratishni shu qurilmada qaytadan boshlang."
+    },
+    "backToLogin": "Kirish sahifasiga qaytish",
+    "changeNumber": "Raqamni o‘zgartirish",
+    "codeExpired": "Kod muddati tugagan.",
+    "codeLabel": "Tasdiqlash kodi",
+    "codeSentTo": "{phone} raqamiga 6 xonali kod yubordik.",
+    "confirm": "Tasdiqlash",
     "createAccount": "Hisob yaratish",
     "email": "Email",
     "err": {
@@ -237,21 +264,44 @@
       "pwShort": "Parol kamida 8 ta belgidan iborat bo‘lishi kerak",
       "wrong": "Email yoki parol noto‘g‘ri."
     },
+    "forgot": "Parolni unutdingizmi?",
+    "forgotEm": "unutdingizmi?",
+    "forgotLead": "Parolni",
+    "forgotMeta": "Parolni tiklash",
+    "forgotNote": "Hisobingizga bog‘langan telefon raqami yoki emailni kiriting. Tasdiqlash kodini yuboramiz.",
     "haveAccount": "Hisobingiz bormi?",
     "hidePw": "Parolni yashirish",
+    "identifier": "Telefon raqami yoki email",
     "loginEm": "oshpaz.",
     "loginLead": "Xush kelibsiz,",
     "loginNote": "Saqlangan retseptlaringiz va boshlagan taomlaringiz sizni kutmoqda.",
     "min8": "Kamida 8 ta belgi.",
     "name": "Ism",
     "newHere": "Yangimisiz?",
+    "otherIdentifier": "Boshqa raqam yoki email kiritish",
     "password": "Parol",
+    "phoneHint": "Raqamingizga SMS orqali tasdiqlash kodi yuboramiz.",
     "pick": "Bugungi tavsiya",
+    "resendCode": "Kodni qayta yuborish",
+    "resetDone": "Parol yangilandi. Yangi parol bilan kiring.",
+    "resetEm": "o‘rnating.",
+    "resetLead": "Yangi parol",
+    "resetMeta": "Yangi parol",
+    "resetNote": "Agar hisob mavjud bo‘lsa, kod yuborildi: tasdiqlangan emailingizga, email bo‘lmasa telefoningizga SMS orqali. Emailingizga kira olmasangiz, pastdagi SMS tugmasini bosing.",
+    "restartSignup": "Hisob yaratishni qaytadan boshlang",
+    "sendCode": "Kod yuborish",
     "showPw": "Parolni ko‘rsatish",
     "signupEm": "qo‘shiling.",
     "signupEyebrow": "Hisob yaratish",
     "signupLead": "Dasturxonga",
-    "signupNote": "Retseptlarni saqlang va pishirgan taomlaringizni kuzating."
+    "signupNote": "Retseptlarni saqlang va pishirgan taomlaringizni kuzating.",
+    "signupNoteSms": "Telefon raqamingiz bilan ro‘yxatdan o‘ting: retseptlarni saqlang va pishirgan taomlaringizni kuzating.",
+    "smsInstead": "Emailga kira olmayman — SMS yuborish",
+    "verifyEm": "kiriting.",
+    "verifyEyebrow": "Tasdiqlash",
+    "verifyLead": "Kodni",
+    "verifyMeta": "Raqamni tasdiqlash",
+    "wait": "{label} ({seconds} s)"
   },
   "card": {
     "cooked": {
@@ -284,28 +334,52 @@
     "save": "Saqlash"
   },
   "cook": {
+    "addFive": "+5 daq.",
+    "addMinute": "+1 daq.",
+    "alertedOther": "{title}: vaqt tugadi",
     "allStepsDone": {
       "other": "{title} — barcha {total} qadam bajarildi. Yoqimli ishtaha!"
     },
     "backToRecipe": "Retseptga qaytish",
+    "celebrate": "Barakalla!",
     "createAccount": "Hisob yarating",
     "createAccountNote": "— pishirgan taomlaringiz tarixi saqlanadi va retseptlarni baholay olasiz.",
+    "current": "Hozir",
+    "done": "Bajarildi",
     "exit": "Chiqish",
     "finish": "Tugatish",
     "freeRecipes": "Bepul retseptlarni ko‘rish",
+    "goThere": "Bosqichga o‘tish",
     "howDidItGo": "Qanday chiqdi?",
+    "ingredientsNow": "Shu bosqichda kerak",
+    "jumpTo": "{n}-bosqichga o‘tish: {title}",
+    "lastStage": "Oxirgi bosqich",
     "metaTitle": "Pishirish: {title}",
+    "nextUp": "Keyingisi: {title}",
     "otherRecipes": "Boshqa retseptlar",
+    "overview": "Barcha bosqichlar",
     "premiumLocked": "Premium retseptlar uchun qadam-baqadam rejim pullik versiyaga kiradi. To‘lov tizimi hozircha ulanmagan, shuning uchun bu retseptni ochib bo‘lmaydi.",
     "progress": "Pishirish jarayoni",
     "rateInvite": "Baho bering, natija rasmini qo‘shing — boshqa oshpazlarga yordam beradi.",
     "ready": "Tayyor!",
     "saving": "Pishirish natijasi saqlanmoqda…",
     "scaledNote": "Miqdorlar {servings} kishiga hisoblangan. Matndagi sonlar va taymer asl retsept ({base} kishilik) bo‘yicha — idish kattaligiga qarab vaqtni moslang.",
+    "screenOn": "Ekran o‘chmaydi",
+    "stage": "{n}-bosqich",
+    "stageOf": "Bosqich {n} / {total}",
     "stepOf": "Qadam {n} / {total}",
+    "swipeHint": "Suring yoki ← → tugmalaridan foydalaning",
     "temperature": "Harorat: {temp}°C",
+    "textLarger": "Matnni kattalashtirish",
+    "textNormal": "Oddiy matn",
+    "textSize": "Matn o‘lchami",
     "thanks": "Rahmat! Bahoyingiz saqlandi va ijodkor sahifasida ko‘rinadi.",
+    "timeUp": "Vaqt tugadi!",
+    "timeUpNote": "Taomning holatini tekshiring.",
+    "timerFor": "Bosqich taymeri",
+    "timerRunning": "Taymer ishlayapti",
     "tip": "Maslahat: {tip}",
+    "tipTitle": "Maslahat",
     "youCooked": "Siz buni pishirdingiz."
   },
   "cookbook": {
@@ -485,6 +559,15 @@
     "toDraft": "Qoralamaga qaytarish",
     "unitPh": "Birlik",
     "up": "Yuqoriga"
+  },
+  "email": {
+    "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",
+    "label": {
+      "email_change": "Emailni tasdiqlash kodi",
+      "password_reset": "Parolni tiklash kodi",
+      "phone_change": "Telefonni tasdiqlash kodi",
+      "signup": "Tasdiqlash kodi"
+    }
   },
   "err": {
     "badRequest": "Noto‘g‘ri so‘rov.",
@@ -711,6 +794,11 @@
     "socials": "Ijtimoiy tarmoqlar",
     "socialsNote": "Qo‘shilgan hisoblar ommaviy profilingizda, tanishtiruv ostida ko‘rinadi."
   },
+  "pw": {
+    "common": "Bu parol juda oddiy. Boshqasini tanlang.",
+    "long": "Parol juda uzun (ko‘pi bilan 72 bayt)",
+    "phone": "Parol telefon raqamingizni o‘z ichiga olmasin."
+  },
   "recipe": {
     "notFound": "Retsept topilmadi"
   },
@@ -810,21 +898,32 @@
   "settings": {
     "accountType": "Hisob turi",
     "currentEmail": "Hozirgi email:",
+    "currentNumber": "Hozirgi raqam:",
     "currentPw": "Joriy parol",
     "emailNote": "Tizimga shu email bilan kirasiz.",
     "emailPwNote": "Emailni faqat siz o‘zgartira olishingiz uchun parol so‘raladi.",
+    "emailSectionNote": "Ixtiyoriy. Tasdiqlangan email parolni tiklash kodini qabul qiladi, SMS esa zaxira yo‘l bo‘lib qoladi.",
     "emailTitle": "Email",
     "member": "A’zo bo‘lgan sana",
     "newEmail": "Yangi email",
+    "newPhone": "Yangi telefon raqami",
     "newPw": "Yangi parol",
     "notSet": "kiritilmagan",
+    "notVerified": "tasdiqlanmagan",
+    "nothingChanges": "Kod kiritilmaguncha hech narsa o‘zgarmaydi.",
+    "otherEmail": "Boshqa email kiritish",
+    "otherNumber": "Boshqa raqam kiritish",
     "passwordNote": "O‘zgartirilgach, boshqa qurilmalardagi sessiyalar yopiladi.",
     "passwordTitle": "Parol",
     "personal": "Shaxsiy ma’lumotlar",
     "personalNote": "Ismingiz retsept baholarida ko‘rinadi.",
     "phone": "Telefon raqami",
     "phoneNote": "Ixtiyoriy. Boshqa foydalanuvchilarga ko‘rinmaydi.",
+    "phoneSectionNote": "Tizimga kirish va parolni SMS orqali tiklash uchun.",
     "repeatPw": "Yangi parolni takrorlang",
+    "sendNoteEmail": "Yangi emailga kod yuboramiz.",
+    "sendNotePhone": "Yangi raqamga SMS orqali kod yuboramiz.",
+    "sentTo": "{to} manziliga yuborilgan 6 xonali kodni kiriting.",
     "updateEmail": "Emailni yangilash",
     "updatePw": "Parolni yangilash",
     "username": "Foydalanuvchi nomi",
@@ -860,6 +959,13 @@
   },
   "site": {
     "tagline": "Sevimli ijodkorlaringizdan qadam-baqadam retseptlar"
+  },
+  "sms": {
+    "email_change": "{brand}: email tasdiqlash kodi {code}. Kodni hech kimga bermang.",
+    "exists": "{brand}: bu raqamga hisob allaqachon ochilgan. Saytda Kirish yoki Parolni unutdim bo'limidan foydalaning.",
+    "password_reset": "{brand}: parolni tiklash kodi {code}. Kodni hech kimga bermang.",
+    "phone_change": "{brand}: telefon tasdiqlash kodi {code}. Kodni hech kimga bermang.",
+    "signup": "{brand}: tasdiqlash kodi {code}. Kodni hech kimga bermang."
   },
   "social": {
     "add": "Ijtimoiy tarmoq qo‘shish",
