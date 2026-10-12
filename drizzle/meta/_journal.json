@@ -57,6 +57,13 @@
       "when": 1791621136126,
       "tag": "0007_striped_ser_duncan",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791802714550,
+      "tag": "0008_unique_la_nuit",
+      "breakpoints": true
     }
   ]
 }

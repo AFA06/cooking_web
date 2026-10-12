@@ -488,6 +488,8 @@
     "tip": "Oshpaz maslahati",
     "totalTime": "Umumiy vaqt",
     "updateRating": "Bahoyingizni yangilang",
+    "video": "Video",
+    "videoTitle": "{title} — video",
     "withTimer": "Taymer bilan · {time}"
   },
   "dialog": {
@@ -516,9 +518,16 @@
     "calories": "Kaloriya (kkal)",
     "carbs": "Uglevod (g)",
     "category": "Toifa",
+    "check": {
+      "nutrition": "Ozuqaviy qiymat (ixtiyoriy)",
+      "title": "Sarlavha va tavsif"
+    },
+    "checkTitle": "Tayyorlik",
     "cookMin": "Pishirish (daq.)",
     "cover": "Muqova rasmi havolasi",
+    "coverHint": "Eng muhim rasm: kartochkada va retsept sahifasida ko‘rinadi.",
     "coverNote": "Rasm yuklash hozircha mavjud emas. O‘zingizga tegishli yoki foydalanish huquqingiz bor rasm havolasini kiriting.",
+    "coverPhoto": "Muqova rasmi",
     "deleteIng": "Masalliqni o‘chirish",
     "description": "Tavsif",
     "down": "Pastga",
@@ -527,28 +536,41 @@
     "editTitle": "Tahrirlash: {title}",
     "fat": "Yog‘ (g)",
     "gallery": "Qo‘shimcha rasmlar (ixtiyoriy)",
+    "galleryHint2": "Taom jarayoni va natijasini ko‘rsating.",
     "galleryNote": "Har bir qatorga bitta rasm havolasi, ko‘pi bilan 5 ta. Retsept sahifasida muqovadan keyin galereyada ko‘rinadi.",
     "ingName": "{n}-masalliq nomi",
     "ingredients": "Masalliqlar",
     "instruction": "Ko‘rsatma",
+    "moveStepDown": "Qadamni pastga",
+    "moveStepUp": "Qadamni yuqoriga",
     "namePh": "Nomi",
     "newRecipe": "Yangi retsept",
     "nutrition": "Ozuqaviy qiymati — 1 kishi uchun (ixtiyoriy)",
     "nutritionNote": "Butun taomning qiymati porsiyalar soniga bo‘lingani, ya’ni bir kishi yeydigan miqdor. To‘ldirilsa, retsept kartochkasida va sahifasida ko‘rinadi.",
+    "optional": "Ixtiyoriy",
     "premium": "Premium retsept",
     "premiumNote": "To‘lov tizimi hozircha ulanmagan, shuning uchun o‘quvchilar premium retseptlarni ocha olmaydi.",
     "prepMin": "Tayyorlash (daq.)",
+    "preview": "Ko‘rinishi",
     "price": "Narxi (so‘m)",
     "protein": "Oqsil (g)",
     "publish": "Nashr etish",
     "published": "Nashr etildi.",
     "qtyPh": "Miqdori",
+    "ready": "Nashr etishga tayyor",
     "saveDraft": "Qoralamani saqlash",
+    "sec": {
+      "media": "Rasm va video",
+      "pricing": "Narx va nashr"
+    },
     "servings": "Porsiya",
     "stepImage": "Rasm havolasi (ixtiyoriy)",
     "stepIngs": "Ishlatiladigan masalliq raqamlari",
+    "stepIngsNone": "Avval masalliqlarni qo‘shing",
     "stepIngsPh": "masalan: 1, 3",
+    "stepIngsPick": "Bu qadamda ishlatiladigan masalliqlar",
     "stepN": "Qadam {n}",
+    "stepPhoto": "Qadam rasmi (ixtiyoriy)",
     "steps": "Qadamlar",
     "tags": "Teglar (vergul bilan)",
     "tagsPlaceholder": "O‘zbek, Guruch, Qo‘y go‘shti",
@@ -558,7 +580,12 @@
     "title": "Sarlavha",
     "toDraft": "Qoralamaga qaytarish",
     "unitPh": "Birlik",
-    "up": "Yuqoriga"
+    "untitled": "Retsept nomi",
+    "up": "Yuqoriga",
+    "video": "Video (ixtiyoriy)",
+    "videoBad": "Bu havola qo‘llab-quvvatlanmaydi",
+    "videoHint": "YouTube yoki Vimeo havolasi, yoki .mp4 fayl havolasi. Video retsept sahifasida ko‘rsatiladi.",
+    "videoOk": "Video tanildi"
   },
   "email": {
     "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",
@@ -591,6 +618,7 @@
     "noCreator": "Ijodkor tanlanmagan.",
     "nutritionAll": "Ozuqaviy qiymatning to‘rttasini ham to‘ldiring yoki hammasini bo‘sh qoldiring",
     "photoBig": "Rasm juda katta",
+    "photoType": "Faqat rasm fayli yuklanadi (JPEG).",
     "premiumPrice": "Premium retsept uchun narx kerak",
     "rateCookFirst": "Baholash uchun avval shu retseptni oxirigacha pishiring.",
     "rateSignIn": "Baholash uchun tizimga kiring.",
@@ -604,7 +632,9 @@
     "stepMin": "Kamida bitta qadam qo‘shing",
     "stepTitle": "Har bir qadamning sarlavhasi bo‘lishi kerak",
     "titleLong": "Sarlavha juda uzun",
-    "titleShort": "Sarlavha juda qisqa"
+    "titleShort": "Sarlavha juda qisqa",
+    "uploadLimit": "Yuklangan rasmlar chegarasiga yetdingiz.",
+    "videoUrl": "Video havolasi YouTube, Vimeo yoki https:// bilan boshlanadigan .mp4 fayl bo‘lishi kerak"
   },
   "error": {
     "retry": "Qayta urinish",
@@ -978,6 +1008,23 @@
     "newest": "Yangilari",
     "quickest": "Eng tez tayyor bo‘ladigan"
   },
+  "studio": {
+    "empty": "Hali retseptlar yo‘q",
+    "emptyText": "Birinchi retseptingizni yarating — rasm, video va qadamlar bilan.",
+    "eyebrow": "Ijodkor studiyasi",
+    "getStarted": "Boshlash uchun",
+    "hasVideo": "Video bor",
+    "hello": "Salom, {name}",
+    "lead": "Retseptlaringizni yarating, rasm va video qo‘shing va natijalarni kuzating.",
+    "noCover": "Muqova yo‘q",
+    "todo": {
+      "profile": "Profilingizni to‘ldiring: ism, tanishtiruv va rasm",
+      "publish": "Retseptni nashr eting",
+      "recipe": "Birinchi retseptni yarating",
+      "socials": "Ijtimoiy tarmoqlarni ulang",
+      "video": "Retseptga video qo‘shing"
+    }
+  },
   "time": {
     "daysAgo": "{count} kun oldin",
     "hours": "{count} soat",
@@ -998,5 +1045,15 @@
   },
   "unit": {
     "som": "so‘m"
+  },
+  "up": {
+    "add": "Rasm qo‘shish",
+    "drop": "yoki shu yerga tashlang",
+    "max": "Ko‘pi bilan {max} ta",
+    "orLink": "Yoki rasm havolasini kiriting",
+    "remove": "Olib tashlash",
+    "replace": "Almashtirish",
+    "upload": "Rasm yuklash",
+    "useLink": "Havolani qo‘llash"
   }
 }

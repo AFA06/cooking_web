@@ -496,6 +496,8 @@
     "tip": "Chef's tip",
     "totalTime": "Total time",
     "updateRating": "Update your rating",
+    "video": "Video",
+    "videoTitle": "{title} — video",
     "withTimer": "With timer · {time}"
   },
   "dialog": {
@@ -524,9 +526,16 @@
     "calories": "Calories (kcal)",
     "carbs": "Carbs (g)",
     "category": "Category",
+    "check": {
+      "nutrition": "Nutrition (optional)",
+      "title": "Title and description"
+    },
+    "checkTitle": "Readiness",
     "cookMin": "Cooking (min)",
     "cover": "Cover image link",
+    "coverHint": "The most important photo: shown on the card and the recipe page.",
     "coverNote": "Photo upload isn't available yet. Enter a link to an image you own or have the right to use.",
+    "coverPhoto": "Cover photo",
     "deleteIng": "Delete ingredient",
     "description": "Description",
     "down": "Move down",
@@ -535,28 +544,41 @@
     "editTitle": "Editing: {title}",
     "fat": "Fat (g)",
     "gallery": "Extra photos (optional)",
+    "galleryHint2": "Show the process and the result.",
     "galleryNote": "One image link per line, up to 5. They appear in the gallery after the cover on the recipe page.",
     "ingName": "Ingredient {n} name",
     "ingredients": "Ingredients",
     "instruction": "Instruction",
+    "moveStepDown": "Move step down",
+    "moveStepUp": "Move step up",
     "namePh": "Name",
     "newRecipe": "New recipe",
     "nutrition": "Nutrition — per serving (optional)",
     "nutritionNote": "The whole dish divided by the number of servings — what one person eats. If filled in, it shows on the recipe card and page.",
+    "optional": "Optional",
     "premium": "Premium recipe",
     "premiumNote": "Payments aren't connected yet, so readers can't unlock premium recipes.",
     "prepMin": "Prep (min)",
+    "preview": "Preview",
     "price": "Price (UZS)",
     "protein": "Protein (g)",
     "publish": "Publish",
     "published": "Published.",
     "qtyPh": "Amount",
+    "ready": "Ready to publish",
     "saveDraft": "Save draft",
+    "sec": {
+      "media": "Photos and video",
+      "pricing": "Pricing and publishing"
+    },
     "servings": "Servings",
     "stepImage": "Image link (optional)",
     "stepIngs": "Numbers of the ingredients used",
+    "stepIngsNone": "Add ingredients first",
     "stepIngsPh": "e.g. 1, 3",
+    "stepIngsPick": "Ingredients used in this step",
     "stepN": "Step {n}",
+    "stepPhoto": "Step photo (optional)",
     "steps": "Steps",
     "tags": "Tags (comma-separated)",
     "tagsPlaceholder": "Uzbek, Rice, Lamb",
@@ -566,7 +588,12 @@
     "title": "Title",
     "toDraft": "Back to draft",
     "unitPh": "Unit",
-    "up": "Move up"
+    "untitled": "Recipe title",
+    "up": "Move up",
+    "video": "Video (optional)",
+    "videoBad": "This link isn't supported",
+    "videoHint": "A YouTube or Vimeo link, or a link to an .mp4 file. The video is shown on the recipe page.",
+    "videoOk": "Video recognised"
   },
   "email": {
     "body": "{label}: {code}\n\nThe code is valid for {minutes} minutes. Do not share it with anyone.\nIf you did not make this request, ignore this email.",
@@ -599,6 +626,7 @@
     "noCreator": "No creator selected.",
     "nutritionAll": "Fill in all four nutrition values or leave them all empty",
     "photoBig": "The photo is too large",
+    "photoType": "Only image files (JPEG) can be uploaded.",
     "premiumPrice": "A premium recipe needs a price",
     "rateCookFirst": "To rate, first cook this recipe all the way through.",
     "rateSignIn": "Sign in to rate.",
@@ -612,7 +640,9 @@
     "stepMin": "Add at least one step",
     "stepTitle": "Every step needs a title",
     "titleLong": "The title is too long",
-    "titleShort": "The title is too short"
+    "titleShort": "The title is too short",
+    "uploadLimit": "You've reached the limit of uploaded photos.",
+    "videoUrl": "The video link must be a YouTube or Vimeo link, or an .mp4 file over https://"
   },
   "error": {
     "retry": "Try again",
@@ -992,6 +1022,23 @@
     "newest": "Newest",
     "quickest": "Quickest to make"
   },
+  "studio": {
+    "empty": "No recipes yet",
+    "emptyText": "Create your first recipe — with photos, a video and steps.",
+    "eyebrow": "Creator studio",
+    "getStarted": "Get started",
+    "hasVideo": "Has video",
+    "hello": "Hello, {name}",
+    "lead": "Create recipes, add photos and videos, and follow how they perform.",
+    "noCover": "No cover",
+    "todo": {
+      "profile": "Complete your profile: name, intro and photo",
+      "publish": "Publish a recipe",
+      "recipe": "Create your first recipe",
+      "socials": "Connect your social networks",
+      "video": "Add a video to a recipe"
+    }
+  },
   "time": {
     "daysAgo": "{count} d ago",
     "hours": "{count} h",
@@ -1012,5 +1059,15 @@
   },
   "unit": {
     "som": "UZS"
+  },
+  "up": {
+    "add": "Add a photo",
+    "drop": "or drop it here",
+    "max": "Up to {max}",
+    "orLink": "Or enter an image link",
+    "remove": "Remove",
+    "replace": "Replace",
+    "upload": "Upload a photo",
+    "useLink": "Use link"
   }
 }

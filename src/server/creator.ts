@@ -22,6 +22,8 @@ export async function listCreatorRecipes(creatorId: string) {
       id: schema.recipes.id,
       slug: schema.recipes.slug,
       title: schema.recipes.title,
+      coverUrl: schema.recipes.coverUrl,
+      videoUrl: schema.recipes.videoUrl,
       status: schema.recipes.status,
       isPremium: schema.recipes.isPremium,
       updatedAt: schema.recipes.updatedAt,

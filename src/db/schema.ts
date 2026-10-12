@@ -96,6 +96,8 @@ export const recipes = pgTable(
     priceAmount: integer("price_amount"),
     priceCurrency: text("price_currency"),
     tags: text("tags").array().notNull().default([]),
+    /** A YouTube or Vimeo link, or a direct video file, shown on the recipe page. */
+    videoUrl: text("video_url"),
     status: recipeStatusEnum("status").notNull().default("draft"),
     isFeatured: boolean("is_featured").notNull().default(false),
     publishedAt: timestamp("published_at", { withTimezone: true }),
@@ -103,6 +105,22 @@ export const recipes = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("recipes_slug_idx").on(t.slug), index("recipes_creator_idx").on(t.creatorId)],
+);
+
+/**
+ * Photos uploaded by creators, stored as resized JPEG (base64) and served from /api/media/:id.
+ * Each upload gets its own id, so responses can be cached for good.
+ */
+export const mediaUploads = pgTable(
+  "media_uploads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: uuid("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    mime: text("mime").notNull(),
+    data: text("data").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("media_uploads_owner_idx").on(t.ownerId)],
 );
 
 export const recipeIngredients = pgTable(

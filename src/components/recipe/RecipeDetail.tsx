@@ -11,6 +11,7 @@ import { CookLink, ScaledIngredients, ScaledTime, ServingsProvider, ServingsStep
 import { ShareButton } from "@/components/recipe/ShareButton";
 import { getLocale, getT } from "@/i18n/server";
 import { LOCALE_INFO, type Locale, type TFunction } from "@/i18n/core";
+import { parseVideoUrl } from "@/lib/video";
 import { DIFFICULTY_KEY, formatMinutes, formatPrice, toIsoDuration } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -132,6 +133,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
   const openSteps = recipe.steps.slice(0, previewCount);
   const lockedSteps = recipe.steps.slice(previewCount);
   const ingredientsById = new Map(recipe.ingredients.map((i) => [i.id, i]));
+  const video = recipe.videoUrl ? parseVideoUrl(recipe.videoUrl) : null;
 
   return (
     <ServingsProvider base={recipe.servings}>
@@ -237,6 +239,27 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
             </header>
           </div>
         </Container>
+
+        {video && (
+          <Container size="xl" className="mt-14 lg:mt-20">
+            <h2 className="text-[1.9rem] font-medium leading-tight text-amber-950 sm:text-[2.4rem]">{t("detail.video")}</h2>
+            <div className="mt-5 aspect-video max-w-5xl overflow-hidden rounded-[1.75rem] bg-ink">
+              {video.kind === "file" ? (
+                <video src={video.src} controls preload="metadata" playsInline className="h-full w-full" />
+              ) : (
+                <iframe
+                  src={video.embedUrl}
+                  title={t("detail.videoTitle", { title: recipe.title })}
+                  loading="lazy"
+                  allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  className="h-full w-full"
+                />
+              )}
+            </div>
+          </Container>
+        )}
 
         <Container size="xl" className="mt-16 grid items-start gap-12 lg:mt-24 lg:grid-cols-[23rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[26rem_minmax(0,1fr)] xl:gap-20">
           <section aria-labelledby="ingredients-heading" className="rounded-[1.75rem] bg-sage-50 p-6 sm:p-8 lg:sticky lg:top-24">

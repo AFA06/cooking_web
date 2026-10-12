@@ -50,7 +50,7 @@ export default async function AdminNewRecipePage({ searchParams }: { searchParam
         description={t("adm.publishedUnder", { name: creator.name })}
       />
       <Panel className="max-w-4xl">
-        <RecipeEditor initial={EMPTY_RECIPE} save={adminSaveRecipe.bind(null, creator.id)} basePath="/admin/recipes" />
+        <RecipeEditor initial={EMPTY_RECIPE} save={adminSaveRecipe.bind(null, creator.id)} basePath="/admin/recipes" sidebar={false} />
       </Panel>
     </>
   );

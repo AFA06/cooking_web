@@ -2,11 +2,14 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
+import { Check, Circle, Clock, Film, Plus } from "lucide-react";
+import { ImageUploader } from "@/components/dashboard/ImageUploader";
 import { Button } from "@/components/ui/Button";
 import { useT } from "@/i18n/client";
 import { RECIPE_CATEGORIES, type RecipeCategory } from "@/lib/categories";
 import { estimateNutrition } from "@/lib/nutrition";
 import type { RecipeInput } from "@/lib/recipe-schema";
+import { parseVideoUrl } from "@/lib/video";
 import { cn } from "@/lib/utils";
 
 type Ingredient = { name: string; quantity: string; unit: string };
@@ -25,8 +28,8 @@ export interface EditorInitial {
   title: string;
   description: string;
   coverUrl: string;
-  /** One link per line. */
-  galleryUrls: string;
+  galleryUrls: string[];
+  videoUrl: string;
   servings: string;
   prepTimeMinutes: string;
   cookTimeMinutes: string;
@@ -49,7 +52,8 @@ export const EMPTY_RECIPE: EditorInitial = {
   title: "",
   description: "",
   coverUrl: "",
-  galleryUrls: "",
+  galleryUrls: [],
+  videoUrl: "",
   servings: "4",
   prepTimeMinutes: "15",
   cookTimeMinutes: "30",
@@ -83,7 +87,8 @@ function toInput(v: EditorInitial): RecipeInput {
     title: v.title,
     description: v.description,
     coverUrl: v.coverUrl,
-    galleryUrls: v.galleryUrls.split("\n").map((line) => line.trim()).filter(Boolean),
+    galleryUrls: v.galleryUrls.map((url) => url.trim()).filter(Boolean),
+    videoUrl: v.videoUrl.trim(),
     servings: Number(v.servings),
     prepTimeMinutes: Number(v.prepTimeMinutes),
     cookTimeMinutes: Number(v.cookTimeMinutes),
@@ -120,9 +125,38 @@ interface RecipeEditorProps {
   save: SaveAction;
   /** Where the edit page for a recipe lives, e.g. "/dashboard/recipes". */
   basePath: string;
+  /** The side column with the live card and checklist; the admin panel is too narrow for it. */
+  sidebar?: boolean;
 }
 
-export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
+const MAX_GALLERY = 5;
+const BLANK_STEP: Step = { title: "", instruction: "", mediaUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" };
+
+const parsePositions = (value: string) =>
+  value
+    .split(",")
+    .map((n) => Number(n.trim()))
+    .filter((n) => Number.isInteger(n) && n > 0);
+
+/** One titled card of the form, with a step number so the page reads top to bottom. */
+function Section({ n, title, note, children }: { n: number; title: string; note?: string; children: React.ReactNode }) {
+  return (
+    <section className="rounded-[1.75rem] border border-amber-200 bg-amber-100/40 p-5 sm:p-7">
+      <header className="mb-6 flex items-start gap-4">
+        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-700 font-serif text-lg font-semibold text-amber-50" aria-hidden="true">
+          {n}
+        </span>
+        <div>
+          <h2 className="font-serif text-2xl font-medium text-amber-950">{title}</h2>
+          {note && <p className="mt-0.5 text-sm text-amber-600">{note}</p>}
+        </div>
+      </header>
+      <div className="space-y-5">{children}</div>
+    </section>
+  );
+}
+
+export function RecipeEditor({ initial, save, basePath, sidebar = true }: RecipeEditorProps) {
   const t = useT();
   const router = useRouter();
   const [v, setV] = React.useState<EditorInitial>(initial);
@@ -145,10 +179,7 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
       fatGrams: String(perServing.fatGrams),
       carbGrams: String(perServing.carbGrams),
     }));
-    setNutritionNote(
-      t("ed.calcDone", { servings: v.servings }) +
-        (skipped.length > 0 ? t("ed.calcSkipped", { list: skipped.join(", ") }) : t("ed.calcCheck")),
-    );
+    setNutritionNote(t("ed.calcDone", { servings: v.servings }) + (skipped.length > 0 ? t("ed.calcSkipped", { list: skipped.join(", ") }) : t("ed.calcCheck")));
   };
   const move = <T,>(list: T[], i: number, dir: -1 | 1): T[] => {
     const j = i + dir;
@@ -157,6 +188,42 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
     [copy[i], copy[j]] = [copy[j], copy[i]];
     return copy;
   };
+
+  // Moving or deleting an ingredient renumbers the others, so the steps' picks follow the right ones.
+  const reorderIngredients = (next: Ingredient[], mapping: (oldNumber: number) => number | null) => {
+    setV((p) => ({
+      ...p,
+      ingredients: next,
+      steps: p.steps.map((s) => ({
+        ...s,
+        ingredientPositions: parsePositions(s.ingredientPositions)
+          .map(mapping)
+          .filter((n): n is number => n !== null)
+          .sort((a, b) => a - b)
+          .join(", "),
+      })),
+    }));
+  };
+
+  const togglePosition = (stepIndex: number, position: number) => {
+    const current = parsePositions(v.steps[stepIndex].ingredientPositions);
+    const next = current.includes(position) ? current.filter((n) => n !== position) : [...current, position].sort((a, b) => a - b);
+    setStep(stepIndex, { ingredientPositions: next.join(", ") });
+  };
+
+  const video = v.videoUrl.trim() ? parseVideoUrl(v.videoUrl) : undefined;
+
+  /* readiness: what a reader needs before the recipe is worth publishing */
+  const checks = [
+    { key: "title", label: t("ed.check.title"), done: v.title.trim().length >= 3 && v.description.trim().length >= 10, required: true },
+    { key: "cover", label: t("ed.coverPhoto"), done: v.coverUrl.trim() !== "", required: true },
+    { key: "ingredients", label: t("ed.ingredients"), done: v.ingredients.some((i) => i.name.trim() && i.quantity.trim()), required: true },
+    { key: "steps", label: t("ed.steps"), done: v.steps.some((s) => s.title.trim() && s.instruction.trim()), required: true },
+    { key: "video", label: t("ed.video"), done: !!video, required: false },
+    { key: "nutrition", label: t("ed.check.nutrition"), done: v.calories !== "", required: false },
+  ];
+  const ready = checks.filter((c) => c.required).every((c) => c.done);
+  const total = v.prepTimeMinutes && v.cookTimeMinutes ? Number(v.prepTimeMinutes) + Number(v.cookTimeMinutes) : 0;
 
   const submit = (publish: boolean) =>
     startTransition(async () => {
@@ -175,197 +242,346 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
 
   return (
     <form
-      className="space-y-10"
+      className={cn("grid items-start gap-8", sidebar && "xl:grid-cols-[minmax(0,1fr)_21rem]")}
       onSubmit={(e) => {
         e.preventDefault();
         submit(v.status === "published");
       }}
     >
-      <section className="space-y-4">
-        <h2 className="text-2xl font-serif text-amber-950">{t("profile.basics")}</h2>
-        <div>
-          <label htmlFor="title" className={label}>{t("ed.title")}</label>
-          <input id="title" className={field} value={v.title} maxLength={120} onChange={(e) => set("title", e.target.value)} />
-        </div>
-        <div>
-          <label htmlFor="description" className={label}>{t("ed.description")}</label>
-          <textarea id="description" rows={3} className={field} value={v.description} maxLength={600} onChange={(e) => set("description", e.target.value)} />
-        </div>
-        <div>
-          <label htmlFor="cover" className={label}>{t("ed.cover")}</label>
-          <input id="cover" type="url" inputMode="url" placeholder="https://…" className={field} value={v.coverUrl} onChange={(e) => set("coverUrl", e.target.value)} />
-          <p className="mt-1 text-xs text-amber-600">{t("ed.coverNote")}</p>
-        </div>
-        <div>
-          <label htmlFor="gallery" className={label}>{t("ed.gallery")}</label>
-          <textarea id="gallery" rows={3} placeholder={"https://…\nhttps://…"} className={field} value={v.galleryUrls} onChange={(e) => set("galleryUrls", e.target.value)} />
-          <p className="mt-1 text-xs text-amber-600">{t("ed.galleryNote")}</p>
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="min-w-0 space-y-6">
+        {/* 1 — basics */}
+        <Section n={1} title={t("profile.basics")}>
           <div>
-            <label htmlFor="servings" className={label}>{t("ed.servings")}</label>
-            <input id="servings" type="number" min={1} className={field} value={v.servings} onChange={(e) => set("servings", e.target.value)} />
+            <label htmlFor="title" className={label}>{t("ed.title")}</label>
+            <input id="title" className={cn(field, "mt-1.5 text-lg")} value={v.title} maxLength={120} onChange={(e) => set("title", e.target.value)} />
           </div>
           <div>
-            <label htmlFor="prep" className={label}>{t("ed.prepMin")}</label>
-            <input id="prep" type="number" min={0} className={field} value={v.prepTimeMinutes} onChange={(e) => set("prepTimeMinutes", e.target.value)} />
+            <label htmlFor="description" className={label}>{t("ed.description")}</label>
+            <textarea id="description" rows={3} className={cn(field, "mt-1.5")} value={v.description} maxLength={600} onChange={(e) => set("description", e.target.value)} />
+            <p className="mt-1 text-xs text-amber-600 tabular-nums">{v.description.length} / 600</p>
           </div>
-          <div>
-            <label htmlFor="cook" className={label}>{t("ed.cookMin")}</label>
-            <input id="cook" type="number" min={0} className={field} value={v.cookTimeMinutes} onChange={(e) => set("cookTimeMinutes", e.target.value)} />
-          </div>
-          <div>
-            <label htmlFor="difficulty" className={label}>{t("recipes.filterDifficulty")}</label>
-            <select id="difficulty" className={field} value={v.difficulty} onChange={(e) => set("difficulty", e.target.value as EditorInitial["difficulty"])}>
-              <option value="easy">{t("difficulty.easy")}</option>
-              <option value="medium">{t("difficulty.medium")}</option>
-              <option value="hard">{t("difficulty.hard")}</option>
-            </select>
-          </div>
-        </div>
-        <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
-          <div>
-            <label htmlFor="category" className={label}>{t("ed.category")}</label>
-            <select id="category" className={field} value={v.category} onChange={(e) => set("category", e.target.value as RecipeCategory)}>
-              {RECIPE_CATEGORIES.map((c) => (
-                <option key={c.key} value={c.key}>{t(c.label)}</option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="tags" className={label}>{t("ed.tags")}</label>
-            <input id="tags" className={field} value={v.tags} placeholder={t("ed.tagsPlaceholder")} onChange={(e) => set("tags", e.target.value)} />
-          </div>
-        </div>
-        <div className="flex flex-wrap items-end gap-6">
-          <label className="flex items-center gap-2 text-amber-950 min-h-11">
-            <input type="checkbox" className="h-5 w-5" checked={v.isPremium} onChange={(e) => set("isPremium", e.target.checked)} />
-            {t("ed.premium")}
-          </label>
-          {v.isPremium && (
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
             <div>
-              <label htmlFor="price" className={label}>{t("ed.price")}</label>
-              <input id="price" type="number" min={1} className={field} value={v.priceAmount} onChange={(e) => set("priceAmount", e.target.value)} />
+              <label htmlFor="servings" className={label}>{t("ed.servings")}</label>
+              <input id="servings" type="number" min={1} className={cn(field, "mt-1.5")} value={v.servings} onChange={(e) => set("servings", e.target.value)} />
             </div>
-          )}
-        </div>
-        {v.isPremium && (
-          <p className="text-xs text-amber-600">{t("ed.premiumNote")}</p>
-        )}
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-2xl font-serif text-amber-950">{t("ed.ingredients")}</h2>
-        {v.ingredients.map((ing, i) => (
-          <div key={i} className="grid grid-cols-[1fr_5rem_5rem] sm:grid-cols-[2rem_1fr_6rem_6rem_auto] gap-2 items-end">
-            <span className="hidden sm:block pb-3 text-sm text-amber-600">{i + 1}</span>
-            <div className="col-span-3 sm:col-span-1">
-              <label className="sr-only" htmlFor={`ing-name-${i}`}>{t("ed.ingName", { n: i + 1 })}</label>
-              <input id={`ing-name-${i}`} className={field} placeholder={t("ed.namePh")} value={ing.name} onChange={(e) => setIngredient(i, { name: e.target.value })} />
+            <div>
+              <label htmlFor="prep" className={label}>{t("ed.prepMin")}</label>
+              <input id="prep" type="number" min={0} className={cn(field, "mt-1.5")} value={v.prepTimeMinutes} onChange={(e) => set("prepTimeMinutes", e.target.value)} />
             </div>
-            <div className="col-span-1">
-              <label className="sr-only" htmlFor={`ing-qty-${i}`}>{t("ed.qtyPh")}</label>
-              <input id={`ing-qty-${i}`} className={field} placeholder={t("ed.qtyPh")} value={ing.quantity} onChange={(e) => setIngredient(i, { quantity: e.target.value })} />
+            <div>
+              <label htmlFor="cook" className={label}>{t("ed.cookMin")}</label>
+              <input id="cook" type="number" min={0} className={cn(field, "mt-1.5")} value={v.cookTimeMinutes} onChange={(e) => set("cookTimeMinutes", e.target.value)} />
             </div>
-            <div className="col-span-1">
-              <label className="sr-only" htmlFor={`ing-unit-${i}`}>{t("ed.unitPh")}</label>
-              <input id={`ing-unit-${i}`} className={field} placeholder={t("ed.unitPh")} value={ing.unit} onChange={(e) => setIngredient(i, { unit: e.target.value })} />
-            </div>
-            <div className="col-span-1 flex gap-1">
-              <Button type="button" size="sm" variant="ghost" aria-label={t("ed.up")} onClick={() => set("ingredients", move(v.ingredients, i, -1))}>↑</Button>
-              <Button type="button" size="sm" variant="ghost" aria-label={t("ed.down")} onClick={() => set("ingredients", move(v.ingredients, i, 1))}>↓</Button>
-              <Button type="button" size="sm" variant="ghost" aria-label={t("ed.deleteIng")} disabled={v.ingredients.length === 1} onClick={() => set("ingredients", v.ingredients.filter((_, n) => n !== i))}>✕</Button>
+            <div>
+              <label htmlFor="difficulty" className={label}>{t("recipes.filterDifficulty")}</label>
+              <select id="difficulty" className={cn(field, "mt-1.5")} value={v.difficulty} onChange={(e) => set("difficulty", e.target.value as EditorInitial["difficulty"])}>
+                <option value="easy">{t("difficulty.easy")}</option>
+                <option value="medium">{t("difficulty.medium")}</option>
+                <option value="hard">{t("difficulty.hard")}</option>
+              </select>
             </div>
           </div>
-        ))}
-        <Button type="button" variant="outline" size="sm" onClick={() => set("ingredients", [...v.ingredients, { name: "", quantity: "", unit: "" }])}>
-          {t("ed.addIng")}
-        </Button>
+          <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+            <div>
+              <label htmlFor="category" className={label}>{t("ed.category")}</label>
+              <select id="category" className={cn(field, "mt-1.5")} value={v.category} onChange={(e) => set("category", e.target.value as RecipeCategory)}>
+                {RECIPE_CATEGORIES.map((c) => (
+                  <option key={c.key} value={c.key}>{t(c.label)}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label htmlFor="tags" className={label}>{t("ed.tags")}</label>
+              <input id="tags" className={cn(field, "mt-1.5")} value={v.tags} placeholder={t("ed.tagsPlaceholder")} onChange={(e) => set("tags", e.target.value)} />
+            </div>
+          </div>
+        </Section>
 
-        <fieldset className="border-t border-amber-200 pt-4">
-          <legend className={cn(label, "pr-2")}>{t("ed.nutrition")}</legend>
-          <p className="text-xs text-amber-600">
-            {t("ed.nutritionNote")}
-          </p>
-          <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {NUTRITION_FIELDS.map(({ key, text }) => (
-              <div key={key}>
-                <label htmlFor={key} className="block text-xs text-amber-600">{t(text)}</label>
-                <input id={key} type="number" min={0} className={field} value={v[key]} onChange={(e) => set(key, e.target.value)} />
+        {/* 2 — photos and video */}
+        <Section n={2} title={t("ed.sec.media")} note={t("ed.coverHint")}>
+          <div>
+            <p className={label}>{t("ed.coverPhoto")}</p>
+            <div className="mt-2 max-w-xl">
+              <ImageUploader value={v.coverUrl} onChange={(url) => set("coverUrl", url)} label={t("ed.coverPhoto")} />
+            </div>
+          </div>
+
+          <div>
+            <div className="flex items-baseline justify-between gap-3">
+              <p className={label}>{t("ed.gallery")}</p>
+              <p className="text-xs text-amber-600">{t("up.max", { max: MAX_GALLERY })}</p>
+            </div>
+            <p className="mt-0.5 text-sm text-amber-600">{t("ed.galleryHint2")}</p>
+            <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {v.galleryUrls.map((url, i) => (
+                <ImageUploader
+                  key={`${i}-${url}`}
+                  value={url}
+                  compact
+                  shape="square"
+                  onChange={(next) => set("galleryUrls", next ? v.galleryUrls.map((u, n) => (n === i ? next : u)) : v.galleryUrls.filter((_, n) => n !== i))}
+                />
+              ))}
+              {v.galleryUrls.length < MAX_GALLERY && (
+                <ImageUploader key={`new-${v.galleryUrls.length}`} value="" compact shape="square" label={t("up.add")} onChange={(url) => url && set("galleryUrls", [...v.galleryUrls, url])} />
+              )}
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="video" className={cn(label, "flex items-center gap-2")}>
+              <Film className="h-4 w-4 text-amber-700" aria-hidden="true" />
+              {t("ed.video")}
+            </label>
+            <input
+              id="video"
+              type="url"
+              inputMode="url"
+              placeholder="https://youtu.be/…"
+              className={cn(field, "mt-1.5")}
+              value={v.videoUrl}
+              onChange={(e) => set("videoUrl", e.target.value)}
+            />
+            <p className="mt-1.5 text-sm text-amber-600">{t("ed.videoHint")}</p>
+            {v.videoUrl.trim() !== "" && (
+              <p role="status" className={cn("mt-1.5 text-sm font-medium", video ? "text-sage-700" : "text-red-700")}>
+                {video ? t("ed.videoOk") : t("ed.videoBad")}
+              </p>
+            )}
+            {video && video.kind !== "file" && (
+              <div className="mt-3 aspect-video max-w-xl overflow-hidden rounded-2xl bg-ink">
+                <iframe src={video.embedUrl} title={t("detail.video")} loading="lazy" allowFullScreen className="h-full w-full" />
+              </div>
+            )}
+            {video && video.kind === "file" && <video src={video.src} controls preload="metadata" playsInline className="mt-3 aspect-video max-w-xl rounded-2xl bg-ink" />}
+          </div>
+        </Section>
+
+        {/* 3 — ingredients and nutrition */}
+        <Section n={3} title={t("ed.ingredients")}>
+          <div className="space-y-3">
+            {v.ingredients.map((ing, i) => (
+              <div key={i} className="grid grid-cols-[1fr_5rem_5rem] items-end gap-2 sm:grid-cols-[2rem_1fr_6rem_6rem_auto]">
+                <span className="hidden pb-3 text-center font-serif text-lg text-amber-600 sm:block">{i + 1}</span>
+                <div className="col-span-3 sm:col-span-1">
+                  <label className="sr-only" htmlFor={`ing-name-${i}`}>{t("ed.ingName", { n: i + 1 })}</label>
+                  <input id={`ing-name-${i}`} className={field} placeholder={t("ed.namePh")} value={ing.name} onChange={(e) => setIngredient(i, { name: e.target.value })} />
+                </div>
+                <div>
+                  <label className="sr-only" htmlFor={`ing-qty-${i}`}>{t("ed.qtyPh")}</label>
+                  <input id={`ing-qty-${i}`} className={field} placeholder={t("ed.qtyPh")} value={ing.quantity} onChange={(e) => setIngredient(i, { quantity: e.target.value })} />
+                </div>
+                <div>
+                  <label className="sr-only" htmlFor={`ing-unit-${i}`}>{t("ed.unitPh")}</label>
+                  <input id={`ing-unit-${i}`} className={field} placeholder={t("ed.unitPh")} value={ing.unit} onChange={(e) => setIngredient(i, { unit: e.target.value })} />
+                </div>
+                <div className="col-span-3 flex gap-1 sm:col-span-1">
+                  <Button type="button" size="sm" variant="ghost" aria-label={t("ed.up")} disabled={i === 0} onClick={() => reorderIngredients(move(v.ingredients, i, -1), (n) => (n === i + 1 ? i : n === i ? i + 1 : n))}>↑</Button>
+                  <Button type="button" size="sm" variant="ghost" aria-label={t("ed.down")} disabled={i === v.ingredients.length - 1} onClick={() => reorderIngredients(move(v.ingredients, i, 1), (n) => (n === i + 1 ? i + 2 : n === i + 2 ? i + 1 : n))}>↓</Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    aria-label={t("ed.deleteIng")}
+                    disabled={v.ingredients.length === 1}
+                    onClick={() => reorderIngredients(v.ingredients.filter((_, n) => n !== i), (n) => (n === i + 1 ? null : n > i + 1 ? n - 1 : n))}
+                  >
+                    ✕
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Button type="button" variant="outline" size="sm" onClick={calculateNutrition}>{t("ed.calcFrom")}</Button>
-            {nutritionNote && <p className="text-xs text-amber-900" role="status">{nutritionNote}</p>}
-          </div>
-        </fieldset>
-      </section>
+          <Button type="button" variant="outline" size="sm" onClick={() => set("ingredients", [...v.ingredients, { name: "", quantity: "", unit: "" }])}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {t("ed.addIng")}
+          </Button>
 
-      <section className="space-y-6">
-        <h2 className="text-2xl font-serif text-amber-950">{t("ed.steps")}</h2>
-        {v.steps.map((s, i) => (
-          <fieldset key={i} className="border-t border-amber-200 pt-4 space-y-3">
-            <legend className="text-sm font-semibold text-amber-900 pr-2">{t("ed.stepN", { n: i + 1 })}</legend>
-            <div>
-              <label className={label} htmlFor={`st-title-${i}`}>{t("ed.title")}</label>
-              <input id={`st-title-${i}`} className={field} value={s.title} onChange={(e) => setStep(i, { title: e.target.value })} />
+          <fieldset className="border-t border-amber-200 pt-5">
+            <legend className={cn(label, "pr-2")}>{t("ed.nutrition")}</legend>
+            <p className="text-xs text-amber-600">{t("ed.nutritionNote")}</p>
+            <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
+              {NUTRITION_FIELDS.map(({ key, text }) => (
+                <div key={key}>
+                  <label htmlFor={key} className="block text-xs text-amber-600">{t(text)}</label>
+                  <input id={key} type="number" min={0} className={field} value={v[key]} onChange={(e) => set(key, e.target.value)} />
+                </div>
+              ))}
             </div>
-            <div>
-              <label className={label} htmlFor={`st-ins-${i}`}>{t("ed.instruction")}</label>
-              <textarea id={`st-ins-${i}`} rows={3} className={field} value={s.instruction} onChange={(e) => setStep(i, { instruction: e.target.value })} />
-            </div>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-              <div>
-                <label className={label} htmlFor={`st-timer-${i}`}>{t("ed.timerMin")}</label>
-                <input id={`st-timer-${i}`} type="number" min={0} className={field} value={s.timerMinutes} onChange={(e) => setStep(i, { timerMinutes: e.target.value })} />
-              </div>
-              <div>
-                <label className={label} htmlFor={`st-temp-${i}`}>{t("ed.temp")}</label>
-                <input id={`st-temp-${i}`} type="number" min={0} className={field} value={s.temperatureCelsius} onChange={(e) => setStep(i, { temperatureCelsius: e.target.value })} />
-              </div>
-              <div className="col-span-2">
-                <label className={label} htmlFor={`st-ing-${i}`}>{t("ed.stepIngs")}</label>
-                <input id={`st-ing-${i}`} className={field} placeholder={t("ed.stepIngsPh")} value={s.ingredientPositions} onChange={(e) => setStep(i, { ingredientPositions: e.target.value })} />
-              </div>
-            </div>
-            <div>
-              <label className={label} htmlFor={`st-img-${i}`}>{t("ed.stepImage")}</label>
-              <input id={`st-img-${i}`} type="url" className={field} value={s.mediaUrl} onChange={(e) => setStep(i, { mediaUrl: e.target.value })} />
-            </div>
-            <div>
-              <label className={label} htmlFor={`st-tip-${i}`}>{t("ed.tipOptional")}</label>
-              <input id={`st-tip-${i}`} className={field} value={s.tip} onChange={(e) => setStep(i, { tip: e.target.value })} />
-            </div>
-            <div className="flex gap-1">
-              <Button type="button" size="sm" variant="ghost" onClick={() => set("steps", move(v.steps, i, -1))}>{t("ed.up")}</Button>
-              <Button type="button" size="sm" variant="ghost" onClick={() => set("steps", move(v.steps, i, 1))}>{t("ed.down")}</Button>
-              <Button type="button" size="sm" variant="ghost" disabled={v.steps.length === 1} onClick={() => set("steps", v.steps.filter((_, n) => n !== i))}>{t("common.delete")}</Button>
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <Button type="button" variant="outline" size="sm" onClick={calculateNutrition}>{t("ed.calcFrom")}</Button>
+              {nutritionNote && <p className="text-xs text-amber-900" role="status">{nutritionNote}</p>}
             </div>
           </fieldset>
-        ))}
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          onClick={() => set("steps", [...v.steps, { title: "", instruction: "", mediaUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" }])}
-        >
-          {t("ed.addStep")}
-        </Button>
-      </section>
+        </Section>
 
-      <div className="sticky bottom-0 z-10 space-y-2 border-t border-amber-200 bg-amber-50/95 py-4 backdrop-blur">
-        {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
-        {notice && <p role="status" className="text-sm text-emerald-800">{notice}</p>}
-        <div className="flex flex-wrap gap-3">
-          <Button type="button" variant="outline" loading={pending} onClick={() => submit(false)}>
-            {v.status === "published" ? t("ed.toDraft") : t("ed.saveDraft")}
+        {/* 4 — steps */}
+        <Section n={4} title={t("ed.steps")}>
+          <div className="space-y-5">
+            {v.steps.map((s, i) => {
+              const picked = parsePositions(s.ingredientPositions);
+              return (
+                <fieldset key={i} className="rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5">
+                  <legend className="flex items-center gap-2 px-2 font-serif text-lg font-semibold text-amber-950">
+                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-clay-400 text-sm text-amber-50">{i + 1}</span>
+                    {t("ed.stepN", { n: i + 1 })}
+                  </legend>
+                  <div className="mt-2 grid gap-4 lg:grid-cols-[minmax(0,1fr)_12rem]">
+                    <div className="space-y-4">
+                      <div>
+                        <label className={label} htmlFor={`st-title-${i}`}>{t("ed.title")}</label>
+                        <input id={`st-title-${i}`} className={cn(field, "mt-1.5")} value={s.title} onChange={(e) => setStep(i, { title: e.target.value })} />
+                      </div>
+                      <div>
+                        <label className={label} htmlFor={`st-ins-${i}`}>{t("ed.instruction")}</label>
+                        <textarea id={`st-ins-${i}`} rows={3} className={cn(field, "mt-1.5")} value={s.instruction} onChange={(e) => setStep(i, { instruction: e.target.value })} />
+                      </div>
+                    </div>
+                    <div>
+                      <p className={label}>{t("ed.stepPhoto")}</p>
+                      <div className="mt-1.5">
+                        <ImageUploader value={s.mediaUrl} compact onChange={(url) => setStep(i, { mediaUrl: url })} label={t("ed.stepPhoto")} />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid grid-cols-2 gap-3 sm:max-w-md">
+                    <div>
+                      <label className={cn(label, "flex items-center gap-1.5")} htmlFor={`st-timer-${i}`}>
+                        <Clock className="h-4 w-4 text-amber-700" aria-hidden="true" />
+                        {t("ed.timerMin")}
+                      </label>
+                      <input id={`st-timer-${i}`} type="number" min={0} className={cn(field, "mt-1.5")} value={s.timerMinutes} onChange={(e) => setStep(i, { timerMinutes: e.target.value })} />
+                    </div>
+                    <div>
+                      <label className={label} htmlFor={`st-temp-${i}`}>{t("ed.temp")}</label>
+                      <input id={`st-temp-${i}`} type="number" min={0} className={cn(field, "mt-1.5")} value={s.temperatureCelsius} onChange={(e) => setStep(i, { temperatureCelsius: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div className="mt-4">
+                    <p className={label}>{t("ed.stepIngsPick")}</p>
+                    {v.ingredients.some((ing) => ing.name.trim()) ? (
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {v.ingredients.map((ing, n) =>
+                          ing.name.trim() ? (
+                            <button
+                              key={n}
+                              type="button"
+                              aria-pressed={picked.includes(n + 1)}
+                              onClick={() => togglePosition(i, n + 1)}
+                              className={cn(
+                                "flex h-10 items-center gap-1.5 rounded-full border px-3.5 text-sm transition-colors",
+                                picked.includes(n + 1) ? "border-sage-600 bg-sage-100 font-semibold text-sage-900" : "border-amber-300 text-amber-900 hover:border-amber-950",
+                              )}
+                            >
+                              {picked.includes(n + 1) && <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />}
+                              {ing.name}
+                            </button>
+                          ) : null,
+                        )}
+                      </div>
+                    ) : (
+                      <p className="mt-1 text-sm text-amber-600">{t("ed.stepIngsNone")}</p>
+                    )}
+                  </div>
+
+                  <div className="mt-4">
+                    <label className={label} htmlFor={`st-tip-${i}`}>{t("ed.tipOptional")}</label>
+                    <input id={`st-tip-${i}`} className={cn(field, "mt-1.5")} value={s.tip} onChange={(e) => setStep(i, { tip: e.target.value })} />
+                  </div>
+
+                  <div className="mt-4 flex flex-wrap gap-1 border-t border-amber-200 pt-3">
+                    <Button type="button" size="sm" variant="ghost" disabled={i === 0} onClick={() => set("steps", move(v.steps, i, -1))}>{t("ed.moveStepUp")}</Button>
+                    <Button type="button" size="sm" variant="ghost" disabled={i === v.steps.length - 1} onClick={() => set("steps", move(v.steps, i, 1))}>{t("ed.moveStepDown")}</Button>
+                    <Button type="button" size="sm" variant="ghost" disabled={v.steps.length === 1} onClick={() => set("steps", v.steps.filter((_, n) => n !== i))}>{t("common.delete")}</Button>
+                  </div>
+                </fieldset>
+              );
+            })}
+          </div>
+          <Button type="button" variant="outline" size="sm" onClick={() => set("steps", [...v.steps, { ...BLANK_STEP }])}>
+            <Plus className="h-4 w-4" aria-hidden="true" />
+            {t("ed.addStep")}
           </Button>
-          <Button type="button" loading={pending} onClick={() => submit(true)}>
-            {v.status === "published" ? t("common.save") : t("ed.publish")}
-          </Button>
+        </Section>
+
+        {/* 5 — price */}
+        <Section n={5} title={t("ed.sec.pricing")}>
+          <label className="flex min-h-11 cursor-pointer items-center gap-3 text-amber-950">
+            <input type="checkbox" className="h-5 w-5 accent-amber-700" checked={v.isPremium} onChange={(e) => set("isPremium", e.target.checked)} />
+            <span className="text-lg font-medium">{t("ed.premium")}</span>
+          </label>
+          {v.isPremium && (
+            <div className="max-w-xs">
+              <label htmlFor="price" className={label}>{t("ed.price")}</label>
+              <input id="price" type="number" min={1} className={cn(field, "mt-1.5")} value={v.priceAmount} onChange={(e) => set("priceAmount", e.target.value)} />
+              <p className="mt-2 text-xs text-amber-600">{t("ed.premiumNote")}</p>
+            </div>
+          )}
+        </Section>
+
+        <div className="sticky bottom-0 z-10 space-y-2 rounded-t-2xl border-t border-amber-200 bg-amber-50/95 px-1 py-4 backdrop-blur">
+          {error && <p role="alert" className="text-sm font-medium text-red-700">{error}</p>}
+          {notice && <p role="status" className="text-sm font-medium text-sage-700">{notice}</p>}
+          <div className="flex flex-wrap gap-3">
+            <Button type="button" variant="outline" size="lg" loading={pending} onClick={() => submit(false)}>
+              {v.status === "published" ? t("ed.toDraft") : t("ed.saveDraft")}
+            </Button>
+            <Button type="button" size="lg" loading={pending} onClick={() => submit(true)}>
+              {v.status === "published" ? t("common.save") : t("ed.publish")}
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* side: what readers will see, and what is still missing */}
+      {sidebar && (
+        <aside className="space-y-5 xl:sticky xl:top-6">
+          <div>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.16em] text-amber-600">{t("ed.preview")}</p>
+            <article className="overflow-hidden rounded-[1.25rem] border border-amber-200 bg-amber-100">
+              <div className="relative aspect-[4/3] bg-amber-200">
+                {v.coverUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- live preview of the creator's own photo
+                  <img src={v.coverUrl} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="flex h-full items-center justify-center text-sm text-amber-500">{t("studio.noCover")}</span>
+                )}
+                <span className={cn("absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-semibold", v.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-amber-50")}>
+                  {v.isPremium ? t("filter.premium") : t("filter.free")}
+                </span>
+              </div>
+              <div className="p-4">
+                <h3 className="line-clamp-2 text-xl font-medium leading-tight text-amber-950">{v.title.trim() || t("ed.untitled")}</h3>
+                {total > 0 && (
+                  <p className="mt-2 flex items-center gap-1.5 text-sm text-amber-600">
+                    <Clock className="h-4 w-4" aria-hidden="true" />
+                    {t("time.min", { count: total })}
+                  </p>
+                )}
+              </div>
+            </article>
+          </div>
+
+          <div className="rounded-2xl border border-amber-200 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-amber-600">{t("ed.checkTitle")}</p>
+            <ul className="mt-3 space-y-2">
+              {checks.map((c) => (
+                <li key={c.key} className="flex items-center gap-2.5 text-[0.95rem]">
+                  {c.done ? <Check className="h-5 w-5 shrink-0 text-sage-600" strokeWidth={3} aria-hidden="true" /> : <Circle className="h-5 w-5 shrink-0 text-amber-400" aria-hidden="true" />}
+                  <span className={c.done ? "text-amber-950" : "text-amber-600"}>
+                    {c.label}
+                    {!c.required && <span className="ml-1.5 text-xs text-amber-500">· {t("ed.optional")}</span>}
+                  </span>
+                </li>
+              ))}
+            </ul>
+            {ready && <p className="mt-4 rounded-xl bg-sage-100 px-3 py-2 text-sm font-semibold text-sage-900">{t("ed.ready")}</p>}
+          </div>
+        </aside>
+      )}
     </form>
   );
 }

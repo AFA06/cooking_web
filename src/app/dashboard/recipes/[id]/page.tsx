@@ -22,7 +22,7 @@ export default async function EditRecipePage({ params }: { params: Promise<{ id:
   if (!data) notFound();
 
   return (
-    <Container size="md" className="py-12">
+    <Container size="lg" className="py-10">
       <h1 className="mb-8 text-3xl font-medium text-amber-950 break-words sm:text-4xl">{t("ed.editTitle", { title: data.recipe.title })}</h1>
       <RecipeEditor initial={toEditorInitial(data)} save={saveRecipe} basePath="/dashboard/recipes" />
     </Container>

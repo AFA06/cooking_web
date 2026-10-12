@@ -32,6 +32,7 @@ export async function persistRecipe(o: PersistOptions): Promise<{ error: string 
     coverUrl: d.coverUrl,
     coverAlt: d.title,
     galleryUrls: d.galleryUrls,
+    videoUrl: d.videoUrl || null,
     servings: d.servings,
     prepTimeMinutes: d.prepTimeMinutes,
     cookTimeMinutes: d.cookTimeMinutes,

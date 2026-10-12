@@ -69,6 +69,8 @@ export interface Recipe {
   ingredients: RecipeIngredient[];
   steps: RecipeStep[];
   media: RecipeMedia[];
+  /** Link to a YouTube/Vimeo page or a direct video file. */
+  videoUrl?: string;
   tags: string[];
   publishedAt: string;
   /** Completed guided-cooking sessions. */

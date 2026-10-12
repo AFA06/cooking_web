@@ -1,11 +1,15 @@
 import { z } from "zod";
 import { CATEGORY_KEYS } from "@/lib/categories";
+import { parseVideoUrl } from "@/lib/video";
+
+/** A picture is either a web link or one of our own uploads. */
+export const IMAGE_URL = /^(https?:\/\/|\/api\/media\/[0-9a-f-]{36}$)/i;
 
 const optionalUrl = z
   .string()
   .trim()
   .max(1000)
-  .refine((v) => v === "" || /^https?:\/\//i.test(v), "err.imgUrl");
+  .refine((v) => v === "" || IMAGE_URL.test(v), "err.imgUrl");
 
 /** Photos a recipe can have besides its cover. */
 export const MAX_GALLERY_PHOTOS = 5;
@@ -14,8 +18,9 @@ export const recipeInputSchema = z
   .object({
     title: z.string().trim().min(3, "err.titleShort").max(120, "err.titleLong"),
     description: z.string().trim().min(10, "err.descShort").max(600),
-    coverUrl: z.string().trim().regex(/^https?:\/\//i, "err.coverUrl").max(1000),
-    galleryUrls: z.array(z.string().trim().regex(/^https?:\/\//i, "err.imgUrl").max(1000)).max(MAX_GALLERY_PHOTOS, "err.maxGallery"),
+    coverUrl: z.string().trim().regex(IMAGE_URL, "err.coverUrl").max(1000),
+    videoUrl: z.string().trim().max(500).refine((v) => v === "" || parseVideoUrl(v) !== null, "err.videoUrl"),
+    galleryUrls: z.array(z.string().trim().regex(IMAGE_URL, "err.imgUrl").max(1000)).max(MAX_GALLERY_PHOTOS, "err.maxGallery"),
     servings: z.coerce.number().int().min(1).max(100),
     prepTimeMinutes: z.coerce.number().int().min(0).max(2880),
     cookTimeMinutes: z.coerce.number().int().min(0).max(2880),

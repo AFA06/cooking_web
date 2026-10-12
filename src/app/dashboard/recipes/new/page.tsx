@@ -14,7 +14,7 @@ export default async function NewRecipePage() {
   const [creator, t] = await Promise.all([getCurrentCreator(), getT()]);
   if (!creator) redirect("/creators/join");
   return (
-    <Container size="md" className="py-12">
+    <Container size="lg" className="py-10">
       <h1 className="text-3xl sm:text-4xl font-serif font-medium text-amber-950 mb-8">{t("ed.newRecipe")}</h1>
       <RecipeEditor initial={EMPTY_RECIPE} save={saveRecipe} basePath="/dashboard/recipes" />
     </Container>
