@@ -11,6 +11,7 @@ import {
   updateProfile,
   type AccountState,
 } from "@/app/account/actions";
+import { useT } from "@/i18n/client";
 
 const field =
   "mt-1.5 h-14 w-full rounded-xl border border-amber-300 bg-amber-100 px-4 text-lg text-amber-950 transition-colors placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
@@ -44,16 +45,17 @@ function Footer({ state, pending, children }: { state: AccountState; pending: bo
 }
 
 export function ProfileForm({ initial }: { initial: { name: string; username: string } }) {
+  const t = useT();
   const [state, action, pending] = React.useActionState<AccountState, FormData>(updateProfile, {});
   const { bind } = useFields(initial);
   return (
     <form action={action} className="space-y-5">
       <div>
-        <label htmlFor="name" className={label}>Ism</label>
+        <label htmlFor="name" className={label}>{t("auth.name")}</label>
         <input id="name" {...bind("name")} required minLength={2} maxLength={80} autoComplete="name" className={field} />
       </div>
       <div>
-        <label htmlFor="username" className={label}>Foydalanuvchi nomi</label>
+        <label htmlFor="username" className={label}>{t("settings.username")}</label>
         <div className="relative">
           <span className="pointer-events-none absolute left-4 top-1/2 mt-[0.2rem] -translate-y-1/2 text-lg text-amber-500" aria-hidden="true">@</span>
           <input
@@ -67,9 +69,9 @@ export function ProfileForm({ initial }: { initial: { name: string; username: st
             className={`${field} pl-9`}
           />
         </div>
-        <p className={hint}>Ixtiyoriy. 3–24 ta belgi: lotin harflari, raqamlar va “_”.</p>
+        <p className={hint}>{t("settings.usernameNote")}</p>
       </div>
-      <Footer state={state} pending={pending}>Saqlash</Footer>
+      <Footer state={state} pending={pending}>{t("common.save")}</Footer>
     </form>
   );
 }
@@ -95,6 +97,7 @@ function ContactForm({
   start: (state: AccountState, formData: FormData) => Promise<AccountState>;
   confirm: (state: AccountState, formData: FormData) => Promise<AccountState>;
 }) {
+  const t = useT();
   const isPhone = kind === "phone";
   const [startState, startAction, starting] = React.useActionState<AccountState, FormData>(start, {});
   const [confirmState, confirmAction, confirming] = React.useActionState<AccountState, FormData>(confirm, {});
@@ -113,9 +116,9 @@ function ContactForm({
   return (
     <div className="space-y-5">
       <p className="text-amber-900">
-        {isPhone ? "Hozirgi raqam: " : "Hozirgi email: "}
-        <span className="font-semibold text-amber-950">{current ?? "kiritilmagan"}</span>
-        {current && !verified && <span className="ml-2 text-sm text-red-700">tasdiqlanmagan</span>}
+        {isPhone ? `${t("settings.currentNumber")} ` : `${t("settings.currentEmail")} `}
+        <span className="font-semibold text-amber-950">{current ?? t("settings.notSet")}</span>
+        {current && !verified && <span className="ml-2 text-sm text-red-700">{t("settings.notVerified")}</span>}
       </p>
 
       {waitingForCode ? (
@@ -123,7 +126,7 @@ function ContactForm({
           <input type="hidden" name="challengeId" value={challengeId} />
           <input type="hidden" name="sentTo" value={sentTo ?? ""} />
           <div>
-            <label htmlFor={`${kind}-code`} className={label}>Tasdiqlash kodi</label>
+            <label htmlFor={`${kind}-code`} className={label}>{t("auth.codeLabel")}</label>
             <input
               id={`${kind}-code`}
               name="code"
@@ -137,15 +140,15 @@ function ContactForm({
               className={`${field} text-center font-mono text-2xl tracking-[0.5em]`}
             />
             <p className={hint}>
-              <span className="font-semibold text-amber-950">{sentTo}</span> manziliga yuborilgan 6 xonali kodni kiriting.
+              {t("settings.sentTo", { to: sentTo ?? "" })}
             </p>
           </div>
-          <Footer state={codeState} pending={confirming}>Tasdiqlash</Footer>
+          <Footer state={codeState} pending={confirming}>{t("auth.confirm")}</Footer>
         </form>
       ) : (
         <form action={startAction} className="space-y-5">
           <div>
-            <label htmlFor={`${kind}-value`} className={label}>{isPhone ? "Yangi telefon raqami" : "Yangi email"}</label>
+            <label htmlFor={`${kind}-value`} className={label}>{isPhone ? t("settings.newPhone") : t("settings.newEmail")}</label>
             <input
               id={`${kind}-value`}
               {...bind("value")}
@@ -159,18 +162,18 @@ function ContactForm({
             />
           </div>
           <div>
-            <label htmlFor={`${kind}-password`} className={label}>Joriy parol</label>
+            <label htmlFor={`${kind}-password`} className={label}>{t("settings.currentPw")}</label>
             <input id={`${kind}-password`} {...bind("currentPassword")} type="password" required maxLength={72} autoComplete="current-password" className={field} />
             <p className={hint}>
-              {isPhone ? "Yangi raqamga SMS orqali kod yuboramiz." : "Yangi emailga kod yuboramiz."} Kod kiritilmaguncha hech narsa o‘zgarmaydi.
+              {isPhone ? t("settings.sendNotePhone") : t("settings.sendNoteEmail")} {t("settings.nothingChanges")}
             </p>
           </div>
-          <Footer state={startState} pending={starting}>Kod yuborish</Footer>
+          <Footer state={startState} pending={starting}>{t("auth.sendCode")}</Footer>
         </form>
       )}
       {waitingForCode && (
         <button type="button" onClick={() => setDismissed(challengeId ?? null)} className="text-sm font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
-          Boshqa {isPhone ? "raqam" : "email"} kiritish
+          {isPhone ? t("settings.otherNumber") : t("settings.otherEmail")}
         </button>
       )}
     </div>
@@ -186,6 +189,7 @@ export function EmailForm(props: ContactProps) {
 }
 
 export function PasswordForm() {
+  const t = useT();
   const [state, action, pending] = React.useActionState<AccountState, FormData>(changePassword, {});
   const { bind, reset } = useFields({ currentPassword: "", newPassword: "", confirmPassword: "" });
   React.useEffect(() => {
@@ -195,19 +199,19 @@ export function PasswordForm() {
   return (
     <form action={action} className="space-y-5">
       <div>
-        <label htmlFor="current-password" className={label}>Joriy parol</label>
+        <label htmlFor="current-password" className={label}>{t("settings.currentPw")}</label>
         <input id="current-password" {...bind("currentPassword")} type="password" required maxLength={72} autoComplete="current-password" className={field} />
       </div>
       <div>
-        <label htmlFor="new-password" className={label}>Yangi parol</label>
+        <label htmlFor="new-password" className={label}>{t("settings.newPw")}</label>
         <input id="new-password" {...bind("newPassword")} type="password" required minLength={8} maxLength={72} autoComplete="new-password" className={field} />
-        <p className={hint}>Kamida 8 ta belgi.</p>
+        <p className={hint}>{t("auth.min8")}</p>
       </div>
       <div>
-        <label htmlFor="confirm-password" className={label}>Yangi parolni takrorlang</label>
+        <label htmlFor="confirm-password" className={label}>{t("settings.repeatPw")}</label>
         <input id="confirm-password" {...bind("confirmPassword")} type="password" required minLength={8} maxLength={72} autoComplete="new-password" className={field} />
       </div>
-      <Footer state={state} pending={pending}>Parolni yangilash</Footer>
+      <Footer state={state} pending={pending}>{t("settings.updatePw")}</Footer>
     </form>
   );
 }

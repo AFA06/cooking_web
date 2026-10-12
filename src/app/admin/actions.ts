@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
+import { getT } from "@/i18n/server";
 import { getCurrentUser, type CurrentUser } from "@/server/auth";
 import { persistRecipe } from "@/server/recipe-write";
 import { recipeInputSchema, slugify, type RecipeInput } from "@/lib/recipe-schema";
@@ -32,18 +33,19 @@ function refreshPublic() {
 /* ───────────── Users ───────────── */
 
 const userSchema = z.object({
-  name: z.string().trim().min(2, "Ism juda qisqa").max(80),
+  name: z.string().trim().min(2, "err.nameShort").max(80),
   /** Optional: phone-only accounts have none. */
-  email: z.string().trim().toLowerCase().max(254).refine((v) => v === "" || z.string().email().safeParse(v).success, "To‘g‘ri email kiriting"),
+  email: z.string().trim().toLowerCase().max(254).refine((v) => v === "" || z.string().email().safeParse(v).success, "auth.err.email"),
   role: z.enum(["user", "creator", "admin"]),
 });
 
 export async function updateUser(userId: string, _: FormState, formData: FormData): Promise<FormState> {
+  const t = await getT();
   const admin = await requireAdmin();
-  if (!uuid.safeParse(userId).success) return { error: "Noto‘g‘ri foydalanuvchi." };
+  if (!uuid.safeParse(userId).success) return { error: t("adm.err.badUser") };
   const parsed = userSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
-  if (userId === admin.id && parsed.data.role !== "admin") return { error: "O‘zingizning admin huquqingizni olib tashlay olmaysiz." };
+  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
+  if (userId === admin.id && parsed.data.role !== "admin") return { error: t("adm.roleHintSelf") };
 
   const email = parsed.data.email || null;
   if (email) {
@@ -52,7 +54,7 @@ export async function updateUser(userId: string, _: FormState, formData: FormDat
       .from(schema.users)
       .where(and(eq(schema.users.email, email), ne(schema.users.id, userId)))
       .limit(1);
-    if (taken) return { error: "Bu email boshqa hisobga tegishli." };
+    if (taken) return { error: t("adm.err.emailTaken") };
   }
 
   const [current] = await db.select({ email: schema.users.email }).from(schema.users).where(eq(schema.users.id, userId)).limit(1);
@@ -63,7 +65,7 @@ export async function updateUser(userId: string, _: FormState, formData: FormDat
     .set({ name: parsed.data.name, role: parsed.data.role, email, ...(emailChanged ? { emailVerifiedAt: null } : {}) })
     .where(eq(schema.users.id, userId));
   revalidatePath("/admin", "layout");
-  return { ok: "Saqlandi." };
+  return { ok: t("adm.saved") };
 }
 
 export async function deleteUser(userId: string): Promise<void> {
@@ -77,19 +79,19 @@ export async function deleteUser(userId: string): Promise<void> {
 /* ───────────── Creators ───────────── */
 
 const creatorSchema = z.object({
-  name: z.string().trim().min(2, "Ism juda qisqa").max(80),
+  name: z.string().trim().min(2, "err.nameShort").max(80),
   slug: z
     .string()
     .trim()
     .toLowerCase()
     .max(60)
-    .regex(/^[a-z0-9-]*$/, "Manzil faqat lotin harflari, raqam va chiziqchadan iborat bo‘lishi kerak"),
+    .regex(/^[a-z0-9-]*$/, "adm.err.slugFormat"),
   bio: z.string().trim().max(500),
   avatarUrl: z
     .string()
     .trim()
     .max(1000)
-    .refine((v) => v === "" || /^https?:\/\//i.test(v), "Rasm havolasi http:// yoki https:// bilan boshlanishi kerak"),
+    .refine((v) => v === "" || /^https?:\/\//i.test(v), "err.imgUrl"),
   isFoundingCreator: z.boolean(),
   isFeatured: z.boolean(),
 });
@@ -115,12 +117,13 @@ async function slugTaken(slug: string, exceptId?: string): Promise<boolean> {
 }
 
 export async function createCreator(_: FormState, formData: FormData): Promise<FormState> {
+  const t = await getT();
   await requireAdmin();
   const parsed = parseCreator(formData);
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
   const d = parsed.data;
   const slug = d.slug || slugify(d.name) || "ijodkor";
-  if (await slugTaken(slug)) return { error: "Bu manzil band. Boshqasini tanlang." };
+  if (await slugTaken(slug)) return { error: t("adm.err.slugTaken") };
 
   const [row] = await db
     .insert(schema.creators)
@@ -131,20 +134,21 @@ export async function createCreator(_: FormState, formData: FormData): Promise<F
 }
 
 export async function updateCreator(creatorId: string, _: FormState, formData: FormData): Promise<FormState> {
+  const t = await getT();
   await requireAdmin();
-  if (!uuid.safeParse(creatorId).success) return { error: "Noto‘g‘ri ijodkor." };
+  if (!uuid.safeParse(creatorId).success) return { error: t("adm.err.badCreator") };
   const parsed = parseCreator(formData);
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
   const d = parsed.data;
-  if (!d.slug) return { error: "Manzil bo‘sh bo‘lmasligi kerak." };
-  if (await slugTaken(d.slug, creatorId)) return { error: "Bu manzil band. Boshqasini tanlang." };
+  if (!d.slug) return { error: t("adm.err.slugEmpty") };
+  if (await slugTaken(d.slug, creatorId)) return { error: t("adm.err.slugTaken") };
 
   await db
     .update(schema.creators)
     .set({ ...d, bio: d.bio || null, avatarUrl: d.avatarUrl || null })
     .where(eq(schema.creators.id, creatorId));
   refreshPublic();
-  return { ok: "Saqlandi." };
+  return { ok: t("adm.saved") };
 }
 
 export async function setCreatorFlag(creatorId: string, flag: "isFoundingCreator" | "isFeatured", value: boolean): Promise<void> {
@@ -209,11 +213,12 @@ export async function adminSaveRecipe(
   input: RecipeInput,
   publish: boolean,
 ): Promise<{ error: string } | { id: string }> {
+  const t = await getT();
   await requireAdmin();
   const parsed = recipeInputSchema.safeParse(input);
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
-  if (recipeId && !uuid.safeParse(recipeId).success) return { error: "Noto‘g‘ri retsept." };
-  if (!recipeId && !uuid.safeParse(creatorId).success) return { error: "Ijodkor tanlanmagan." };
+  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
+  if (recipeId && !uuid.safeParse(recipeId).success) return { error: t("adm.err.badRecipe") };
+  if (!recipeId && !uuid.safeParse(creatorId).success) return { error: t("err.noCreator") };
 
   const result = await persistRecipe({ recipeId, creatorId, ownerOnly: false, data: parsed.data, publish });
   if ("error" in result) return result;

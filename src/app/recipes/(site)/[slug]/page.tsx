@@ -1,4 +1,5 @@
 import { Metadata } from "next";
+import { getT } from "@/i18n/server";
 import { notFound } from "next/navigation";
 import { after } from "next/server";
 import { trackEvent } from "@/server/analytics";
@@ -21,7 +22,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const recipe = await getRecipeBySlug(slug);
   
   if (!recipe) {
-    return { title: "Retsept topilmadi" };
+    return { title: (await getT())("recipe.notFound") };
   }
 
   return {

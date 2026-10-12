@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getRecipeBySlug } from "@/server/recipes";
 import { getCurrentUser } from "@/server/auth";
+import { getT } from "@/i18n/server";
 import { clampServings } from "@/lib/scaling";
 import { GuidedCooking } from "@/components/recipe/GuidedCooking";
 
@@ -15,7 +16,8 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const recipe = await getRecipeBySlug(slug);
-  return { title: recipe ? `Pishirish: ${recipe.title}` : "Retsept topilmadi", robots: { index: false } };
+  const t = await getT();
+  return { title: recipe ? t("cook.metaTitle", { title: recipe.title }) : t("recipe.notFound"), robots: { index: false } };
 }
 
 export default async function CookPage({ params, searchParams }: Props) {

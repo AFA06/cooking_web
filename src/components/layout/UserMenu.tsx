@@ -4,6 +4,7 @@ import Link from "next/link";
 import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { ChefHat, ChevronDown, LayoutDashboard, LogOut, Settings, Shield } from "lucide-react";
 import { logout } from "@/app/auth/actions";
+import { useT } from "@/i18n/client";
 
 interface Props {
   name: string;
@@ -17,18 +18,19 @@ const item =
 
 /** The signed-in person's avatar in the header; opens their links and the sign-out button. */
 export function UserMenu({ name, email, isCreator, isAdmin }: Props) {
+  const t = useT();
   const initial = name.slice(0, 1).toUpperCase();
   const links = [
-    { href: "/account", label: "Mening oshxonam", icon: ChefHat },
-    { href: "/account/settings", label: "Profil sozlamalari", icon: Settings },
-    ...(isCreator ? [{ href: "/dashboard", label: "Ijodkor paneli", icon: LayoutDashboard }] : []),
-    ...(isAdmin ? [{ href: "/admin", label: "Admin paneli", icon: Shield }] : []),
+    { href: "/account", label: t("nav.myKitchen"), icon: ChefHat },
+    { href: "/account/settings", label: t("nav.settings"), icon: Settings },
+    ...(isCreator ? [{ href: "/dashboard", label: t("nav.creatorPanel"), icon: LayoutDashboard }] : []),
+    ...(isAdmin ? [{ href: "/admin", label: t("nav.adminPanel"), icon: Shield }] : []),
   ];
 
   return (
     <DropdownMenu.Root>
       <DropdownMenu.Trigger
-        aria-label="Profil menyusi"
+        aria-label={t("nav.profileMenu")}
         className="group flex h-11 items-center gap-2 rounded-full border border-amber-200 py-1 pl-1 pr-3 text-sm font-medium text-amber-950 outline-none transition-colors hover:border-amber-300 hover:bg-amber-100 focus-visible:ring-2 focus-visible:ring-amber-700 data-[state=open]:border-amber-300 data-[state=open]:bg-amber-100"
       >
         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-sage-500 font-serif text-base font-semibold text-amber-50" aria-hidden="true">
@@ -65,7 +67,7 @@ export function UserMenu({ name, email, isCreator, isAdmin }: Props) {
           <DropdownMenu.Separator className="mx-1 my-1.5 h-px bg-amber-200" />
           <DropdownMenu.Item className={`${item} text-red-700`} onSelect={() => void logout()}>
             <LogOut className="h-[1.15rem] w-[1.15rem]" aria-hidden="true" />
-            Chiqish
+            {t("nav.logout")}
           </DropdownMenu.Item>
         </DropdownMenu.Content>
       </DropdownMenu.Portal>

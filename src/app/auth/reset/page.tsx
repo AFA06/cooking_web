@@ -4,10 +4,13 @@ import { redirect } from "next/navigation";
 import { AuthScreen } from "@/components/auth/AuthScreen";
 import { ResendButton, ResetPasswordForm } from "@/components/auth/CodeForms";
 import { SiteShell } from "@/components/layout/SiteShell";
+import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { completePasswordReset, resendPasswordResetCode } from "../actions";
 
-export const metadata: Metadata = { title: "Yangi parol", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("auth.resetMeta"), robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -17,23 +20,23 @@ const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
  * so it cannot be used to find out who has one.
  */
 export default async function Page({ searchParams }: { searchParams: Promise<{ c?: string }> }) {
-  const { c = "" } = await searchParams;
+  const [{ c = "" }, t] = await Promise.all([searchParams, getT()]);
   if (await getCurrentUser()) redirect("/account");
   if (!UUID.test(c)) redirect("/auth/forgot");
 
   return (
     <SiteShell>
       <AuthScreen
-        eyebrow="Parolni tiklash"
-        title={<>Yangi parol <em className="text-clay-400">o‘rnating.</em></>}
-        note="Agar hisob mavjud bo‘lsa, kod yuborildi: tasdiqlangan emailingizga, email bo‘lmasa telefoningizga SMS orqali. Emailingizga kira olmasangiz, pastdagi SMS tugmasini bosing."
+        eyebrow={t("auth.forgotMeta")}
+        title={<>{t("auth.resetLead")} <em className="text-clay-400">{t("auth.resetEm")}</em></>}
+        note={t("auth.resetNote")}
       >
         <ResetPasswordForm action={completePasswordReset} challengeId={c} />
         <div className="mt-6 flex flex-col gap-4">
-          <ResendButton action={resendPasswordResetCode} challengeId={c} label="Kodni qayta yuborish" />
-          <ResendButton action={resendPasswordResetCode} challengeId={c} via="sms" label="Emailga kira olmayman — SMS yuborish" />
+          <ResendButton action={resendPasswordResetCode} challengeId={c} label={t("auth.resendCode")} />
+          <ResendButton action={resendPasswordResetCode} challengeId={c} via="sms" label={t("auth.smsInstead")} />
           <Link href="/auth/forgot" className="text-sm font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
-            Boshqa raqam yoki email kiritish
+            {t("auth.otherIdentifier")}
           </Link>
         </div>
       </AuthScreen>

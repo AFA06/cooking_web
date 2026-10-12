@@ -1,10 +1,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { BookOpen } from "lucide-react";
+import { getT } from "@/i18n/server";
 import type { CookbookSummary } from "@/server/cookbooks";
 
 /** A cookbook as a tile: its newest recipe large, the next two beside it. */
-export function CookbookCard({ cookbook }: { cookbook: CookbookSummary }) {
+export async function CookbookCard({ cookbook }: { cookbook: CookbookSummary }) {
+  const t = await getT();
   const [first, ...rest] = cookbook.coverUrls;
   return (
     <Link href={`/account/cookbooks/${cookbook.id}`} className="group block">
@@ -27,7 +29,7 @@ export function CookbookCard({ cookbook }: { cookbook: CookbookSummary }) {
         )}
       </div>
       <h3 className="mt-4 truncate text-2xl font-medium leading-tight text-amber-950 group-hover:text-amber-700">{cookbook.name}</h3>
-      <p className="mt-1 text-sm text-amber-600">{cookbook.recipeCount === 0 ? "Hozircha bo‘sh" : `${cookbook.recipeCount} ta retsept`}</p>
+      <p className="mt-1 text-sm text-amber-600">{cookbook.recipeCount === 0 ? t("cookbook.emptyCard") : `${cookbook.recipeCount} ${t("recipes.countNoun", { count: cookbook.recipeCount })}`}</p>
     </Link>
   );
 }

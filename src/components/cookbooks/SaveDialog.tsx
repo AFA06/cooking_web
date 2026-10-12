@@ -6,6 +6,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { Bookmark, BookOpen, Check, Plus, X } from "lucide-react";
 import { createCookbook, loadSaveOptions, setRecipeKept } from "@/app/account/cookbooks/actions";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 /** A place a recipe can be kept: the general saved list or one of the person's cookbooks. */
@@ -57,6 +58,7 @@ export function SaveDialog({ recipeId, open, onOpenChange, onKeptChange }: Props
 
 /** The dialog's contents. Mounted only while it is open, so it starts fresh and reloads every time. */
 function SaveSheet({ recipeId, onKeptChange, onChanged }: Pick<Props, "recipeId" | "onKeptChange"> & { onChanged: () => void }) {
+  const t = useT();
   const [places, setPlaces] = React.useState<Place[] | null>(null);
   const [error, setError] = React.useState<string | null>(null);
   const [naming, setNaming] = React.useState(false);
@@ -68,12 +70,12 @@ function SaveSheet({ recipeId, onKeptChange, onChanged }: Pick<Props, "recipeId"
     loadSaveOptions(recipeId).then((result) => {
       if (cancelled) return;
       if ("error" in result) return setError(result.error);
-      setPlaces([{ id: SAVED_PLACE, name: "Saqlanganlar", has: result.options.saved }, ...result.options.cookbooks]);
+      setPlaces([{ id: SAVED_PLACE, name: t("dialog.saved"), has: result.options.saved }, ...result.options.cookbooks]);
     });
     return () => {
       cancelled = true;
     };
-  }, [recipeId]);
+  }, [recipeId, t]);
 
   const show = (next: Place[]) => {
     setPlaces(next);
@@ -109,13 +111,13 @@ function SaveSheet({ recipeId, onKeptChange, onChanged }: Pick<Props, "recipeId"
   return (
     <>
       <div className="flex items-center justify-between gap-4">
-        <Dialog.Title className="font-serif text-2xl font-medium text-amber-950">Qayerga saqlaymiz?</Dialog.Title>
-        <Dialog.Close className="flex h-11 w-11 items-center justify-center rounded-full text-amber-600 transition-colors hover:bg-amber-100 hover:text-amber-950" aria-label="Yopish">
+        <Dialog.Title className="font-serif text-2xl font-medium text-amber-950">{t("dialog.title")}</Dialog.Title>
+        <Dialog.Close className="flex h-11 w-11 items-center justify-center rounded-full text-amber-600 transition-colors hover:bg-amber-100 hover:text-amber-950" aria-label={t("common.close")}>
           <X className="h-5 w-5" aria-hidden="true" />
         </Dialog.Close>
       </div>
 
-      {places === null && !error && <p className="py-8 text-center text-amber-600" role="status">Yuklanmoqda…</p>}
+      {places === null && !error && <p className="py-8 text-center text-amber-600" role="status">{t("dialog.loading")}</p>}
 
       {places && (
         <ul className="mt-3">
@@ -149,29 +151,29 @@ function SaveSheet({ recipeId, onKeptChange, onChanged }: Pick<Props, "recipeId"
         <div className="mt-3 border-t border-amber-200 pt-4">
           {naming ? (
             <form onSubmit={create} className="space-y-3">
-              <label htmlFor="new-cookbook-name" className="block text-sm font-medium text-amber-950">Yangi kitob nomi</label>
+              <label htmlFor="new-cookbook-name" className="block text-sm font-medium text-amber-950">{t("dialog.newName")}</label>
               <input
                 id="new-cookbook-name"
                 autoFocus
                 maxLength={60}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Masalan: Bayram dasturxoni"
+                placeholder={t("dialog.namePlaceholder")}
                 className="h-12 w-full rounded-xl border border-amber-300 bg-amber-100 px-4 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
               />
               <div className="flex gap-2">
-                <Button type="submit" loading={creating} disabled={name.trim() === ""}>Yaratish va saqlash</Button>
-                <Button type="button" variant="ghost" onClick={() => setNaming(false)}>Bekor qilish</Button>
+                <Button type="submit" loading={creating} disabled={name.trim() === ""}>{t("dialog.createSave")}</Button>
+                <Button type="button" variant="ghost" onClick={() => setNaming(false)}>{t("common.cancel")}</Button>
               </div>
             </form>
           ) : (
             <div className="flex items-center justify-between gap-3">
               <Button type="button" variant="outline" onClick={() => setNaming(true)}>
                 <Plus className="h-4 w-4" aria-hidden="true" />
-                Yangi kitob
+                {t("dialog.newCookbook")}
               </Button>
               <Dialog.Close asChild>
-                <Button type="button">Tayyor</Button>
+                <Button type="button">{t("dialog.done")}</Button>
               </Dialog.Close>
             </div>
           )}

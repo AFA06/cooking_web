@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useT } from "@/i18n/client";
 
 export const authInputClass =
   "mt-1.5 h-14 w-full rounded-xl border border-amber-300 bg-amber-100 px-4 text-lg text-amber-950 transition-colors placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
@@ -16,6 +17,7 @@ interface Props {
 
 /** A password input with a show/hide eye. */
 export function PasswordField({ id, name, label, autoComplete, minLength, hint }: Props) {
+  const t = useT();
   const [shown, setShown] = React.useState(false);
   return (
     <div>
@@ -33,7 +35,7 @@ export function PasswordField({ id, name, label, autoComplete, minLength, hint }
         <button
           type="button"
           onClick={() => setShown((v) => !v)}
-          aria-label={shown ? "Parolni yashirish" : "Parolni ko‘rsatish"}
+          aria-label={shown ? t("auth.hidePw") : t("auth.showPw")}
           aria-pressed={shown}
           className="absolute right-3 top-1.5 flex h-11 w-11 items-center justify-center rounded-lg text-amber-700 hover:text-amber-950 focus-visible:outline-2 focus-visible:outline-amber-950"
         >

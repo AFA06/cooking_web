@@ -9,14 +9,17 @@ import { ConfirmButton } from "@/components/admin/ConfirmButton";
 import { CreatorFields } from "@/components/admin/CreatorFields";
 import { RecipeTable } from "@/components/admin/RecipeTable";
 import { Avatar, EmptyState, PageHeader, Panel, StatTile } from "@/components/admin/ui";
+import { getLocale, getT } from "@/i18n/server";
 import { formatNumber, formatShortDate } from "@/lib/format";
 import { getCreatorAdmin, listRecipesAdmin, requireAdminPage } from "@/server/admin";
 import { deleteCreator, updateCreator } from "../../actions";
 
-export const metadata: Metadata = { title: "Ijodkor" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("role.creator") };
+}
 
 export default async function AdminCreatorPage({ params }: { params: Promise<{ id: string }> }) {
-  await requireAdminPage();
+  const [, t, locale] = await Promise.all([requireAdminPage(), getT(), getLocale()]);
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
   const creator = await getCreatorAdmin(id);
@@ -27,58 +30,58 @@ export default async function AdminCreatorPage({ params }: { params: Promise<{ i
   return (
     <>
       <PageHeader
-        back={{ href: "/admin/creators", label: "Ijodkorlar" }}
+        back={{ href: "/admin/creators", label: t("adm.nav.creators") }}
         title={creator.name}
         description={
           <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
             <Avatar name={creator.name} src={creator.avatarUrl} size={28} />
-            <span>{formatShortDate(creator.createdAt)} dan beri</span>
+            <span>{t("adm.since", { date: formatShortDate(creator.createdAt, locale) })}</span>
             {creator.userId ? (
               <Link href={`/admin/users/${creator.userId}`} className="text-amber-700 hover:underline">{creator.userEmail}</Link>
             ) : (
-              <span>Hisobga ulanmagan</span>
+              <span>{t("adm.notLinked")}</span>
             )}
           </span>
         }
         actions={
           <>
             <Button variant="outline" asChild>
-              <Link href={`/creators/${creator.slug}`}><ExternalLink className="h-4 w-4" aria-hidden="true" />Ommaviy sahifa</Link>
+              <Link href={`/creators/${creator.slug}`}><ExternalLink className="h-4 w-4" aria-hidden="true" />{t("adm.publicPage")}</Link>
             </Button>
             <Button asChild>
-              <Link href={`/admin/recipes/new?creatorId=${creator.id}`}><Plus className="h-4 w-4" aria-hidden="true" />Retsept qo‘shish</Link>
+              <Link href={`/admin/recipes/new?creatorId=${creator.id}`}><Plus className="h-4 w-4" aria-hidden="true" />{t("adm.addRecipe")}</Link>
             </Button>
           </>
         }
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatTile label="Retseptlar" value={`${creator.published}`} suffix={`/ ${creator.recipes}`} hint="nashr etilgan / jami" />
-        <StatTile label="Ko‘rishlar" value={formatNumber(creator.views)} hint="butun davr" />
-        <StatTile label="Saqlashlar" value={formatNumber(creator.saves)} hint="butun davr" />
-        <StatTile label="Tugatish darajasi" value={String(completion)} suffix="%" hint={`${formatNumber(creator.completions)} / ${formatNumber(creator.cooks)} pishirish`} />
+        <StatTile label={t("nav.recipes")} value={`${creator.published}`} suffix={`/ ${creator.recipes}`} hint={t("adm.publishedTotal")} />
+        <StatTile label={t("dash.col.views")} value={formatNumber(creator.views)} hint={t("adm.allTimeShort")} />
+        <StatTile label={t("dash.col.saves")} value={formatNumber(creator.saves)} hint={t("adm.allTimeShort")} />
+        <StatTile label={t("adm.tile.completionRate")} value={String(completion)} suffix="%" hint={t("adm.cookCountNote", { done: formatNumber(creator.completions), total: formatNumber(creator.cooks) })} />
       </div>
 
-      <Panel className="mt-6" title="Retseptlar" description="Bu ijodkor nomidan nashr etilgan va qoralama retseptlar" flush>
+      <Panel className="mt-6" title={t("nav.recipes")} description={t("adm.creatorRecipesNote")} flush>
         {recipes.length === 0 ? (
-          <EmptyState title="Hali retseptlar yo‘q" text="Bu ijodkor nomidan birinchi retseptni qo‘shing." />
+          <EmptyState title={t("adm.noRecipesYet")} text={t("adm.addFirstRecipe")} />
         ) : (
           <RecipeTable recipes={recipes} showCreator={false} />
         )}
       </Panel>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_24rem]">
-        <Panel title="Ma’lumotlar" description="Ommaviy profilda ko‘rinadigan ma’lumotlar">
-          <ActionForm action={updateCreator.bind(null, creator.id)} submitLabel="O‘zgarishlarni saqlash">
+        <Panel title={t("adm.details")} description={t("adm.detailsNote")}>
+          <ActionForm action={updateCreator.bind(null, creator.id)} submitLabel={t("adm.saveChanges")}>
             <CreatorFields values={creator} />
           </ActionForm>
         </Panel>
 
-        <Panel title="Xavfli hudud" className="self-start">
+        <Panel title={t("adm.danger")} className="self-start">
           <ConfirmButton
             action={deleteCreator.bind(null, creator.id)}
-            label="Ijodkorni o‘chirish"
-            warning={`“${creator.name}” profili va uning ${creator.recipes} ta retsepti butunlay o‘chiriladi. Bu amalni ortga qaytarib bo‘lmaydi. Ulangan foydalanuvchi hisobi saqlanib qoladi.`}
+            label={t("adm.deleteCreator")}
+            warning={t("adm.deleteCreatorWarn", { name: creator.name, count: creator.recipes })}
           />
         </Panel>
       </div>

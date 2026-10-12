@@ -32,4 +32,5 @@ export function comparePeriods(series: DayPoint[], days: number) {
   };
 }
 
-export const RANGE_LABEL: Record<number, string> = { 7: "7 kun", 30: "30 kun", 90: "90 kun" };
+/** Message keys: translate with t(RANGE_LABEL[range]). */
+export const RANGE_LABEL: Record<number, string> = { 7: "adm.range.7", 30: "adm.range.30", 90: "adm.range.90" };

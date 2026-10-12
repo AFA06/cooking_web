@@ -11,13 +11,17 @@ import { CookbookCard } from "@/components/cookbooks/CookbookCard";
 import { NewCookbook } from "@/components/cookbooks/CookbookManage";
 import { getCookbooks } from "@/server/cookbooks";
 import { getCookingHistory, getSavedRecipes } from "@/server/user-data";
+import { getLocale, getT } from "@/i18n/server";
 import { formatDate } from "@/lib/format";
+import { formatPhone } from "@/lib/profile";
 
-export const metadata: Metadata = { title: "Mening oshxonam", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("nav.myKitchen"), robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
 export default async function AccountPage() {
-  const user = await getCurrentUser();
+  const [user, t, locale] = await Promise.all([getCurrentUser(), getT(), getLocale()]);
   if (!user) redirect("/auth/login?next=/account");
   const [saved, history, cookbooks] = await Promise.all([getSavedRecipes(user.id), getCookingHistory(user.id), getCookbooks(user.id)]);
 
@@ -27,18 +31,18 @@ export default async function AccountPage() {
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <h1 className="text-3xl sm:text-5xl font-serif font-medium text-amber-950 break-words">{user.name}</h1>
-            <p className="mt-2 text-amber-600">{user.email}</p>
+            <p className="mt-2 text-amber-600">{user.email ?? (user.phone ? formatPhone(user.phone) : "")}</p>
           </div>
           <Button variant="outline" asChild>
-            <Link href="/account/settings"><Settings className="h-4 w-4" aria-hidden="true" />Profilni tahrirlash</Link>
+            <Link href="/account/settings"><Settings className="h-4 w-4" aria-hidden="true" />{t("account.editProfile")}</Link>
           </Button>
         </header>
 
         <section className="mt-12" aria-labelledby="cookbooks-heading">
           <div className="flex flex-wrap items-end justify-between gap-4">
             <div>
-              <h2 id="cookbooks-heading" className="text-2xl font-serif text-amber-950">Retsept kitoblarim</h2>
-              <p className="mt-1 text-amber-600">Sevimli retseptlaringizni o‘zingiz nomlagan kitoblarga ajrating.</p>
+              <h2 id="cookbooks-heading" className="text-2xl font-serif text-amber-950">{t("account.cookbooks")}</h2>
+              <p className="mt-1 text-amber-600">{t("account.cookbooksNote")}</p>
             </div>
             <NewCookbook />
           </div>
@@ -52,10 +56,10 @@ export default async function AccountPage() {
         </section>
 
         <section className="mt-14" aria-labelledby="saved-heading">
-          <h2 id="saved-heading" className="text-2xl font-serif text-amber-950">Saqlangan retseptlar</h2>
+          <h2 id="saved-heading" className="text-2xl font-serif text-amber-950">{t("account.savedRecipes")}</h2>
           {saved.length === 0 ? (
             <p className="mt-4 text-amber-600">
-              Hali hech narsa saqlanmagan. <Link href="/recipes" className="underline">Retseptlarni ko‘ring</Link> va pishirmoqchi bo‘lganlaringizni saqlang.
+              {t("account.savedEmpty1")} <Link href="/recipes" className="underline">{t("account.savedEmptyLink")}</Link> {t("account.savedEmpty2")}
             </p>
           ) : (
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -67,10 +71,10 @@ export default async function AccountPage() {
         </section>
 
         <section className="mt-14" aria-labelledby="history-heading">
-          <h2 id="history-heading" className="text-2xl font-serif text-amber-950">Pishirish tarixi</h2>
+          <h2 id="history-heading" className="text-2xl font-serif text-amber-950">{t("account.history")}</h2>
           {history.length === 0 ? (
             <p className="mt-4 text-amber-600">
-              Hali hech narsa pishirmadingiz. Bepul retseptni oching va “Pishirishni boshlash”ni bosing.
+              {t("account.historyEmpty")}
             </p>
           ) : (
             <ul className="mt-4 divide-y divide-amber-200 border-y border-amber-200">
@@ -80,7 +84,7 @@ export default async function AccountPage() {
                     {h.recipeTitle}
                   </Link>
                   <span className="text-sm text-amber-600">
-                    {h.status === "completed" ? "Tugatilgan" : "Boshlangan"} · {formatDate(h.completedAt ?? h.startedAt)}
+                    {h.status === "completed" ? t("account.completed") : t("account.started")} · {formatDate(h.completedAt ?? h.startedAt, locale)}
                   </span>
                 </li>
               ))}

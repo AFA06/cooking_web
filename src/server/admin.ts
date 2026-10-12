@@ -183,13 +183,16 @@ export interface SourceStat {
   views: number;
 }
 
+/** Marks visits that came without a ?src= tag; the page shows it in the visitor's language. */
+export const DIRECT_SOURCE = "__direct";
+
 export async function getSources(days: number, limit = 8): Promise<SourceStat[]> {
   const data = await rows<{ source: string | null; views: string }>(sql`
     select nullif(trim(source), '') as source, count(*) as views
     from analytics_events
     where name = 'recipe_view' and created_at > now() - make_interval(days => ${days}::int)
     group by 1 order by 2 desc limit ${limit}`);
-  return data.map((r) => ({ source: r.source ?? "To‘g‘ridan-to‘g‘ri", views: num(r.views) }));
+  return data.map((r) => ({ source: r.source ?? DIRECT_SOURCE, views: num(r.views) }));
 }
 
 export interface CreatorStat {

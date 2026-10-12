@@ -1,4 +1,5 @@
 import "server-only";
+import type { TFunction } from "@/i18n/core";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { WINDOW, allow } from "@/server/rate-limit";
 
@@ -47,34 +48,17 @@ export async function sendEmail(to: string, subject: string, text: string): Prom
 
 export type CodePurpose = "signup" | "password_reset" | "email_change" | "phone_change";
 
-const SUBJECT: Record<CodePurpose, string> = {
-  signup: "Tasdiqlash kodi",
-  password_reset: "Parolni tiklash kodi",
-  email_change: "Emailni tasdiqlash kodi",
-  phone_change: "Telefonni tasdiqlash kodi",
-};
-
-const WHAT: Record<CodePurpose, string> = {
-  signup: "tasdiqlash kodi",
-  password_reset: "parolni tiklash kodi",
-  email_change: "email tasdiqlash kodi",
-  phone_change: "telefon tasdiqlash kodi",
-};
-
-/** Plain ASCII on purpose: one non-GSM character turns an SMS into the 70-character, more expensive kind. */
-export async function deliverCode(channel: "sms" | "email", to: string, code: string, purpose: CodePurpose, minutes: number) {
+/** Codes are written in the language the person is using the site in (`t` comes from their request). */
+export async function deliverCode(channel: "sms" | "email", to: string, code: string, purpose: CodePurpose, minutes: number, t: TFunction) {
   if (channel === "sms") {
-    await sendSms(to, `${BRAND}: ${WHAT[purpose]} ${code}. Kodni hech kimga bermang.`);
+    await sendSms(to, t(`sms.${purpose}`, { brand: BRAND, code }));
   } else {
-    await sendEmail(
-      to,
-      `${BRAND}: ${SUBJECT[purpose]}`,
-      `${SUBJECT[purpose]}: ${code}\n\nKod ${minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.`,
-    );
+    const label = t(`email.label.${purpose}`);
+    await sendEmail(to, `${BRAND}: ${label}`, t("email.body", { label, code, minutes }));
   }
 }
 
 /** Sent instead of a code when someone signs up with a number that already has an account. */
-export async function sendAccountExistsNotice(phone: string) {
-  await sendSms(phone, `${BRAND}: bu raqamga hisob allaqachon ochilgan. Saytda Kirish yoki Parolni unutdim bo'limidan foydalaning.`);
+export async function sendAccountExistsNotice(phone: string, t: TFunction) {
+  await sendSms(phone, t("sms.exists", { brand: BRAND }));
 }

@@ -4,6 +4,7 @@ import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { db, schema } from "@/db";
+import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { getReviewEligibility } from "@/server/reviews";
 
@@ -35,11 +36,11 @@ const MAX_PHOTO_BASE64_LENGTH = 800_000;
 const reviewSchema = z.object({
   recipeId: uuid,
   rating: z.number().int().min(1).max(5),
-  comment: z.string().trim().max(1000, "Sharh 1000 ta belgidan oshmasligi kerak"),
+  comment: z.string().trim().max(1000, "err.reviewLong"),
   photo: z
     .object({
       mime: z.enum(["image/jpeg", "image/webp", "image/png"]),
-      data: z.string().regex(/^[A-Za-z0-9+/]+=*$/).max(MAX_PHOTO_BASE64_LENGTH, "Rasm juda katta"),
+      data: z.string().regex(/^[A-Za-z0-9+/]+=*$/).max(MAX_PHOTO_BASE64_LENGTH, "err.photoBig"),
     })
     .nullable(),
 });
@@ -48,14 +49,15 @@ export type ReviewInput = z.input<typeof reviewSchema>;
 
 /** Creates or updates the signed-in cook's review. Only people who finished cooking the recipe may review it. */
 export async function submitReview(input: ReviewInput): Promise<{ ok: true } | { error: string }> {
+  const t = await getT();
   const user = await getCurrentUser();
-  if (!user) return { error: "Baholash uchun tizimga kiring." };
+  if (!user) return { error: t("err.rateSignIn") };
   const parsed = reviewSchema.safeParse(input);
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
   const { recipeId, rating, comment, photo } = parsed.data;
 
   const eligibility = await getReviewEligibility(user.id, recipeId);
-  if (!eligibility.canReview) return { error: "Baholash uchun avval shu retseptni oxirigacha pishiring." };
+  if (!eligibility.canReview) return { error: t("err.rateCookFirst") };
 
   const [review] = await db
     .insert(schema.reviews)

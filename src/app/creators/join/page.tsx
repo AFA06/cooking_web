@@ -6,38 +6,39 @@ import { ArrowDown, ArrowRight, Timer } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { CreatorProfileForm } from "@/components/dashboard/CreatorProfileForm";
 import { PLATFORM_CONFIG } from "@/lib/constants";
+import { getT } from "@/i18n/server";
+import type { TFunction } from "@/i18n/core";
 import { formatClock } from "@/lib/format";
 import { getCurrentUser } from "@/server/auth";
 import { getCreatorForUser } from "@/server/creator";
 import { getFeaturedRecipes, listPublishedRecipes } from "@/server/recipes";
 import type { Recipe } from "@/types/recipe";
 
-export const metadata: Metadata = {
-  title: "Ijodkor bo‘lish",
-  description: "Retseptlaringizni auditoriyangiz haqiqatan pishira oladigan qo‘llanmaga aylantiring.",
-  alternates: { canonical: "/creators/join" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t("nav.becomeCreator"), description: t("join.desc"), alternates: { canonical: "/creators/join" } };
+}
 export const dynamic = "force-dynamic";
 
 const { foundingCreatorCount, foundingCommissionRate } = PLATFORM_CONFIG.creator;
 
-const TERMS = [
-  { figure: String(foundingCreatorCount), title: "Asoschi ijodkorlar", text: `Dastlabki ${foundingCreatorCount} ta ijodkor asoschi hamkor sifatida qo‘shiladi.` },
-  { figure: `${foundingCommissionRate * 100}%`, title: "Platforma komissiyasi", text: "Asoschilar davrida platforma komissiyasi olinmaydi." },
-  { figure: "1", title: "Bitta havola", text: "Retseptingiz bitta havolada: auditoriyangiz uni ochadi va siz bilan birga pishiradi." },
+const TERMS = (t: TFunction) => [
+  { figure: String(foundingCreatorCount), title: t("join.term1.title"), text: t("join.term1.text", { count: foundingCreatorCount }) },
+  { figure: `${foundingCommissionRate * 100}%`, title: t("join.term2.title"), text: t("join.term2.text") },
+  { figure: "1", title: t("join.term3.title"), text: t("join.term3.text") },
 ];
 
-const STEPS = [
-  { title: "Profil oching", text: "Ism va qisqa tanishtiruv yetarli. Ijtimoiy tarmoqlaringizni keyin qo‘shasiz." },
-  { title: "Retseptni qadamlarga bo‘ling", text: "Masalliqlar, har bir qadam, kerak joyda taymer va maslahat. Bepul yoki premium — o‘zingiz tanlaysiz." },
-  { title: "Havolani ulashing", text: "Odamlar videoni ortga qaytarmasdan, ekrandagi qadamlar bo‘yicha pishiradi." },
+const STEPS = (t: TFunction) => [
+  { title: t("join.step1.title"), text: t("join.step1.text") },
+  { title: t("join.step2.title"), text: t("join.step2.text") },
+  { title: t("join.step3.title"), text: t("join.step3.text") },
 ];
 
 const primaryCta = "inline-flex h-14 items-center justify-center gap-2.5 rounded-full bg-clay-400 px-6 text-base sm:px-8 sm:text-lg font-semibold text-amber-50 transition-colors duration-200 hover:bg-amber-950";
 const quietCta = "inline-flex h-14 items-center justify-center rounded-full border border-amber-950/25 px-8 text-lg font-semibold text-amber-950 transition-colors duration-200 hover:border-amber-950";
 
 /** A real recipe shown the way cooks will see it: one step at a time. */
-function StepDeck({ recipe }: { recipe: Recipe }) {
+function StepDeck({ recipe, t }: { recipe: Recipe; t: TFunction }) {
   const steps = recipe.steps.slice(0, 3);
   const tilt = ["rotate-[-3deg]", "translate-x-[7%] translate-y-[5%] rotate-[4deg]", "translate-x-[13%] translate-y-[10%] rotate-[9deg]"];
   return (
@@ -53,7 +54,7 @@ function StepDeck({ recipe }: { recipe: Recipe }) {
               <>
                 <div className="flex items-center justify-between text-sm font-semibold">
                   <span className="uppercase tracking-[0.16em] text-amber-700">
-                    {step.order}-qadam <span className="text-amber-500">/ {recipe.steps.length}</span>
+                    {t("join.deckStep", { n: step.order })} <span className="text-amber-500">/ {recipe.steps.length}</span>
                   </span>
                   {step.timerSeconds ? (
                     <span className="flex items-center gap-1.5 rounded-full bg-amber-950 px-3 py-1.5 text-amber-50">
@@ -83,7 +84,7 @@ function StepDeck({ recipe }: { recipe: Recipe }) {
 }
 
 export default async function JoinPage() {
-  const user = await getCurrentUser();
+  const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   if (user && (await getCreatorForUser(user.id))) redirect("/dashboard");
 
   const [featured] = await getFeaturedRecipes(1);
@@ -96,48 +97,47 @@ export default async function JoinPage() {
         <Container size="xl" className="relative flex min-h-[calc(100svh-4rem)] flex-col pb-7 pt-10 lg:pt-12">
           <div className="grid flex-1 items-center gap-16 lg:grid-cols-[1fr_auto] lg:gap-24 lg:pr-16">
             <header className="rise">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">Ijodkor bo‘lish</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{t("nav.becomeCreator")}</p>
               <h1 className="mt-6 font-serif text-[2.75rem] font-medium leading-[1.02] sm:text-7xl xl:text-[6rem]">
-                Retseptingiz endi — <em className="text-clay-400">qo‘llanma.</em>
+                {t("join.heroLead")} <em className="text-clay-400">{t("join.heroEm")}</em>
               </h1>
               <p className="mt-7 max-w-xl text-lg leading-relaxed text-amber-900">
-                Retseptlaringizni masalliq, taymer va maslahatlar bilan qadam-baqadam nashr eting, bitta havolani auditoriyangizga ulashing va premium
-                retseptlar taklif qiling.
+                {t("join.heroText")}
               </p>
               <div className="mt-9 flex flex-col gap-3 sm:flex-row">
                 {user ? (
                   <a href="#boshlash" className={primaryCta}>
-                    Profil yaratish
+                    {t("join.createProfile")}
                     <ArrowDown className="h-5 w-5" aria-hidden="true" />
                   </a>
                 ) : (
                   <>
                     <Link href="/auth/signup?next=/creators/join" className={primaryCta}>
-                      Boshlash uchun hisob yarating
+                      {t("join.signupCta")}
                       <ArrowRight className="h-5 w-5" aria-hidden="true" />
                     </Link>
                     <Link href="/auth/login?next=/creators/join" className={quietCta}>
-                      Hisobim bor
+                      {t("join.haveAccount")}
                     </Link>
                   </>
                 )}
               </div>
             </header>
-            {sample && sample.steps.length > 0 && <StepDeck recipe={sample} />}
+            {sample && sample.steps.length > 0 && <StepDeck recipe={sample} t={t} />}
           </div>
           <p className="mt-10 border-t border-amber-950/15 pt-6 text-sm text-amber-600">
-            O‘ngdagi karta — haqiqiy retseptning birinchi qadami. Sizning retseptingiz ham xuddi shunday ochiladi.
+            {t("join.deckNote")}
           </p>
         </Container>
       </section>
 
-      <section aria-label="Shartlar" className="border-t border-amber-950/15">
+      <section aria-label={t("join.termsLabel")} className="border-t border-amber-950/15">
         <Container size="xl" className="grid gap-12 py-20 md:grid-cols-3 md:gap-10 lg:py-28">
-          {TERMS.map((t) => (
-            <div key={t.title}>
-              <p className="font-serif text-[5.5rem] leading-none text-clay-400 lg:text-[8rem]">{t.figure}</p>
-              <h2 className="mt-6 font-serif text-2xl font-medium">{t.title}</h2>
-              <p className="mt-2.5 max-w-sm leading-relaxed text-amber-900">{t.text}</p>
+          {TERMS(t).map((term) => (
+            <div key={term.title}>
+              <p className="font-serif text-[5.5rem] leading-none text-clay-400 lg:text-[8rem]">{term.figure}</p>
+              <h2 className="mt-6 font-serif text-2xl font-medium">{term.title}</h2>
+              <p className="mt-2.5 max-w-sm leading-relaxed text-amber-900">{term.text}</p>
             </div>
           ))}
         </Container>
@@ -146,10 +146,10 @@ export default async function JoinPage() {
       <section aria-labelledby="how-heading" className="border-t border-amber-950/15">
         <Container size="xl" className="grid gap-12 py-20 lg:grid-cols-[1fr_2fr] lg:gap-20 lg:py-28">
           <h2 id="how-heading" className="font-serif text-4xl font-medium leading-tight sm:text-5xl">
-            Uch qadam, <em className="text-clay-400">xuddi retseptdek.</em>
+            {t("join.howLead")} <em className="text-clay-400">{t("join.howEm")}</em>
           </h2>
           <ol>
-            {STEPS.map((s, i) => (
+            {STEPS(t).map((s, i) => (
               <li key={s.title} className="grid grid-cols-[3.5rem_1fr] gap-4 border-t border-amber-950/15 py-7 first:border-t-0 first:pt-0 sm:grid-cols-[5rem_1fr]">
                 <span className="font-serif text-3xl text-clay-400" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
@@ -168,9 +168,9 @@ export default async function JoinPage() {
         <Container size="xl">
           <div className="theme-light grid gap-10 rounded-[2rem] bg-amber-50 p-7 text-amber-950 sm:p-12 lg:grid-cols-2 lg:gap-20 lg:p-16">
             <div>
-              <h2 className="font-serif text-4xl font-medium leading-tight sm:text-5xl">Oshxonangiz eshigini oching.</h2>
+              <h2 className="font-serif text-4xl font-medium leading-tight sm:text-5xl">{t("join.openKitchen")}</h2>
               <p className="mt-5 max-w-md leading-relaxed text-amber-900">
-                Premium retseptlarni hozir nashr etish mumkin, lekin to‘lov tizimi ulanmaguncha o‘quvchilar ularni sotib ola olmaydi.
+                {t("join.premiumNote")}
               </p>
             </div>
             {user ? (
@@ -178,11 +178,11 @@ export default async function JoinPage() {
             ) : (
               <div className="flex flex-col justify-center gap-3">
                 <Link href="/auth/signup?next=/creators/join" className="inline-flex h-14 items-center justify-center gap-2.5 rounded-full bg-amber-950 px-6 text-base sm:px-8 sm:text-lg font-semibold text-amber-50 transition-colors duration-200 hover:bg-amber-700">
-                  Boshlash uchun hisob yarating
+                  {t("join.signupCta")}
                   <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Link>
                 <Link href="/auth/login?next=/creators/join" className="inline-flex h-14 items-center justify-center rounded-full border border-amber-300 px-8 text-lg font-semibold transition-colors duration-200 hover:border-amber-950">
-                  Hisobim bor
+                  {t("join.haveAccount")}
                 </Link>
               </div>
             )}

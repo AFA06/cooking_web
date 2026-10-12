@@ -6,23 +6,25 @@ import { z } from "zod";
 import { db, schema } from "@/db";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { clampServings, parseQuantity, scaleQuantity } from "@/lib/scaling";
+import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { getRecipeById } from "@/server/recipes";
 
 type Result = { ok: true } | { error: string };
 
 const uuid = z.string().uuid();
-const SIGN_IN = "Xaridlar ro‘yxati uchun tizimga kiring.";
+const SIGN_IN = "err.shoppingSignIn";
 
 const items = schema.shoppingItems;
 const listed = schema.shoppingRecipes;
 
 /** Puts a recipe's ingredients on the list for the given servings. Adding it again replaces its lines. */
 export async function addToShoppingList(recipeId: string, servings: number): Promise<Result> {
+  const t = await getT();
   const user = await getCurrentUser();
-  if (!user) return { error: SIGN_IN };
+  if (!user) return { error: t(SIGN_IN) };
   const recipe = uuid.safeParse(recipeId).success ? await getRecipeById(recipeId) : undefined;
-  if (!recipe || recipe.ingredients.length === 0) return { error: "Retsept topilmadi." };
+  if (!recipe || recipe.ingredients.length === 0) return { error: t("err.recipeNotFound") };
 
   const chosen = clampServings(servings, recipe.servings);
   const factor = chosen / recipe.servings;
@@ -55,9 +57,10 @@ export async function addToShoppingList(recipeId: string, servings: number): Pro
 }
 
 export async function removeFromShoppingList(recipeId: string): Promise<Result> {
+  const t = await getT();
   const user = await getCurrentUser();
-  if (!user) return { error: SIGN_IN };
-  if (!uuid.safeParse(recipeId).success) return { error: "Retsept topilmadi." };
+  if (!user) return { error: t(SIGN_IN) };
+  if (!uuid.safeParse(recipeId).success) return { error: t("err.recipeNotFound") };
 
   await db.batch([
     db.delete(items).where(and(eq(items.userId, user.id), eq(items.recipeId, recipeId))),
@@ -69,10 +72,11 @@ export async function removeFromShoppingList(recipeId: string): Promise<Result> 
 
 /** Marks lines as bought or not bought. Only the person's own rows are touched. */
 export async function setShoppingChecked(ids: string[], checked: boolean): Promise<Result> {
+  const t = await getT();
   const user = await getCurrentUser();
-  if (!user) return { error: SIGN_IN };
+  if (!user) return { error: t(SIGN_IN) };
   const parsed = z.array(uuid).min(1).max(500).safeParse(ids);
-  if (!parsed.success) return { error: "Noto‘g‘ri so‘rov." };
+  if (!parsed.success) return { error: t("err.badRequest") };
 
   await db.update(items).set({ checked }).where(and(eq(items.userId, user.id), inArray(items.id, parsed.data)));
   revalidatePath(PLATFORM_CONFIG.urls.shopping);
@@ -81,8 +85,9 @@ export async function setShoppingChecked(ids: string[], checked: boolean): Promi
 
 /** Removes what has been bought, or everything. Recipes left with nothing to buy leave the list too. */
 export async function clearShoppingList(scope: "bought" | "all"): Promise<Result> {
+  const t = await getT();
   const user = await getCurrentUser();
-  if (!user) return { error: SIGN_IN };
+  if (!user) return { error: t(SIGN_IN) };
 
   const own = eq(items.userId, user.id);
   await db.delete(items).where(scope === "bought" ? and(own, eq(items.checked, true)) : own);

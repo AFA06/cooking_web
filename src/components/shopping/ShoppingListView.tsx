@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Check, X } from "lucide-react";
 import { clearShoppingList, removeFromShoppingList, setShoppingChecked } from "@/app/shopping/actions";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/i18n/client";
 import { mergeShoppingRows, type ShoppingLine, type ShoppingRow } from "@/lib/shopping";
 import { cn } from "@/lib/utils";
 import type { ShoppingRecipe } from "@/server/shopping";
@@ -51,6 +52,7 @@ function Line({ line, note, onToggle }: { line: ShoppingLine; note: string | nul
 }
 
 export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[]; rows: ShoppingRow[] }) {
+  const t = useT();
   const [current, apply] = React.useOptimistic(rows, applyChange);
   const [, startTransition] = React.useTransition();
   const [confirmingClear, setConfirmingClear] = React.useState(false);
@@ -72,22 +74,22 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
   const noteFor = (line: ShoppingLine) => (shownRecipes.length > 1 ? line.recipeIds.map((id) => titles.get(id)).join(" · ") : null);
   const toggle = (line: ShoppingLine) => run({ type: "check", ids: line.ids, checked: !line.checked }, () => setShoppingChecked(line.ids, !line.checked));
 
-  if (lines.length === 0) return <p className="mt-10 text-lg text-amber-900" role="status">Ro‘yxat tozalandi.</p>;
+  if (lines.length === 0) return <p className="mt-10 text-lg text-amber-900" role="status">{t("shopping.cleared")}</p>;
 
   return (
     <>
       <p className="mt-4 text-lg text-amber-900" aria-live="polite">
         {toBuy.length > 0 ? (
           <>
-            <span className="font-semibold text-amber-950 tabular-nums">{toBuy.length}</span> ta mahsulot olish kerak
-            {bought.length > 0 && <> · <span className="tabular-nums">{bought.length}</span> tasi olindi</>}
+            {t("shopping.toBuyCount", { count: toBuy.length })}
+            {bought.length > 0 && <> · {t("shopping.boughtCount", { count: bought.length })}</>}
           </>
         ) : (
-          "Hammasi olindi. Yoqimli pishiriq!"
+          t("shopping.allBought")
         )}
       </p>
 
-      <ul className="mt-8 flex flex-wrap gap-3" aria-label="Ro‘yxatdagi retseptlar">
+      <ul className="mt-8 flex flex-wrap gap-3" aria-label={t("shopping.recipesList")}>
         {shownRecipes.map((recipe) => (
           <li key={recipe.id} className="flex items-center gap-3 rounded-2xl bg-amber-100 p-2 pr-1">
             <Link href={`/recipes/${recipe.slug}`} className="group flex min-w-0 items-center gap-3">
@@ -96,14 +98,14 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
               </span>
               <span className="min-w-0">
                 <span className="block max-w-[14rem] truncate font-medium text-amber-950 group-hover:text-amber-700">{recipe.title}</span>
-                <span className="block text-sm text-amber-600">{recipe.servings} kishilik</span>
+                <span className="block text-sm text-amber-600">{recipe.servings} {t("servings.unit")}</span>
               </span>
             </Link>
             <button
               type="button"
               onClick={() => run({ type: "removeRecipe", recipeId: recipe.id }, () => removeFromShoppingList(recipe.id))}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-amber-600 transition-colors hover:bg-amber-200 hover:text-amber-950"
-              aria-label={`${recipe.title} masalliqlarini ro‘yxatdan olib tashlash`}
+              aria-label={t("shopping.removeRecipe", { title: recipe.title })}
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -113,7 +115,7 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
 
       {toBuy.length > 0 && (
         <section aria-labelledby="to-buy-heading" className="mt-10">
-          <h2 id="to-buy-heading" className="text-sm font-medium uppercase tracking-wider text-amber-600">Olish kerak</h2>
+          <h2 id="to-buy-heading" className="text-sm font-medium uppercase tracking-wider text-amber-600">{t("shopping.toBuy")}</h2>
           <ul className="mt-2 border-y border-amber-200">
             {toBuy.map((line) => (
               <Line key={line.key} line={line} note={noteFor(line)} onToggle={() => toggle(line)} />
@@ -124,7 +126,7 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
 
       {bought.length > 0 && (
         <section aria-labelledby="bought-heading" className="mt-10">
-          <h2 id="bought-heading" className="text-sm font-medium uppercase tracking-wider text-amber-600">Olindi</h2>
+          <h2 id="bought-heading" className="text-sm font-medium uppercase tracking-wider text-amber-600">{t("shopping.bought")}</h2>
           <ul className="mt-2 border-y border-amber-200">
             {bought.map((line) => (
               <Line key={line.key} line={line} note={noteFor(line)} onToggle={() => toggle(line)} />
@@ -137,16 +139,16 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
 
       <div className="mt-10 flex flex-wrap items-center gap-3">
         {bought.length > 0 && toBuy.length > 0 && (
-          <Button variant="outline" onClick={() => run({ type: "clear", scope: "bought" }, () => clearShoppingList("bought"))}>Olinganlarni o‘chirish</Button>
+          <Button variant="outline" onClick={() => run({ type: "clear", scope: "bought" }, () => clearShoppingList("bought"))}>{t("shopping.clearBought")}</Button>
         )}
         {confirmingClear ? (
           <>
-            <span className="text-amber-900">Butun ro‘yxat o‘chirilsinmi?</span>
-            <Button variant="destructive" onClick={() => run({ type: "clear", scope: "all" }, () => clearShoppingList("all"))}>Ha, tozalash</Button>
-            <Button variant="ghost" onClick={() => setConfirmingClear(false)}>Yo‘q</Button>
+            <span className="text-amber-900">{t("shopping.confirmClear")}</span>
+            <Button variant="destructive" onClick={() => run({ type: "clear", scope: "all" }, () => clearShoppingList("all"))}>{t("shopping.yesClear")}</Button>
+            <Button variant="ghost" onClick={() => setConfirmingClear(false)}>{t("common.no")}</Button>
           </>
         ) : (
-          <Button variant={toBuy.length === 0 ? "primary" : "ghost"} onClick={() => setConfirmingClear(true)}>Ro‘yxatni tozalash</Button>
+          <Button variant={toBuy.length === 0 ? "primary" : "ghost"} onClick={() => setConfirmingClear(true)}>{t("shopping.clear")}</Button>
         )}
       </div>
     </>

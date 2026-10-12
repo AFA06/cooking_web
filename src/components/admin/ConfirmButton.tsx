@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/i18n/client";
 
 interface Props {
   action: () => Promise<void>;
@@ -13,6 +14,7 @@ interface Props {
 
 /** Two-step destructive button: the first click reveals the consequence, the second confirms. */
 export function ConfirmButton({ action, label, warning }: Props) {
+  const t = useT();
   const [armed, setArmed] = React.useState(false);
   const [pending, startTransition] = React.useTransition();
 
@@ -30,10 +32,10 @@ export function ConfirmButton({ action, label, warning }: Props) {
       <p className="text-sm text-amber-950">{warning}</p>
       <div className="mt-3 flex flex-wrap gap-2">
         <Button type="button" variant="destructive" loading={pending} onClick={() => startTransition(() => action())}>
-          Ha, o‘chirish
+          {t("cookbook.yesDelete")}
         </Button>
         <Button type="button" variant="ghost" disabled={pending} onClick={() => setArmed(false)}>
-          Bekor qilish
+          {t("common.cancel")}
         </Button>
       </div>
     </div>

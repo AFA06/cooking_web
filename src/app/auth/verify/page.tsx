@@ -5,15 +5,18 @@ import { AuthScreen } from "@/components/auth/AuthScreen";
 import { ResendButton, VerifyCodeForm } from "@/components/auth/CodeForms";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { maskPhone } from "@/lib/auth-rules";
+import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { cooldownLeft, getOpenChallenge } from "@/server/challenges";
 import { resendSignupCode, verifySignup } from "../actions";
 
-export const metadata: Metadata = { title: "Raqamni tasdiqlash", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("auth.verifyMeta"), robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ c?: string; next?: string }> }) {
-  const { c = "", next = "" } = await searchParams;
+  const [{ c = "", next = "" }, t] = await Promise.all([searchParams, getT()]);
   if (await getCurrentUser()) redirect("/account");
   const safe = next.startsWith("/") && !next.startsWith("//") && !next.startsWith("/\\") ? next : "";
   const challenge = await getOpenChallenge(c, "signup");
@@ -21,24 +24,24 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
   return (
     <SiteShell>
       <AuthScreen
-        eyebrow="Tasdiqlash"
-        title={<>Kodni <em className="text-clay-400">kiriting.</em></>}
-        note={challenge?.destination ? `${maskPhone(challenge.destination)} raqamiga 6 xonali kod yubordik.` : "Kod muddati tugagan."}
+        eyebrow={t("auth.verifyEyebrow")}
+        title={<>{t("auth.verifyLead")} <em className="text-clay-400">{t("auth.verifyEm")}</em></>}
+        note={challenge?.destination ? t("auth.codeSentTo", { phone: maskPhone(challenge.destination) }) : t("auth.codeExpired")}
       >
         {challenge ? (
           <>
             <VerifyCodeForm action={verifySignup} challengeId={challenge.id} next={safe} />
             <div className="mt-6 flex flex-col gap-3">
-              <ResendButton action={resendSignupCode} challengeId={challenge.id} label="Kodni qayta yuborish" secondsLeft={cooldownLeft(challenge)} />
+              <ResendButton action={resendSignupCode} challengeId={challenge.id} label={t("auth.resendCode")} secondsLeft={cooldownLeft(challenge)} />
               <Link href="/auth/signup" className="text-sm font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
-                Raqamni o‘zgartirish
+                {t("auth.changeNumber")}
               </Link>
             </div>
           </>
         ) : (
           <p className="mt-8 text-amber-900">
             <Link href="/auth/signup" className="font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
-              Hisob yaratishni qaytadan boshlang
+              {t("auth.restartSignup")}
             </Link>
           </p>
         )}

@@ -6,20 +6,23 @@ import { z } from "zod";
 import { ActionForm } from "@/components/admin/ActionForm";
 import { ConfirmButton } from "@/components/admin/ConfirmButton";
 import { EmptyState, Field, PageHeader, Panel, SelectInput, StatTile, TextInput } from "@/components/admin/ui";
+import { getLocale, getT } from "@/i18n/server";
 import { formatNumber, formatRelative, formatShortDate } from "@/lib/format";
 import { getUserActivity, getUserAdmin, requireAdminPage } from "@/server/admin";
 import { deleteUser, updateUser } from "../../actions";
 
-export const metadata: Metadata = { title: "Foydalanuvchi" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("role.user") };
+}
 
 const ACTIVITY = {
-  save: { label: "Retseptni saqladi", icon: Bookmark },
-  cook_start: { label: "Pishirishni boshladi", icon: Flame },
-  cook_done: { label: "Pishirib bo‘ldi", icon: CheckCircle2 },
+  save: { label: "adm.act.save", icon: Bookmark },
+  cook_start: { label: "adm.act.cook_start", icon: Flame },
+  cook_done: { label: "adm.act.cook_done", icon: CheckCircle2 },
 } as const;
 
 export default async function AdminUserPage({ params }: { params: Promise<{ id: string }> }) {
-  const admin = await requireAdminPage();
+  const [admin, t, locale] = await Promise.all([requireAdminPage(), getT(), getLocale()]);
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
   const user = await getUserAdmin(id);
@@ -30,30 +33,30 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
   return (
     <>
       <PageHeader
-        back={{ href: "/admin/users", label: "Foydalanuvchilar" }}
+        back={{ href: "/admin/users", label: t("adm.nav.users") }}
         title={user.name}
         description={
           <span className="flex flex-wrap gap-x-3 gap-y-1">
-            <span>{user.email ?? "email yo‘q"}</span>
-            <span>Ro‘yxatdan o‘tgan: {formatShortDate(user.createdAt)}</span>
+            <span>{user.email ?? "—"}</span>
+            <span>{t("adm.registeredOn", { date: formatShortDate(user.createdAt, locale) })}</span>
             {user.creatorId && (
-              <Link href={`/admin/creators/${user.creatorId}`} className="text-amber-700 hover:underline">Ijodkor profili: {user.creatorName}</Link>
+              <Link href={`/admin/creators/${user.creatorId}`} className="text-amber-700 hover:underline">{t("adm.creatorProfile", { name: user.creatorName ?? "" })}</Link>
             )}
           </span>
         }
       />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatTile label="Saqlangan retseptlar" value={formatNumber(user.saves)} />
-        <StatTile label="Pishirish boshlangan" value={formatNumber(user.cooks)} />
-        <StatTile label="Tugatilgan" value={formatNumber(user.completions)} />
-        <StatTile label="Oxirgi kirish" value={user.lastSeenAt ? formatShortDate(user.lastSeenAt).split(" ")[0] : "—"} hint={formatRelative(user.lastSeenAt)} />
+        <StatTile label={t("account.savedRecipes")} value={formatNumber(user.saves)} />
+        <StatTile label={t("adm.tile.cooksStarted")} value={formatNumber(user.cooks)} />
+        <StatTile label={t("account.completed")} value={formatNumber(user.completions)} />
+        <StatTile label={t("adm.lastSeen")} value={user.lastSeenAt ? formatShortDate(user.lastSeenAt, locale).split(" ")[0] : "—"} hint={formatRelative(user.lastSeenAt, t, locale)} />
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_1fr]">
-        <Panel title="Faollik" description="So‘nggi harakatlar" flush>
+        <Panel title={t("adm.activity")} description={t("adm.activityNote")} flush>
           {activity.length === 0 ? (
-            <EmptyState title="Hali faollik yo‘q" text="Foydalanuvchi retsept saqlasa yoki pishirsa, shu yerda ko‘rinadi." />
+            <EmptyState title={t("adm.noActivity")} text={t("adm.noActivityText")} />
           ) : (
             <ul className="divide-y divide-amber-100">
               {activity.map((a, i) => {
@@ -64,10 +67,10 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                       <Icon className="h-4 w-4" aria-hidden="true" />
                     </span>
                     <span className="min-w-0 flex-1 text-sm text-amber-950">
-                      {label}:{" "}
+                      {t(label)}:{" "}
                       <Link href={`/recipes/${a.recipeSlug}`} className="font-medium hover:text-amber-700 hover:underline">{a.recipeTitle}</Link>
                     </span>
-                    <span className="shrink-0 text-xs text-amber-600">{formatRelative(a.at)}</span>
+                    <span className="shrink-0 text-xs text-amber-600">{formatRelative(a.at, t, locale)}</span>
                   </li>
                 );
               })}
@@ -76,32 +79,32 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
         </Panel>
 
         <div className="min-w-0 space-y-6">
-          <Panel title="Ma’lumotlar">
-            <ActionForm action={updateUser.bind(null, user.id)} submitLabel="O‘zgarishlarni saqlash">
-              <Field label="Ism" htmlFor="name">
+          <Panel title={t("adm.details")}>
+            <ActionForm action={updateUser.bind(null, user.id)} submitLabel={t("adm.saveChanges")}>
+              <Field label={t("auth.name")} htmlFor="name">
                 <TextInput id="name" name="name" required maxLength={80} defaultValue={user.name} />
               </Field>
-              <Field label="Email" htmlFor="email">
+              <Field label={t("auth.email")} htmlFor="email">
                 <TextInput id="email" name="email" type="email" maxLength={254} defaultValue={user.email ?? ""} />
               </Field>
-              <Field label="Rol" htmlFor="role" hint={isSelf ? "O‘zingizning admin huquqingizni olib tashlay olmaysiz." : "Admin barcha ma’lumotlarni boshqara oladi."}>
+              <Field label={t("adm.role")} htmlFor="role" hint={isSelf ? t("adm.roleHintSelf") : t("adm.roleHint")}>
                 <SelectInput id="role" name="role" defaultValue={user.role}>
-                  <option value="user">Foydalanuvchi</option>
-                  <option value="creator">Ijodkor</option>
-                  <option value="admin">Admin</option>
+                  <option value="user">{t("role.user")}</option>
+                  <option value="creator">{t("role.creator")}</option>
+                  <option value="admin">{t("role.admin")}</option>
                 </SelectInput>
               </Field>
             </ActionForm>
           </Panel>
 
-          <Panel title="Xavfli hudud">
+          <Panel title={t("adm.danger")}>
             {isSelf ? (
-              <p className="text-sm text-amber-600">O‘z hisobingizni bu yerdan o‘chira olmaysiz.</p>
+              <p className="text-sm text-amber-600">{t("adm.cannotDeleteSelf")}</p>
             ) : (
               <ConfirmButton
                 action={deleteUser.bind(null, user.id)}
-                label="Foydalanuvchini o‘chirish"
-                warning={`“${user.name}” hisobi, saqlagan retseptlari va pishirish tarixi butunlay o‘chiriladi. Bu amalni ortga qaytarib bo‘lmaydi.${user.creatorId ? " Ijodkor profili va retseptlari saqlanib qoladi." : ""}`}
+                label={t("adm.deleteUser")}
+                warning={`${t("adm.deleteUserWarn", { name: user.name })}${user.creatorId ? t("adm.deleteUserKeep") : ""}`}
               />
             )}
           </Panel>

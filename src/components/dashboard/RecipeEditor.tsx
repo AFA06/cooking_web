@@ -3,6 +3,7 @@
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/i18n/client";
 import { RECIPE_CATEGORIES, type RecipeCategory } from "@/lib/categories";
 import { estimateNutrition } from "@/lib/nutrition";
 import type { RecipeInput } from "@/lib/recipe-schema";
@@ -71,10 +72,10 @@ const field =
 const label = "block text-sm font-medium text-amber-950";
 
 const NUTRITION_FIELDS = [
-  { key: "calories", text: "Kaloriya (kkal)" },
-  { key: "proteinGrams", text: "Oqsil (g)" },
-  { key: "fatGrams", text: "Yog‘ (g)" },
-  { key: "carbGrams", text: "Uglevod (g)" },
+  { key: "calories", text: "ed.calories" },
+  { key: "proteinGrams", text: "ed.protein" },
+  { key: "fatGrams", text: "ed.fat" },
+  { key: "carbGrams", text: "ed.carbs" },
 ] as const;
 
 function toInput(v: EditorInitial): RecipeInput {
@@ -122,6 +123,7 @@ interface RecipeEditorProps {
 }
 
 export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
+  const t = useT();
   const router = useRouter();
   const [v, setV] = React.useState<EditorInitial>(initial);
   const [error, setError] = React.useState<string | null>(null);
@@ -135,7 +137,7 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
   const [nutritionNote, setNutritionNote] = React.useState<string | null>(null);
   const calculateNutrition = () => {
     const { perServing, skipped } = estimateNutrition(v.ingredients, Number(v.servings));
-    if (!perServing) return setNutritionNote("Hisoblab bo‘lmadi: masalliqlarni miqdori va o‘lchovi bilan kiriting hamda porsiya sonini tekshiring.");
+    if (!perServing) return setNutritionNote(t("ed.calcFail"));
     setV((p) => ({
       ...p,
       calories: String(perServing.calories),
@@ -144,8 +146,8 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
       carbGrams: String(perServing.carbGrams),
     }));
     setNutritionNote(
-      `Taxminiy hisob: ${v.servings} porsiyaga bo‘lindi.` +
-        (skipped.length > 0 ? ` Hisobga kirmadi: ${skipped.join(", ")} — kerak bo‘lsa, raqamlarni o‘zingiz to‘g‘rilang.` : " Raqamlarni tekshirib, kerak bo‘lsa to‘g‘rilang."),
+      t("ed.calcDone", { servings: v.servings }) +
+        (skipped.length > 0 ? t("ed.calcSkipped", { list: skipped.join(", ") }) : t("ed.calcCheck")),
     );
   };
   const move = <T,>(list: T[], i: number, dir: -1 | 1): T[] => {
@@ -166,7 +168,7 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
         return;
       }
       setV((p) => ({ ...p, id: result.id, status: publish ? "published" : "draft" }));
-      setNotice(publish ? "Nashr etildi." : "Qoralama saqlandi.");
+      setNotice(publish ? t("ed.published") : t("ed.draftSaved"));
       if (!v.id) router.replace(`${basePath}/${result.id}`);
       else router.refresh();
     });
@@ -180,165 +182,165 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
       }}
     >
       <section className="space-y-4">
-        <h2 className="text-2xl font-serif text-amber-950">Asosiy ma’lumotlar</h2>
+        <h2 className="text-2xl font-serif text-amber-950">{t("profile.basics")}</h2>
         <div>
-          <label htmlFor="title" className={label}>Sarlavha</label>
+          <label htmlFor="title" className={label}>{t("ed.title")}</label>
           <input id="title" className={field} value={v.title} maxLength={120} onChange={(e) => set("title", e.target.value)} />
         </div>
         <div>
-          <label htmlFor="description" className={label}>Tavsif</label>
+          <label htmlFor="description" className={label}>{t("ed.description")}</label>
           <textarea id="description" rows={3} className={field} value={v.description} maxLength={600} onChange={(e) => set("description", e.target.value)} />
         </div>
         <div>
-          <label htmlFor="cover" className={label}>Muqova rasmi havolasi</label>
+          <label htmlFor="cover" className={label}>{t("ed.cover")}</label>
           <input id="cover" type="url" inputMode="url" placeholder="https://…" className={field} value={v.coverUrl} onChange={(e) => set("coverUrl", e.target.value)} />
-          <p className="mt-1 text-xs text-amber-600">Rasm yuklash hozircha mavjud emas. O‘zingizga tegishli yoki foydalanish huquqingiz bor rasm havolasini kiriting.</p>
+          <p className="mt-1 text-xs text-amber-600">{t("ed.coverNote")}</p>
         </div>
         <div>
-          <label htmlFor="gallery" className={label}>Qo‘shimcha rasmlar (ixtiyoriy)</label>
+          <label htmlFor="gallery" className={label}>{t("ed.gallery")}</label>
           <textarea id="gallery" rows={3} placeholder={"https://…\nhttps://…"} className={field} value={v.galleryUrls} onChange={(e) => set("galleryUrls", e.target.value)} />
-          <p className="mt-1 text-xs text-amber-600">Har bir qatorga bitta rasm havolasi, ko‘pi bilan 5 ta. Retsept sahifasida muqovadan keyin galereyada ko‘rinadi.</p>
+          <p className="mt-1 text-xs text-amber-600">{t("ed.galleryNote")}</p>
         </div>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           <div>
-            <label htmlFor="servings" className={label}>Porsiya</label>
+            <label htmlFor="servings" className={label}>{t("ed.servings")}</label>
             <input id="servings" type="number" min={1} className={field} value={v.servings} onChange={(e) => set("servings", e.target.value)} />
           </div>
           <div>
-            <label htmlFor="prep" className={label}>Tayyorlash (daq.)</label>
+            <label htmlFor="prep" className={label}>{t("ed.prepMin")}</label>
             <input id="prep" type="number" min={0} className={field} value={v.prepTimeMinutes} onChange={(e) => set("prepTimeMinutes", e.target.value)} />
           </div>
           <div>
-            <label htmlFor="cook" className={label}>Pishirish (daq.)</label>
+            <label htmlFor="cook" className={label}>{t("ed.cookMin")}</label>
             <input id="cook" type="number" min={0} className={field} value={v.cookTimeMinutes} onChange={(e) => set("cookTimeMinutes", e.target.value)} />
           </div>
           <div>
-            <label htmlFor="difficulty" className={label}>Qiyinligi</label>
+            <label htmlFor="difficulty" className={label}>{t("recipes.filterDifficulty")}</label>
             <select id="difficulty" className={field} value={v.difficulty} onChange={(e) => set("difficulty", e.target.value as EditorInitial["difficulty"])}>
-              <option value="easy">Oson</option>
-              <option value="medium">O‘rtacha</option>
-              <option value="hard">Qiyin</option>
+              <option value="easy">{t("difficulty.easy")}</option>
+              <option value="medium">{t("difficulty.medium")}</option>
+              <option value="hard">{t("difficulty.hard")}</option>
             </select>
           </div>
         </div>
         <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
           <div>
-            <label htmlFor="category" className={label}>Toifa</label>
+            <label htmlFor="category" className={label}>{t("ed.category")}</label>
             <select id="category" className={field} value={v.category} onChange={(e) => set("category", e.target.value as RecipeCategory)}>
               {RECIPE_CATEGORIES.map((c) => (
-                <option key={c.key} value={c.key}>{c.label}</option>
+                <option key={c.key} value={c.key}>{t(c.label)}</option>
               ))}
             </select>
           </div>
           <div>
-            <label htmlFor="tags" className={label}>Teglar (vergul bilan)</label>
-            <input id="tags" className={field} value={v.tags} placeholder="O‘zbek, Guruch, Qo‘y go‘shti" onChange={(e) => set("tags", e.target.value)} />
+            <label htmlFor="tags" className={label}>{t("ed.tags")}</label>
+            <input id="tags" className={field} value={v.tags} placeholder={t("ed.tagsPlaceholder")} onChange={(e) => set("tags", e.target.value)} />
           </div>
         </div>
         <div className="flex flex-wrap items-end gap-6">
           <label className="flex items-center gap-2 text-amber-950 min-h-11">
             <input type="checkbox" className="h-5 w-5" checked={v.isPremium} onChange={(e) => set("isPremium", e.target.checked)} />
-            Premium retsept
+            {t("ed.premium")}
           </label>
           {v.isPremium && (
             <div>
-              <label htmlFor="price" className={label}>Narxi (so‘m)</label>
+              <label htmlFor="price" className={label}>{t("ed.price")}</label>
               <input id="price" type="number" min={1} className={field} value={v.priceAmount} onChange={(e) => set("priceAmount", e.target.value)} />
             </div>
           )}
         </div>
         {v.isPremium && (
-          <p className="text-xs text-amber-600">To‘lov tizimi hozircha ulanmagan, shuning uchun o‘quvchilar premium retseptlarni ocha olmaydi.</p>
+          <p className="text-xs text-amber-600">{t("ed.premiumNote")}</p>
         )}
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-2xl font-serif text-amber-950">Masalliqlar</h2>
+        <h2 className="text-2xl font-serif text-amber-950">{t("ed.ingredients")}</h2>
         {v.ingredients.map((ing, i) => (
           <div key={i} className="grid grid-cols-[1fr_5rem_5rem] sm:grid-cols-[2rem_1fr_6rem_6rem_auto] gap-2 items-end">
             <span className="hidden sm:block pb-3 text-sm text-amber-600">{i + 1}</span>
             <div className="col-span-3 sm:col-span-1">
-              <label className="sr-only" htmlFor={`ing-name-${i}`}>{i + 1}-masalliq nomi</label>
-              <input id={`ing-name-${i}`} className={field} placeholder="Nomi" value={ing.name} onChange={(e) => setIngredient(i, { name: e.target.value })} />
+              <label className="sr-only" htmlFor={`ing-name-${i}`}>{t("ed.ingName", { n: i + 1 })}</label>
+              <input id={`ing-name-${i}`} className={field} placeholder={t("ed.namePh")} value={ing.name} onChange={(e) => setIngredient(i, { name: e.target.value })} />
             </div>
             <div className="col-span-1">
-              <label className="sr-only" htmlFor={`ing-qty-${i}`}>Miqdori</label>
-              <input id={`ing-qty-${i}`} className={field} placeholder="Miqdori" value={ing.quantity} onChange={(e) => setIngredient(i, { quantity: e.target.value })} />
+              <label className="sr-only" htmlFor={`ing-qty-${i}`}>{t("ed.qtyPh")}</label>
+              <input id={`ing-qty-${i}`} className={field} placeholder={t("ed.qtyPh")} value={ing.quantity} onChange={(e) => setIngredient(i, { quantity: e.target.value })} />
             </div>
             <div className="col-span-1">
-              <label className="sr-only" htmlFor={`ing-unit-${i}`}>Birlik</label>
-              <input id={`ing-unit-${i}`} className={field} placeholder="Birlik" value={ing.unit} onChange={(e) => setIngredient(i, { unit: e.target.value })} />
+              <label className="sr-only" htmlFor={`ing-unit-${i}`}>{t("ed.unitPh")}</label>
+              <input id={`ing-unit-${i}`} className={field} placeholder={t("ed.unitPh")} value={ing.unit} onChange={(e) => setIngredient(i, { unit: e.target.value })} />
             </div>
             <div className="col-span-1 flex gap-1">
-              <Button type="button" size="sm" variant="ghost" aria-label="Yuqoriga" onClick={() => set("ingredients", move(v.ingredients, i, -1))}>↑</Button>
-              <Button type="button" size="sm" variant="ghost" aria-label="Pastga" onClick={() => set("ingredients", move(v.ingredients, i, 1))}>↓</Button>
-              <Button type="button" size="sm" variant="ghost" aria-label="Masalliqni o‘chirish" disabled={v.ingredients.length === 1} onClick={() => set("ingredients", v.ingredients.filter((_, n) => n !== i))}>✕</Button>
+              <Button type="button" size="sm" variant="ghost" aria-label={t("ed.up")} onClick={() => set("ingredients", move(v.ingredients, i, -1))}>↑</Button>
+              <Button type="button" size="sm" variant="ghost" aria-label={t("ed.down")} onClick={() => set("ingredients", move(v.ingredients, i, 1))}>↓</Button>
+              <Button type="button" size="sm" variant="ghost" aria-label={t("ed.deleteIng")} disabled={v.ingredients.length === 1} onClick={() => set("ingredients", v.ingredients.filter((_, n) => n !== i))}>✕</Button>
             </div>
           </div>
         ))}
         <Button type="button" variant="outline" size="sm" onClick={() => set("ingredients", [...v.ingredients, { name: "", quantity: "", unit: "" }])}>
-          Masalliq qo‘shish
+          {t("ed.addIng")}
         </Button>
 
         <fieldset className="border-t border-amber-200 pt-4">
-          <legend className={cn(label, "pr-2")}>Ozuqaviy qiymati — 1 kishi uchun (ixtiyoriy)</legend>
+          <legend className={cn(label, "pr-2")}>{t("ed.nutrition")}</legend>
           <p className="text-xs text-amber-600">
-            Butun taomning qiymati porsiyalar soniga bo‘lingani, ya’ni bir kishi yeydigan miqdor. To‘ldirilsa, retsept kartochkasida va sahifasida ko‘rinadi.
+            {t("ed.nutritionNote")}
           </p>
           <div className="mt-3 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {NUTRITION_FIELDS.map(({ key, text }) => (
               <div key={key}>
-                <label htmlFor={key} className="block text-xs text-amber-600">{text}</label>
+                <label htmlFor={key} className="block text-xs text-amber-600">{t(text)}</label>
                 <input id={key} type="number" min={0} className={field} value={v[key]} onChange={(e) => set(key, e.target.value)} />
               </div>
             ))}
           </div>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-            <Button type="button" variant="outline" size="sm" onClick={calculateNutrition}>Masalliqlardan hisoblash</Button>
+            <Button type="button" variant="outline" size="sm" onClick={calculateNutrition}>{t("ed.calcFrom")}</Button>
             {nutritionNote && <p className="text-xs text-amber-900" role="status">{nutritionNote}</p>}
           </div>
         </fieldset>
       </section>
 
       <section className="space-y-6">
-        <h2 className="text-2xl font-serif text-amber-950">Qadamlar</h2>
+        <h2 className="text-2xl font-serif text-amber-950">{t("ed.steps")}</h2>
         {v.steps.map((s, i) => (
           <fieldset key={i} className="border-t border-amber-200 pt-4 space-y-3">
-            <legend className="text-sm font-semibold text-amber-900 pr-2">Qadam {i + 1}</legend>
+            <legend className="text-sm font-semibold text-amber-900 pr-2">{t("ed.stepN", { n: i + 1 })}</legend>
             <div>
-              <label className={label} htmlFor={`st-title-${i}`}>Sarlavha</label>
+              <label className={label} htmlFor={`st-title-${i}`}>{t("ed.title")}</label>
               <input id={`st-title-${i}`} className={field} value={s.title} onChange={(e) => setStep(i, { title: e.target.value })} />
             </div>
             <div>
-              <label className={label} htmlFor={`st-ins-${i}`}>Ko‘rsatma</label>
+              <label className={label} htmlFor={`st-ins-${i}`}>{t("ed.instruction")}</label>
               <textarea id={`st-ins-${i}`} rows={3} className={field} value={s.instruction} onChange={(e) => setStep(i, { instruction: e.target.value })} />
             </div>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
               <div>
-                <label className={label} htmlFor={`st-timer-${i}`}>Taymer (daq.)</label>
+                <label className={label} htmlFor={`st-timer-${i}`}>{t("ed.timerMin")}</label>
                 <input id={`st-timer-${i}`} type="number" min={0} className={field} value={s.timerMinutes} onChange={(e) => setStep(i, { timerMinutes: e.target.value })} />
               </div>
               <div>
-                <label className={label} htmlFor={`st-temp-${i}`}>Harorat (°C)</label>
+                <label className={label} htmlFor={`st-temp-${i}`}>{t("ed.temp")}</label>
                 <input id={`st-temp-${i}`} type="number" min={0} className={field} value={s.temperatureCelsius} onChange={(e) => setStep(i, { temperatureCelsius: e.target.value })} />
               </div>
               <div className="col-span-2">
-                <label className={label} htmlFor={`st-ing-${i}`}>Ishlatiladigan masalliq raqamlari</label>
-                <input id={`st-ing-${i}`} className={field} placeholder="masalan: 1, 3" value={s.ingredientPositions} onChange={(e) => setStep(i, { ingredientPositions: e.target.value })} />
+                <label className={label} htmlFor={`st-ing-${i}`}>{t("ed.stepIngs")}</label>
+                <input id={`st-ing-${i}`} className={field} placeholder={t("ed.stepIngsPh")} value={s.ingredientPositions} onChange={(e) => setStep(i, { ingredientPositions: e.target.value })} />
               </div>
             </div>
             <div>
-              <label className={label} htmlFor={`st-img-${i}`}>Rasm havolasi (ixtiyoriy)</label>
+              <label className={label} htmlFor={`st-img-${i}`}>{t("ed.stepImage")}</label>
               <input id={`st-img-${i}`} type="url" className={field} value={s.mediaUrl} onChange={(e) => setStep(i, { mediaUrl: e.target.value })} />
             </div>
             <div>
-              <label className={label} htmlFor={`st-tip-${i}`}>Maslahat (ixtiyoriy)</label>
+              <label className={label} htmlFor={`st-tip-${i}`}>{t("ed.tipOptional")}</label>
               <input id={`st-tip-${i}`} className={field} value={s.tip} onChange={(e) => setStep(i, { tip: e.target.value })} />
             </div>
             <div className="flex gap-1">
-              <Button type="button" size="sm" variant="ghost" onClick={() => set("steps", move(v.steps, i, -1))}>Yuqoriga</Button>
-              <Button type="button" size="sm" variant="ghost" onClick={() => set("steps", move(v.steps, i, 1))}>Pastga</Button>
-              <Button type="button" size="sm" variant="ghost" disabled={v.steps.length === 1} onClick={() => set("steps", v.steps.filter((_, n) => n !== i))}>O‘chirish</Button>
+              <Button type="button" size="sm" variant="ghost" onClick={() => set("steps", move(v.steps, i, -1))}>{t("ed.up")}</Button>
+              <Button type="button" size="sm" variant="ghost" onClick={() => set("steps", move(v.steps, i, 1))}>{t("ed.down")}</Button>
+              <Button type="button" size="sm" variant="ghost" disabled={v.steps.length === 1} onClick={() => set("steps", v.steps.filter((_, n) => n !== i))}>{t("common.delete")}</Button>
             </div>
           </fieldset>
         ))}
@@ -348,7 +350,7 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
           size="sm"
           onClick={() => set("steps", [...v.steps, { title: "", instruction: "", mediaUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" }])}
         >
-          Qadam qo‘shish
+          {t("ed.addStep")}
         </Button>
       </section>
 
@@ -357,10 +359,10 @@ export function RecipeEditor({ initial, save, basePath }: RecipeEditorProps) {
         {notice && <p role="status" className="text-sm text-emerald-800">{notice}</p>}
         <div className="flex flex-wrap gap-3">
           <Button type="button" variant="outline" loading={pending} onClick={() => submit(false)}>
-            {v.status === "published" ? "Qoralamaga qaytarish" : "Qoralamani saqlash"}
+            {v.status === "published" ? t("ed.toDraft") : t("ed.saveDraft")}
           </Button>
           <Button type="button" loading={pending} onClick={() => submit(true)}>
-            {v.status === "published" ? "Saqlash" : "Nashr etish"}
+            {v.status === "published" ? t("common.save") : t("ed.publish")}
           </Button>
         </div>
       </div>

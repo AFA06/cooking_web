@@ -2,22 +2,24 @@ import { Container } from "@/components/ui/Container";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SearchBar } from "@/components/home/SearchBar";
 import { CategoryRail, ContinueCooking, CreatorInvite, HowItCooks, LatestRecipes, LeadRecipe } from "@/components/home/sections";
+import { getT } from "@/i18n/server";
+import type { TFunction } from "@/i18n/core";
 import { getCurrentUser } from "@/server/auth";
 import { listPublishedRecipes } from "@/server/recipes";
 import { getActiveCooking, getSavedRecipeIds } from "@/server/user-data";
 
 export const dynamic = "force-dynamic";
 
-function greeting(): string {
+function greeting(t: TFunction): string {
   const hour = Number(new Intl.DateTimeFormat("en-GB", { hour: "numeric", hour12: false, timeZone: "Asia/Tashkent" }).format(new Date()));
-  if (hour >= 5 && hour < 11) return "Xayrli tong";
-  if (hour >= 11 && hour < 17) return "Xayrli kun";
-  if (hour >= 17 && hour < 23) return "Xayrli kech";
-  return "Xayrli tun";
+  if (hour >= 5 && hour < 11) return t("home.greeting.morning");
+  if (hour >= 11 && hour < 17) return t("home.greeting.day");
+  if (hour >= 17 && hour < 23) return t("home.greeting.evening");
+  return t("home.greeting.night");
 }
 
 export default async function HomePage() {
-  const user = await getCurrentUser();
+  const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   const [recipes, savedList, activeCooking] = await Promise.all([
     listPublishedRecipes(),
     user ? getSavedRecipeIds(user.id) : [],
@@ -34,14 +36,14 @@ export default async function HomePage() {
       <Container size="xl" className="grid gap-10 pb-16 pt-8 lg:grid-cols-[5fr_6fr] lg:gap-14 lg:pb-24 lg:pt-12">
         <div className="flex min-w-0 flex-col justify-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
-            {user ? `${greeting()}, ${user.name.split(" ")[0]}` : "Qadam-baqadam pazandalik"}
+            {user ? `${greeting(t)}, ${user.name.split(" ")[0]}` : t("home.eyebrow")}
           </p>
           <h1 className="mt-4 text-[2.75rem] font-medium leading-[1.04] text-amber-950 sm:text-6xl lg:text-[4.25rem]">
-            Bugun nima <em className="font-normal italic text-amber-700">pishiramiz?</em>
+            {t("home.titleLead")} <em className="font-normal italic text-amber-700">{t("home.titleEm")}</em>
           </h1>
           {!user && (
             <p className="mt-5 max-w-lg text-lg leading-relaxed text-amber-900">
-              Sevimli oshpazlaringizning retseptlari — aniq miqdor, taymer va har bir qadamda ko‘rsatma bilan. Videoni ortga qaytarib o‘tirmaysiz.
+              {t("home.intro")}
             </p>
           )}
           <div className="mt-8 max-w-xl">

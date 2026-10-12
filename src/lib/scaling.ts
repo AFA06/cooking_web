@@ -67,7 +67,7 @@ function roundForKitchen(amount: number, kind: UnitKind): number {
 }
 
 /** Amounts below one are written as words, the way a cook would say them. */
-const WORD_BY_PART: Record<string, string> = { "0.25": "chorak", "0.5": "yarim" };
+const WORD_BY_PART: Record<string, string> = { "0.25": "¼", "0.5": "½" };
 
 function formatAmount(amount: number, kind: UnitKind): string {
   if (Number.isInteger(amount)) return amount.toLocaleString("ru-RU");

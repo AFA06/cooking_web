@@ -4,10 +4,10 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Camera, Star, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/i18n/client";
 import { submitReview } from "@/app/recipes/actions";
 import { cn } from "@/lib/utils";
 
-const LABELS = ["", "Yoqmadi", "O‘rtacha", "Yaxshi", "Juda yaxshi", "A’lo"];
 const MAX_SIDE = 1280;
 /** Stay under the server's limit with room to spare. */
 const MAX_BASE64_LENGTH = 700_000;
@@ -40,6 +40,8 @@ interface Props {
 
 export function ReviewForm({ recipeId, initial, onDone }: Props) {
   const router = useRouter();
+  const t = useT();
+  const labelFor = (n: number) => (n > 0 ? t(`review.label.${n}`) : "");
   const [rating, setRating] = React.useState(initial?.rating ?? 0);
   const [hover, setHover] = React.useState(0);
   const [comment, setComment] = React.useState(initial?.comment ?? "");
@@ -56,13 +58,13 @@ export function ReviewForm({ recipeId, initial, onDone }: Props) {
     try {
       setPhoto(await resizePhoto(file));
     } catch {
-      setError("Bu rasmni yuklab bo‘lmadi. Boshqa rasm tanlab ko‘ring.");
+      setError(t("review.photoFail"));
     }
   };
 
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (rating === 0) return setError("Avval yulduzcha bilan baho bering.");
+    if (rating === 0) return setError(t("review.rateFirst"));
     startTransition(async () => {
       setError(null);
       const result = await submitReview({ recipeId, rating, comment, photo: photo ? { mime: "image/jpeg", data: photo } : null });
@@ -76,7 +78,7 @@ export function ReviewForm({ recipeId, initial, onDone }: Props) {
   if (saved && !onDone) {
     return (
       <p role="status" className="rounded-2xl bg-sage-50 px-5 py-4 font-medium text-sage-900">
-        Rahmat! Bahoyingiz saqlandi.
+        {t("review.thanks")}
       </p>
     );
   }
@@ -84,7 +86,7 @@ export function ReviewForm({ recipeId, initial, onDone }: Props) {
   return (
     <form onSubmit={submit} className="space-y-5">
       <fieldset>
-        <legend className="text-sm font-medium text-amber-950">Bahoyingiz</legend>
+        <legend className="text-sm font-medium text-amber-950">{t("review.yourRating")}</legend>
         <div className="mt-2 flex items-center gap-4">
           <div className="flex" onMouseLeave={() => setHover(0)}>
             {[1, 2, 3, 4, 5].map((value) => (
@@ -95,33 +97,33 @@ export function ReviewForm({ recipeId, initial, onDone }: Props) {
                   strokeWidth={1.5}
                   aria-hidden="true"
                 />
-                <span className="sr-only">{value} yulduz — {LABELS[value]}</span>
+                <span className="sr-only">{t("review.starsLabel", { value, label: labelFor(value) })}</span>
               </label>
             ))}
           </div>
-          <span className="text-sm font-medium text-amber-900" aria-hidden="true">{LABELS[shown]}</span>
+          <span className="text-sm font-medium text-amber-900" aria-hidden="true">{labelFor(shown)}</span>
         </div>
       </fieldset>
 
       <div>
-        <label htmlFor="review-comment" className="text-sm font-medium text-amber-950">Fikringiz (ixtiyoriy)</label>
+        <label htmlFor="review-comment" className="text-sm font-medium text-amber-950">{t("review.comment")}</label>
         <textarea
           id="review-comment"
           rows={3}
           maxLength={1000}
           value={comment}
           onChange={(e) => setComment(e.target.value)}
-          placeholder="Taom qanday chiqdi? Nimani o‘zgartirdingiz?"
+          placeholder={t("review.commentPlaceholder")}
           className="mt-1.5 w-full rounded-2xl border border-amber-300 bg-amber-100 px-4 py-3 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none"
         />
       </div>
 
       <div>
-        <input ref={fileRef} type="file" accept="image/*" className="sr-only" tabIndex={-1} onChange={(e) => pickPhoto(e.target.files?.[0])} aria-label="Natija rasmini tanlash" />
+        <input ref={fileRef} type="file" accept="image/*" className="sr-only" tabIndex={-1} onChange={(e) => pickPhoto(e.target.files?.[0])} aria-label={t("review.pickPhoto")} />
         {photo ? (
           <div className="relative w-fit">
             {/* eslint-disable-next-line @next/next/no-img-element -- local preview of a just-selected file */}
-            <img src={`data:image/jpeg;base64,${photo}`} alt="Tanlangan rasm" className="h-28 w-36 rounded-2xl object-cover" />
+            <img src={`data:image/jpeg;base64,${photo}`} alt={t("review.selectedPhoto")} className="h-28 w-36 rounded-2xl object-cover" />
             <button
               type="button"
               onClick={() => {
@@ -129,7 +131,7 @@ export function ReviewForm({ recipeId, initial, onDone }: Props) {
                 if (fileRef.current) fileRef.current.value = "";
               }}
               className="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-amber-950 text-amber-50"
-              aria-label="Rasmni olib tashlash"
+              aria-label={t("review.removePhoto")}
             >
               <X className="h-4 w-4" aria-hidden="true" />
             </button>
@@ -137,13 +139,13 @@ export function ReviewForm({ recipeId, initial, onDone }: Props) {
         ) : (
           <Button type="button" variant="outline" onClick={() => fileRef.current?.click()}>
             <Camera className="h-4 w-4" aria-hidden="true" />
-            {initial?.photoId ? "Rasmni almashtirish" : "Natija rasmini qo‘shish"}
+            {initial?.photoId ? t("review.replacePhoto") : t("review.addPhoto")}
           </Button>
         )}
       </div>
 
       {error && <p role="alert" className="text-sm font-medium text-red-700">{error}</p>}
-      <Button type="submit" size="lg" loading={pending}>{initial ? "Bahoni yangilash" : "Bahoni yuborish"}</Button>
+      <Button type="submit" size="lg" loading={pending}>{initial ? t("review.update") : t("review.submit")}</Button>
     </form>
   );
 }

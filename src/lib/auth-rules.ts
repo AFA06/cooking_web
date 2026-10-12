@@ -43,21 +43,21 @@ const COMMON_PASSWORDS = new Set([
   "parol123", "parol1234", "salom123", "uzbekistan", "tashkent", "damda123",
 ]);
 
-/** Returns a message when the password is unacceptable, otherwise null. bcrypt only reads the first 72 bytes. */
+/** Returns a message KEY (translate with t) when the password is unacceptable, otherwise null. bcrypt only reads the first 72 bytes. */
 export function checkPassword(password: string, phone?: string | null): string | null {
-  if (password.length < 8) return "Parol kamida 8 ta belgidan iborat bo‘lishi kerak";
-  if (new TextEncoder().encode(password).length > 72) return "Parol juda uzun (ko‘pi bilan 72 bayt)";
+  if (password.length < 8) return "auth.err.pwShort";
+  if (new TextEncoder().encode(password).length > 72) return "pw.long";
   const lower = password.toLowerCase();
-  if (COMMON_PASSWORDS.has(lower) || /^(.)\1+$/.test(password)) return "Bu parol juda oddiy. Boshqasini tanlang.";
+  if (COMMON_PASSWORDS.has(lower) || /^(.)\1+$/.test(password)) return "pw.common";
   if (/^\d+$/.test(password)) {
     const asc = "01234567890123456789";
     const desc = "98765432109876543210";
-    if (asc.includes(password) || desc.includes(password)) return "Bu parol juda oddiy. Boshqasini tanlang.";
+    if (asc.includes(password) || desc.includes(password)) return "pw.common";
   }
   if (phone) {
     const digits = phone.replace(/\D/g, "");
     if (digits.length >= 9 && password.replace(/\D/g, "").includes(digits.slice(-9))) {
-      return "Parol telefon raqamingizni o‘z ichiga olmasin.";
+      return "pw.phone";
     }
   }
   return null;

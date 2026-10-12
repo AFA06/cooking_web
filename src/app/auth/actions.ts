@@ -9,6 +9,7 @@ import { after } from "next/server";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { checkPassword, normalizeUzPhone, parseIdentifier } from "@/lib/auth-rules";
+import { getT } from "@/i18n/server";
 import { createSession, destroyAllSessions, destroySession } from "@/server/auth";
 import { TTL_MINUTES, createChallenge, getOpenChallenge, resendChallenge, verifyChallenge } from "@/server/challenges";
 import { DeliveryUnavailable, deliverCode, sendAccountExistsNotice } from "@/server/notify";
@@ -20,10 +21,11 @@ export interface AuthState {
   ok?: string;
 }
 
-const TOO_MANY = "Juda ko‘p urinish. Birozdan so‘ng qayta urinib ko‘ring.";
-const BAD_CODE = "Kod noto‘g‘ri yoki muddati tugagan.";
-const UNAVAILABLE = "SMS xizmati hozircha ishlamayapti. Birozdan so‘ng qayta urinib ko‘ring.";
-const GENERIC_SENT = "Agar hisob mavjud bo‘lsa, kod yuborildi.";
+// Message keys; every one is translated with t() where it is returned.
+const TOO_MANY = "auth.a.tooMany";
+const BAD_CODE = "auth.a.badCode";
+const UNAVAILABLE = "auth.a.unavailable";
+const GENERIC_SENT = "auth.a.genericSent";
 
 // Only allow same-site relative redirects.
 function safeNext(value: FormDataEntryValue | null): string {
@@ -67,7 +69,8 @@ const DUMMY_HASH = "$2b$12$C6UzMDM.H6dfI/f/IKcEeO5bQ7O8ZIOTbN0vJj5X9i1x4zV5g3a2K
 /* ───────────── Sign-in ───────────── */
 
 export async function login(_: AuthState, formData: FormData): Promise<AuthState> {
-  const wrong = { error: "Telefon yoki email, yoki parol noto‘g‘ri." };
+  const t = await getT();
+  const wrong = { error: t("auth.a.loginWrong") };
   const ident = parseIdentifier(text(formData, "identifier", 254));
   const password = text(formData, "password", 200);
   if (!ident || !password) return wrong;
@@ -77,7 +80,7 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
   // Failures are counted per caller and per account, for known and unknown accounts alike,
   // so a lockout tells an attacker nothing about which accounts exist.
   if ((await peek("login-fail", ip, WINDOW.quarterHour)) >= 30 || (await peek("login-fail", idKey, WINDOW.quarterHour)) >= 8) {
-    return { error: "Juda ko‘p noto‘g‘ri urinish. 15 daqiqadan so‘ng qayta urinib ko‘ring." };
+    return { error: t("acct.err.locked") };
   }
 
   const [user] = await db
@@ -104,22 +107,23 @@ export async function logout() {
 /* ───────────── Sign-up, verified by SMS ───────────── */
 
 const signupSchema = z.object({
-  name: z.string().trim().min(2, "Ismingizni kiriting").max(80),
+  name: z.string().trim().min(2, "auth.err.name").max(80),
   phone: z.string().max(40),
   password: z.string().max(200),
 });
 
 export async function startSignup(_: AuthState, formData: FormData): Promise<AuthState> {
+  const t = await getT();
   const parsed = signupSchema.safeParse({ name: formData.get("name"), phone: formData.get("phone"), password: formData.get("password") });
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
   const phone = normalizeUzPhone(parsed.data.phone);
-  if (!phone) return { error: "Telefon raqami noto‘g‘ri. Masalan: +998 90 123 45 67" };
+  if (!phone) return { error: t("acct.err.phone") };
   const weak = checkPassword(parsed.data.password, phone);
-  if (weak) return { error: weak };
+  if (weak) return { error: t(weak) };
 
   const ip = await clientKey();
   const phoneKey = keyedHash("dest", phone);
-  if (!(await allow("signup-ip", ip, 10, WINDOW.hour)) || !(await allow("send-dest", phoneKey, 6, WINDOW.hour))) return { error: TOO_MANY };
+  if (!(await allow("signup-ip", ip, 10, WINDOW.hour)) || !(await allow("send-dest", phoneKey, 6, WINDOW.hour))) return { error: t(TOO_MANY) };
 
   const [existing] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.phone, phone)).limit(1);
   // Hash even when the number is taken, so both paths cost the same time.
@@ -131,7 +135,7 @@ export async function startSignup(_: AuthState, formData: FormData): Promise<Aut
       // Same screens and same answer as a real signup, so the form cannot be used to probe who has an account.
       // The number's owner is told by SMS instead.
       ({ id: challengeId } = await createChallenge({ purpose: "signup", channel: "sms", destination: phone, inert: true }));
-      await sendAccountExistsNotice(phone);
+      await sendAccountExistsNotice(phone, t);
     } else {
       const created = await createChallenge({
         purpose: "signup",
@@ -141,7 +145,7 @@ export async function startSignup(_: AuthState, formData: FormData): Promise<Aut
       });
       challengeId = created.id;
       try {
-        await deliverCode("sms", phone, created.code, "signup", TTL_MINUTES.sms);
+        await deliverCode("sms", phone, created.code, "signup", TTL_MINUTES.sms, t);
       } catch (e) {
         await db.delete(schema.authChallenges).where(eq(schema.authChallenges.id, created.id));
         throw e;
@@ -149,17 +153,18 @@ export async function startSignup(_: AuthState, formData: FormData): Promise<Aut
     }
   } catch (e) {
     console.error("signup delivery failed:", e instanceof Error ? e.message : "unknown");
-    return { error: e instanceof DeliveryUnavailable ? UNAVAILABLE : "Kod yuborib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring." };
+    return { error: e instanceof DeliveryUnavailable ? t(UNAVAILABLE) : t("auth.a.sendFailed") };
   }
 
   redirect(withNext(`/auth/verify?c=${challengeId}`, safeNext(formData.get("next"))));
 }
 
 export async function verifySignup(_: AuthState, formData: FormData): Promise<AuthState> {
-  if (!(await allow("verify-ip", await clientKey(), 40, WINDOW.hour))) return { error: TOO_MANY };
+  const t = await getT();
+  if (!(await allow("verify-ip", await clientKey(), 40, WINDOW.hour))) return { error: t(TOO_MANY) };
   const row = await verifyChallenge(text(formData, "challengeId", 64), text(formData, "code", 12).trim(), "signup");
-  if (!row || row.payload?.inert === "1" || !row.payload?.passwordHash || !row.destination) return { error: BAD_CODE };
-  if (!(await isBoundToThisBrowser(row.payload.bind))) return { error: "Bu so‘rov boshqa qurilmadan boshlangan. Hisob yaratishni shu qurilmada qaytadan boshlang." };
+  if (!row || row.payload?.inert === "1" || !row.payload?.passwordHash || !row.destination) return { error: t(BAD_CODE) };
+  if (!(await isBoundToThisBrowser(row.payload.bind))) return { error: t("auth.a.wrongBrowser") };
 
   let userId: string;
   try {
@@ -170,7 +175,7 @@ export async function verifySignup(_: AuthState, formData: FormData): Promise<Au
     userId = user.id;
   } catch {
     // Someone else completed a signup for this number first.
-    return { error: "Bu raqam bilan hisob allaqachon mavjud. Tizimga kiring." };
+    return { error: t("auth.a.phoneExists") };
   }
   await createSession(userId);
   redirect(safeNext(formData.get("next")));
@@ -178,23 +183,24 @@ export async function verifySignup(_: AuthState, formData: FormData): Promise<Au
 
 /** Sends the signup code again (same challenge, new code). */
 export async function resendSignupCode(_: AuthState, formData: FormData): Promise<AuthState> {
+  const t = await getT();
   const id = text(formData, "challengeId", 64);
   const ip = await clientKey();
-  if (!(await allow("resend-ip", ip, 15, WINDOW.hour))) return { error: TOO_MANY };
+  if (!(await allow("resend-ip", ip, 15, WINDOW.hour))) return { error: t(TOO_MANY) };
   const open = await getOpenChallenge(id, "signup");
-  if (!open || !open.destination) return { error: "Kod muddati tugagan. Qaytadan boshlang." };
-  if (open.payload?.inert === "1") return { ok: "Kod yuborildi." };
-  if (!(await allow("send-dest", keyedHash("dest", open.destination), 6, WINDOW.hour))) return { error: TOO_MANY };
+  if (!open || !open.destination) return { error: t("auth.a.codeExpiredRestart") };
+  if (open.payload?.inert === "1") return { ok: t("auth.a.codeSent") };
+  if (!(await allow("send-dest", keyedHash("dest", open.destination), 6, WINDOW.hour))) return { error: t(TOO_MANY) };
 
   const next = await resendChallenge(id, "signup", "sms");
-  if (!next) return { error: "Biroz kuting, so‘ng qayta urinib ko‘ring." };
+  if (!next) return { error: t("auth.a.waitRetry") };
   try {
-    await deliverCode("sms", open.destination, next.code, "signup", TTL_MINUTES.sms);
+    await deliverCode("sms", open.destination, next.code, "signup", TTL_MINUTES.sms, t);
   } catch (e) {
     console.error("signup resend failed:", e instanceof Error ? e.message : "unknown");
-    return { error: UNAVAILABLE };
+    return { error: t(UNAVAILABLE) };
   }
-  return { ok: "Yangi kod yuborildi." };
+  return { ok: t("auth.a.newCodeSent") };
 }
 
 /* ───────────── Forgot password ───────────── */
@@ -204,12 +210,13 @@ export async function resendSignupCode(_: AuthState, formData: FormData): Promis
  * The code goes to the account's verified email when it has one, otherwise to its verified phone.
  */
 export async function requestPasswordReset(_: AuthState, formData: FormData): Promise<AuthState> {
+  const t = await getT();
   const ident = parseIdentifier(text(formData, "identifier", 254));
-  if (!ident) return { error: "Telefon raqamingiz yoki emailingizni to‘g‘ri kiriting." };
+  if (!ident) return { error: t("auth.a.identBad") };
 
   const ip = await clientKey();
   if (!(await allow("reset-ip", ip, 10, WINDOW.hour)) || !(await allow("reset-ident", keyedHash("ident", ident.value), 5, WINDOW.hour))) {
-    return { error: TOO_MANY };
+    return { error: t(TOO_MANY) };
   }
 
   let challengeId: string = randomUUID(); // a decoy: the reset screen cannot tell it from a real one
@@ -230,7 +237,7 @@ export async function requestPasswordReset(_: AuthState, formData: FormData): Pr
       // Delivered after the response, so a real account does not answer more slowly than a decoy.
       after(async () => {
         try {
-          await deliverCode(channel, destination, created.code, "password_reset", TTL_MINUTES[channel]);
+          await deliverCode(channel, destination, created.code, "password_reset", TTL_MINUTES[channel], t);
         } catch (e) {
           console.error("reset delivery failed:", e instanceof Error ? e.message : "unknown");
         }
@@ -245,10 +252,11 @@ export async function requestPasswordReset(_: AuthState, formData: FormData): Pr
  * their inbox. The reply never says whether the account or the channel exists.
  */
 export async function resendPasswordResetCode(_: AuthState, formData: FormData): Promise<AuthState> {
+  const t = await getT();
   const id = text(formData, "challengeId", 64);
   const viaSms = text(formData, "via", 8) === "sms";
-  const reply: AuthState = { ok: GENERIC_SENT };
-  if (!(await allow("resend-ip", await clientKey(), 15, WINDOW.hour))) return { error: TOO_MANY };
+  const reply: AuthState = { ok: t(GENERIC_SENT) };
+  if (!(await allow("resend-ip", await clientKey(), 15, WINDOW.hour))) return { error: t(TOO_MANY) };
 
   const open = await getOpenChallenge(id, "password_reset");
   if (!open?.userId) return reply;
@@ -270,7 +278,7 @@ export async function resendPasswordResetCode(_: AuthState, formData: FormData):
   if (!next) return reply;
   after(async () => {
     try {
-      await deliverCode(channel, destination, next.code, "password_reset", TTL_MINUTES[channel]);
+      await deliverCode(channel, destination, next.code, "password_reset", TTL_MINUTES[channel], t);
     } catch (e) {
       console.error("reset resend failed:", e instanceof Error ? e.message : "unknown");
     }
@@ -279,22 +287,23 @@ export async function resendPasswordResetCode(_: AuthState, formData: FormData):
 }
 
 export async function completePasswordReset(_: AuthState, formData: FormData): Promise<AuthState> {
-  if (!(await allow("verify-ip", await clientKey(), 40, WINDOW.hour))) return { error: TOO_MANY };
+  const t = await getT();
+  if (!(await allow("verify-ip", await clientKey(), 40, WINDOW.hour))) return { error: t(TOO_MANY) };
   const password = text(formData, "newPassword", 200);
-  if (password !== text(formData, "confirmPassword", 200)) return { error: "Parollar bir xil emas." };
+  if (password !== text(formData, "confirmPassword", 200)) return { error: t("auth.a.pwMismatch") };
   // Checked before the code is spent, so a weak password does not burn it.
   const weak = checkPassword(password);
-  if (weak) return { error: weak };
+  if (weak) return { error: t(weak) };
 
   const row = await verifyChallenge(text(formData, "challengeId", 64), text(formData, "code", 12).trim(), "password_reset");
-  if (!row?.userId) return { error: BAD_CODE };
+  if (!row?.userId) return { error: t(BAD_CODE) };
 
   const [user] = await db
     .update(schema.users)
     .set({ passwordHash: await bcrypt.hash(password, 12) })
     .where(eq(schema.users.id, row.userId))
     .returning({ phone: schema.users.phone, email: schema.users.email });
-  if (!user) return { error: BAD_CODE };
+  if (!user) return { error: t(BAD_CODE) };
 
   // Anyone who held the old password or an old session is out, and no other reset code stays usable.
   await destroyAllSessions(row.userId);
