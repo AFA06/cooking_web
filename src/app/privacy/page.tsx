@@ -19,7 +19,7 @@ export default function Page() {
         <div className="mt-8 space-y-6 leading-relaxed text-amber-900">
           <section>
             <h2 className="text-xl font-medium text-amber-950">Biz nimalarni yig‘amiz</h2>
-            <p className="mt-2">Hisob yaratganingizda ismingiz, email manzilingiz va shifrlangan parolingiz saqlanadi. Shuningdek, saqlagan retseptlaringiz va pishirish tarixingiz saqlanadi.</p>
+            <p className="mt-2">Hisob yaratganingizda ismingiz, telefon raqamingiz, (ixtiyoriy) email manzilingiz va shifrlangan parolingiz saqlanadi. Telefon raqami va email tasdiqlash hamda parolni tiklash kodlarini yuborish uchun ishlatiladi. Shuningdek, saqlagan retseptlaringiz va pishirish tarixingiz saqlanadi.</p>
           </section>
           <section>
             <h2 className="text-xl font-medium text-amber-950">Ulardan qanday foydalanamiz</h2>

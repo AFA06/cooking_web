@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { eq } from "drizzle-orm";
-import { ArrowLeft, KeyRound, Mail, UserRound } from "lucide-react";
+import { ArrowLeft, KeyRound, Mail, Phone, UserRound } from "lucide-react";
 import { Container } from "@/components/ui/Container";
 import { SiteShell } from "@/components/layout/SiteShell";
-import { EmailForm, PasswordForm, ProfileForm } from "@/components/account/SettingsForms";
+import { EmailForm, PasswordForm, PhoneForm, ProfileForm } from "@/components/account/SettingsForms";
 import { db, schema } from "@/db";
 import { formatDate } from "@/lib/format";
 import { formatPhone } from "@/lib/profile";
@@ -20,7 +20,13 @@ export default async function SettingsPage() {
   const user = await getCurrentUser();
   if (!user) redirect("/auth/login?next=/account/settings");
   const [details] = await db
-    .select({ username: schema.users.username, phone: schema.users.phone, createdAt: schema.users.createdAt })
+    .select({
+      username: schema.users.username,
+      phone: schema.users.phone,
+      phoneVerifiedAt: schema.users.phoneVerifiedAt,
+      emailVerifiedAt: schema.users.emailVerifiedAt,
+      createdAt: schema.users.createdAt,
+    })
     .from(schema.users)
     .where(eq(schema.users.id, user.id))
     .limit(1);
@@ -31,9 +37,22 @@ export default async function SettingsPage() {
       icon: UserRound,
       title: "Shaxsiy ma’lumotlar",
       note: "Ismingiz retsept baholarida ko‘rinadi.",
-      form: <ProfileForm initial={{ name: user.name, username: details.username ?? "", phone: details.phone ? formatPhone(details.phone) : "" }} />,
+      form: <ProfileForm initial={{ name: user.name, username: details.username ?? "" }} />,
     },
-    { id: "email", icon: Mail, title: "Email", note: "Tizimga shu email bilan kirasiz.", form: <EmailForm email={user.email} /> },
+    {
+      id: "telefon",
+      icon: Phone,
+      title: "Telefon raqami",
+      note: "Tizimga kirish va parolni SMS orqali tiklash uchun.",
+      form: <PhoneForm current={details.phone ? formatPhone(details.phone) : null} verified={!!details.phoneVerifiedAt} />,
+    },
+    {
+      id: "email",
+      icon: Mail,
+      title: "Email",
+      note: "Ixtiyoriy. Tasdiqlangan email parolni tiklash kodini qabul qiladi, SMS esa zaxira yo‘l bo‘lib qoladi.",
+      form: <EmailForm current={user.email} verified={!!details.emailVerifiedAt} />,
+    },
     { id: "parol", icon: KeyRound, title: "Parol", note: "O‘zgartirilgach, boshqa qurilmalardagi sessiyalar yopiladi.", form: <PasswordForm /> },
   ];
 
@@ -53,7 +72,8 @@ export default async function SettingsPage() {
           {details.username && <p className="mt-2 text-lg text-amber-600">@{details.username}</p>}
           <dl className="mt-8 divide-y divide-amber-200 border-y border-amber-200 text-[0.95rem]">
             {[
-              ["Email", user.email],
+              ["Telefon", details.phone ? formatPhone(details.phone) : "—"],
+              ["Email", user.email ?? "—"],
               ["Hisob turi", ROLE_LABEL[user.role]],
               ["A’zo bo‘lgan sana", formatDate(details.createdAt)],
             ].map(([term, value]) => (

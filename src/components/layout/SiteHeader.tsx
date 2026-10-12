@@ -1,3 +1,4 @@
+import { formatPhone } from "@/lib/profile";
 import Link from "next/link";
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/Button";
@@ -59,7 +60,7 @@ export async function SiteHeader() {
                     <Link href="/dashboard/recipes/new"><Plus className="h-4 w-4" aria-hidden="true" />Retsept yaratish</Link>
                   </Button>
                 )}
-                <UserMenu name={user.name} email={user.email} isCreator={isCreator} isAdmin={isAdmin} />
+                <UserMenu name={user.name} email={user.email ?? (user.phone ? formatPhone(user.phone) : "")} isCreator={isCreator} isAdmin={isAdmin} />
               </>
             ) : (
               <>

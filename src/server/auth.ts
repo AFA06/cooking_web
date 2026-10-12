@@ -32,7 +32,8 @@ export async function destroySession() {
 
 export interface CurrentUser {
   id: string;
-  email: string;
+  email: string | null;
+  phone: string | null;
   name: string;
   role: "user" | "creator" | "admin";
 }
@@ -41,7 +42,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   const [row] = await db
-    .select({ id: schema.users.id, email: schema.users.email, name: schema.users.name, role: schema.users.role })
+    .select({ id: schema.users.id, email: schema.users.email, phone: schema.users.phone, name: schema.users.name, role: schema.users.role })
     .from(schema.sessions)
     .innerJoin(schema.users, eq(schema.sessions.userId, schema.users.id))
     .where(and(eq(schema.sessions.tokenHash, hashToken(token)), gt(schema.sessions.expiresAt, new Date())))
@@ -56,4 +57,9 @@ export async function destroyOtherSessions(userId: string) {
     ? and(eq(schema.sessions.userId, userId), ne(schema.sessions.tokenHash, hashToken(token)))
     : eq(schema.sessions.userId, userId);
   await db.delete(schema.sessions).where(condition);
+}
+
+/** Signs the person out on every device, including this one. Used after a password reset. */
+export async function destroyAllSessions(userId: string) {
+  await db.delete(schema.sessions).where(eq(schema.sessions.userId, userId));
 }

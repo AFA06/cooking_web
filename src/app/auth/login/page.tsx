@@ -9,15 +9,15 @@ import { login } from "../actions";
 export const metadata: Metadata = { title: "Kirish", robots: { index: false } };
 export const dynamic = "force-dynamic";
 
-export default async function Page({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
-  const { next = "" } = await searchParams;
+export default async function Page({ searchParams }: { searchParams: Promise<{ next?: string; reset?: string }> }) {
+  const { next = "", reset } = await searchParams;
   if (await getCurrentUser()) redirect("/account");
   const safe = next.startsWith("/") && !next.startsWith("//") ? next : "";
 
   return (
     <SiteShell>
       <AuthScreen eyebrow="Kirish" title={<>Xush kelibsiz, <em className="text-clay-400">oshpaz.</em></>} note="Saqlangan retseptlaringiz va boshlagan taomlaringiz sizni kutmoqda.">
-        <AuthForm mode="login" action={login} next={safe} />
+        <AuthForm mode="login" action={login} next={safe} notice={reset === "1" ? "Parol yangilandi. Yangi parol bilan kiring." : undefined} />
       </AuthScreen>
     </SiteShell>
   );

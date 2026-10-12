@@ -2,7 +2,15 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/Button";
-import { changeEmail, changePassword, updateProfile, type AccountState } from "@/app/account/actions";
+import {
+  changePassword,
+  confirmEmailChange,
+  confirmPhoneChange,
+  startEmailChange,
+  startPhoneChange,
+  updateProfile,
+  type AccountState,
+} from "@/app/account/actions";
 
 const field =
   "mt-1.5 h-14 w-full rounded-xl border border-amber-300 bg-amber-100 px-4 text-lg text-amber-950 transition-colors placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
@@ -35,7 +43,7 @@ function Footer({ state, pending, children }: { state: AccountState; pending: bo
   );
 }
 
-export function ProfileForm({ initial }: { initial: { name: string; username: string; phone: string } }) {
+export function ProfileForm({ initial }: { initial: { name: string; username: string } }) {
   const [state, action, pending] = React.useActionState<AccountState, FormData>(updateProfile, {});
   const { bind } = useFields(initial);
   return (
@@ -61,40 +69,120 @@ export function ProfileForm({ initial }: { initial: { name: string; username: st
         </div>
         <p className={hint}>Ixtiyoriy. 3–24 ta belgi: lotin harflari, raqamlar va “_”.</p>
       </div>
-      <div>
-        <label htmlFor="phone" className={label}>Telefon raqami</label>
-        <input id="phone" {...bind("phone")} type="tel" inputMode="tel" maxLength={30} autoComplete="tel" placeholder="+998 90 123 45 67" className={field} />
-        <p className={hint}>Ixtiyoriy. Boshqa foydalanuvchilarga ko‘rinmaydi.</p>
-      </div>
       <Footer state={state} pending={pending}>Saqlash</Footer>
     </form>
   );
 }
 
-export function EmailForm({ email }: { email: string }) {
-  const [state, action, pending] = React.useActionState<AccountState, FormData>(changeEmail, {});
-  const { bind, reset } = useFields({ email: "", currentPassword: "" });
-  React.useEffect(() => {
-    if (state.ok) reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [state]);
+interface ContactProps {
+  /** Current value, or null when none is set yet. */
+  current: string | null;
+  verified: boolean;
+}
+
+/**
+ * Changing a phone number or email is two steps: password and new value, then the code sent to the
+ * new value. Until the code is entered nothing changes, so a typo or a stranger's address can never be saved.
+ */
+function ContactForm({
+  kind,
+  current,
+  verified,
+  start,
+  confirm,
+}: ContactProps & {
+  kind: "phone" | "email";
+  start: (state: AccountState, formData: FormData) => Promise<AccountState>;
+  confirm: (state: AccountState, formData: FormData) => Promise<AccountState>;
+}) {
+  const isPhone = kind === "phone";
+  const [startState, startAction, starting] = React.useActionState<AccountState, FormData>(start, {});
+  const [confirmState, confirmAction, confirming] = React.useActionState<AccountState, FormData>(confirm, {});
+  const { bind } = useFields({ value: "", currentPassword: "" });
+  const [dismissed, setDismissed] = React.useState<string | null>(null);
+
+  const done = confirmState.ok;
+  const challengeId = startState.challengeId;
+  const sentTo = startState.sentTo;
+  const waitingForCode = !!challengeId && challengeId !== dismissed && !done;
+  // An old failed attempt must not show its error on a freshly sent code.
+  const codeState = confirmState.challengeId === challengeId ? confirmState : {};
+
+  if (done) return <p role="status" className="text-sm font-medium text-sage-700">{done}</p>;
+
   return (
-    <form action={action} className="space-y-5">
+    <div className="space-y-5">
       <p className="text-amber-900">
-        Hozirgi email: <span className="font-semibold text-amber-950">{email}</span>
+        {isPhone ? "Hozirgi raqam: " : "Hozirgi email: "}
+        <span className="font-semibold text-amber-950">{current ?? "kiritilmagan"}</span>
+        {current && !verified && <span className="ml-2 text-sm text-red-700">tasdiqlanmagan</span>}
       </p>
-      <div>
-        <label htmlFor="email" className={label}>Yangi email</label>
-        <input id="email" {...bind("email")} type="email" required maxLength={254} autoComplete="email" className={field} />
-      </div>
-      <div>
-        <label htmlFor="email-password" className={label}>Joriy parol</label>
-        <input id="email-password" {...bind("currentPassword")} type="password" required maxLength={72} autoComplete="current-password" className={field} />
-        <p className={hint}>Emailni faqat siz o‘zgartira olishingiz uchun parol so‘raladi.</p>
-      </div>
-      <Footer state={state} pending={pending}>Emailni yangilash</Footer>
-    </form>
+
+      {waitingForCode ? (
+        <form action={confirmAction} className="space-y-5">
+          <input type="hidden" name="challengeId" value={challengeId} />
+          <input type="hidden" name="sentTo" value={sentTo ?? ""} />
+          <div>
+            <label htmlFor={`${kind}-code`} className={label}>Tasdiqlash kodi</label>
+            <input
+              id={`${kind}-code`}
+              name="code"
+              inputMode="numeric"
+              autoComplete="one-time-code"
+              pattern="\d{6}"
+              maxLength={6}
+              required
+              autoFocus
+              placeholder="••••••"
+              className={`${field} text-center font-mono text-2xl tracking-[0.5em]`}
+            />
+            <p className={hint}>
+              <span className="font-semibold text-amber-950">{sentTo}</span> manziliga yuborilgan 6 xonali kodni kiriting.
+            </p>
+          </div>
+          <Footer state={codeState} pending={confirming}>Tasdiqlash</Footer>
+        </form>
+      ) : (
+        <form action={startAction} className="space-y-5">
+          <div>
+            <label htmlFor={`${kind}-value`} className={label}>{isPhone ? "Yangi telefon raqami" : "Yangi email"}</label>
+            <input
+              id={`${kind}-value`}
+              {...bind("value")}
+              type={isPhone ? "tel" : "email"}
+              inputMode={isPhone ? "tel" : "email"}
+              required
+              maxLength={254}
+              autoComplete={isPhone ? "tel" : "email"}
+              placeholder={isPhone ? "+998 90 123 45 67" : undefined}
+              className={field}
+            />
+          </div>
+          <div>
+            <label htmlFor={`${kind}-password`} className={label}>Joriy parol</label>
+            <input id={`${kind}-password`} {...bind("currentPassword")} type="password" required maxLength={72} autoComplete="current-password" className={field} />
+            <p className={hint}>
+              {isPhone ? "Yangi raqamga SMS orqali kod yuboramiz." : "Yangi emailga kod yuboramiz."} Kod kiritilmaguncha hech narsa o‘zgarmaydi.
+            </p>
+          </div>
+          <Footer state={startState} pending={starting}>Kod yuborish</Footer>
+        </form>
+      )}
+      {waitingForCode && (
+        <button type="button" onClick={() => setDismissed(challengeId ?? null)} className="text-sm font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
+          Boshqa {isPhone ? "raqam" : "email"} kiritish
+        </button>
+      )}
+    </div>
   );
+}
+
+export function PhoneForm(props: ContactProps) {
+  return <ContactForm kind="phone" start={startPhoneChange} confirm={confirmPhoneChange} {...props} />;
+}
+
+export function EmailForm(props: ContactProps) {
+  return <ContactForm kind="email" start={startEmailChange} confirm={confirmEmailChange} {...props} />;
 }
 
 export function PasswordForm() {

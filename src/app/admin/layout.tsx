@@ -16,7 +16,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <AdminShell
       userName={user.name}
-      userEmail={user.email}
+      userEmail={user.email ?? user.phone ?? ""}
       logout={
         <form action={logout}>
           <button type="submit" className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-amber-200/80 hover:bg-white/5 hover:text-white">

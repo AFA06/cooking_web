@@ -26,18 +26,65 @@ export const users = pgTable(
   "users",
   {
     id: uuid("id").primaryKey().defaultRandom(),
-    email: text("email").notNull(),
+    /** Optional: people can sign up with a phone number alone. Only a verified email is used for recovery. */
+    email: text("email"),
+    emailVerifiedAt: timestamp("email_verified_at", { withTimezone: true }),
     name: text("name").notNull(),
     /** Optional public handle: lowercase letters, digits and underscores. */
     username: text("username"),
-    /** Optional, stored in international form (+998…). */
+    /** Stored in international form (+998…). Required for new accounts, verified by SMS code. */
     phone: text("phone"),
+    phoneVerifiedAt: timestamp("phone_verified_at", { withTimezone: true }),
     passwordHash: text("password_hash").notNull(),
     role: roleEnum("role").notNull().default("user"),
     locale: text("locale").notNull().default("uz"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [uniqueIndex("users_email_idx").on(t.email), uniqueIndex("users_username_idx").on(t.username)],
+  (t) => [
+    uniqueIndex("users_email_idx").on(t.email),
+    uniqueIndex("users_username_idx").on(t.username),
+    uniqueIndex("users_phone_idx").on(t.phone),
+  ],
+);
+
+export const challengePurposeEnum = pgEnum("challenge_purpose", ["signup", "password_reset", "email_change", "phone_change"]);
+export const challengeChannelEnum = pgEnum("challenge_channel", ["sms", "email"]);
+
+/**
+ * One-time codes sent to a phone or an email. The code itself is never stored, only a keyed hash.
+ * A signup challenge also carries the pending account (name and password hash) until the code is entered.
+ */
+export const authChallenges = pgTable(
+  "auth_challenges",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    purpose: challengePurposeEnum("purpose").notNull(),
+    channel: challengeChannelEnum("channel").notNull(),
+    /** Phone (+998…) or email the code goes to. Empty for password resets, where the account decides. */
+    destination: text("destination"),
+    userId: uuid("user_id").references(() => users.id, { onDelete: "cascade" }),
+    payload: jsonb("payload").$type<Record<string, string>>(),
+    codeHash: text("code_hash").notNull(),
+    attempts: integer("attempts").notNull().default(0),
+    sendCount: integer("send_count").notNull().default(1),
+    lastSentAt: timestamp("last_sent_at", { withTimezone: true }).notNull().defaultNow(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    consumedAt: timestamp("consumed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("auth_challenges_user_idx").on(t.userId), index("auth_challenges_expires_idx").on(t.expiresAt)],
+);
+
+/** Sliding-window counters for throttling: failed logins, code requests, SMS sends. Keys are hashed. */
+export const authEvents = pgTable(
+  "auth_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kind: text("kind").notNull(),
+    keyHash: text("key_hash").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("auth_events_lookup_idx").on(t.kind, t.keyHash, t.createdAt)],
 );
 
 export const sessions = pgTable(

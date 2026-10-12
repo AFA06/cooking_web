@@ -33,7 +33,8 @@ function refreshPublic() {
 
 const userSchema = z.object({
   name: z.string().trim().min(2, "Ism juda qisqa").max(80),
-  email: z.string().trim().toLowerCase().email("To‘g‘ri email kiriting").max(254),
+  /** Optional: phone-only accounts have none. */
+  email: z.string().trim().toLowerCase().max(254).refine((v) => v === "" || z.string().email().safeParse(v).success, "To‘g‘ri email kiriting"),
   role: z.enum(["user", "creator", "admin"]),
 });
 
@@ -44,14 +45,23 @@ export async function updateUser(userId: string, _: FormState, formData: FormDat
   if (!parsed.success) return { error: parsed.error.issues[0].message };
   if (userId === admin.id && parsed.data.role !== "admin") return { error: "O‘zingizning admin huquqingizni olib tashlay olmaysiz." };
 
-  const [taken] = await db
-    .select({ id: schema.users.id })
-    .from(schema.users)
-    .where(and(eq(schema.users.email, parsed.data.email), ne(schema.users.id, userId)))
-    .limit(1);
-  if (taken) return { error: "Bu email boshqa hisobga tegishli." };
+  const email = parsed.data.email || null;
+  if (email) {
+    const [taken] = await db
+      .select({ id: schema.users.id })
+      .from(schema.users)
+      .where(and(eq(schema.users.email, email), ne(schema.users.id, userId)))
+      .limit(1);
+    if (taken) return { error: "Bu email boshqa hisobga tegishli." };
+  }
 
-  await db.update(schema.users).set(parsed.data).where(eq(schema.users.id, userId));
+  const [current] = await db.select({ email: schema.users.email }).from(schema.users).where(eq(schema.users.id, userId)).limit(1);
+  // An email typed by an admin has not been proven by its owner, so it cannot receive recovery codes.
+  const emailChanged = (current?.email ?? null) !== email;
+  await db
+    .update(schema.users)
+    .set({ name: parsed.data.name, role: parsed.data.role, email, ...(emailChanged ? { emailVerifiedAt: null } : {}) })
+    .where(eq(schema.users.id, userId));
   revalidatePath("/admin", "layout");
   return { ok: "Saqlandi." };
 }

@@ -34,7 +34,7 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
         title={user.name}
         description={
           <span className="flex flex-wrap gap-x-3 gap-y-1">
-            <span>{user.email}</span>
+            <span>{user.email ?? "email yo‘q"}</span>
             <span>Ro‘yxatdan o‘tgan: {formatShortDate(user.createdAt)}</span>
             {user.creatorId && (
               <Link href={`/admin/creators/${user.creatorId}`} className="text-amber-700 hover:underline">Ijodkor profili: {user.creatorName}</Link>
@@ -82,7 +82,7 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                 <TextInput id="name" name="name" required maxLength={80} defaultValue={user.name} />
               </Field>
               <Field label="Email" htmlFor="email">
-                <TextInput id="email" name="email" type="email" required maxLength={254} defaultValue={user.email} />
+                <TextInput id="email" name="email" type="email" maxLength={254} defaultValue={user.email ?? ""} />
               </Field>
               <Field label="Rol" htmlFor="role" hint={isSelf ? "O‘zingizning admin huquqingizni olib tashlay olmaysiz." : "Admin barcha ma’lumotlarni boshqara oladi."}>
                 <SelectInput id="role" name="role" defaultValue={user.role}>
