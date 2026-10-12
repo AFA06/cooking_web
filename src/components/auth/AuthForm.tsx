@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
+import { LegalConsent } from "@/components/legal/LegalConsent";
 import { PasswordField, authInputClass } from "@/components/auth/PasswordField";
 import type { AuthState } from "@/app/auth/actions";
 
@@ -60,6 +61,7 @@ export function AuthForm({ mode, action, next, notice }: Props) {
           {state.error}
         </p>
       )}
+      {isSignup && <LegalConsent />}
       <Button type="submit" size="xl" className="w-full rounded-full" loading={pending}>
         {isSignup ? "Kod yuborish" : "Kirish"}
       </Button>
