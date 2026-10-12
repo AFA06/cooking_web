@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
+import { getT } from "@/i18n/server";
 import { getFeaturedRecipes, listPublishedRecipes } from "@/server/recipes";
 
 interface Props {
@@ -12,6 +13,7 @@ interface Props {
 
 /** Sign-in and sign-up share one screen: the form on the left, a real dish turning on the right. */
 export async function AuthScreen({ eyebrow, title, note, children }: Props) {
+  const t = await getT();
   const [featured] = await getFeaturedRecipes(1);
   const dish = featured ?? (await listPublishedRecipes())[0];
 
@@ -37,7 +39,7 @@ export async function AuthScreen({ eyebrow, title, note, children }: Props) {
               href={`/recipes/${dish.slug}`}
               className="theme-light absolute bottom-0 left-0 max-w-[18rem] rounded-2xl bg-amber-50 px-5 py-4 shadow-[0_20px_40px_-18px_rgba(0,0,0,0.7)] transition-transform duration-300 hover:-translate-y-1"
             >
-              <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">Bugungi tavsiya</span>
+              <span className="block text-xs font-semibold uppercase tracking-[0.16em] text-amber-700">{t("home.pick")}</span>
               <span className="mt-1.5 block font-serif text-xl font-medium leading-tight text-amber-950">{dish.title}</span>
               <span className="mt-1 block text-sm text-amber-600">{dish.creator.name}</span>
             </Link>

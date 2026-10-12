@@ -7,6 +7,7 @@ import { SocialLinks } from "@/components/creator/SocialLinks";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { RatingStars, formatRating } from "@/components/reviews/RatingStars";
 import { ReviewList } from "@/components/reviews/ReviewList";
+import { getT } from "@/i18n/server";
 import { formatNumber } from "@/lib/format";
 import { getCurrentUser } from "@/server/auth";
 import { getCreatorForUser } from "@/server/creator";
@@ -23,7 +24,7 @@ export const dynamic = "force-dynamic";
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const creator = await getCreatorBySlug(slug);
-  if (!creator) return { title: "Ijodkor topilmadi" };
+  if (!creator) return { title: (await getT())("creator.notFound") };
   return { title: creator.name, description: creator.bio, alternates: { canonical: `/creators/${creator.slug}` } };
 }
 
@@ -32,7 +33,7 @@ export default async function CreatorPage({ params }: Props) {
   const creator = await getCreatorBySlug(slug);
   if (!creator) notFound();
 
-  const user = await getCurrentUser();
+  const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   const [recipes, summary, reviews, savedList, ownCreator] = await Promise.all([
     getRecipesByCreator(creator.slug),
     getCreatorSummary(creator.id),
@@ -45,14 +46,14 @@ export default async function CreatorPage({ params }: Props) {
 
   const stats = [
     {
-      label: "O‘rtacha baho",
+      label: t("creator.avgRating"),
       icon: Star,
       value: rating.count > 0 ? formatRating(rating.average) : "—",
-      note: rating.count > 0 ? `${formatNumber(rating.count)} ta baho asosida` : "Hali baholanmagan",
+      note: rating.count > 0 ? t("creator.basedOn", { count: rating.count }) : t("creator.unrated"),
       stars: rating.count > 0 ? rating.average : null,
     },
-    { label: "Pishirilgan", icon: Flame, value: formatNumber(summary.cooked), note: "marta oxirigacha pishirilgan", stars: null },
-    { label: "Retseptlar", icon: BookOpen, value: formatNumber(summary.publishedRecipes), note: "nashr etilgan", stars: null },
+    { label: t("creator.cooked"), icon: Flame, value: formatNumber(summary.cooked), note: t("creator.cookedNote"), stars: null },
+    { label: t("nav.recipes"), icon: BookOpen, value: formatNumber(summary.publishedRecipes), note: t("creator.published"), stars: null },
   ];
 
   return (
@@ -68,7 +69,7 @@ export default async function CreatorPage({ params }: Props) {
               </span>
             )}
             <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">{creator.isFoundingCreator ? "Asoschi ijodkor" : "Ijodkor"}</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">{creator.isFoundingCreator ? t("creator.foundingCreator") : t("creator.creator")}</p>
               <h1 className="mt-3 text-[2.6rem] font-medium leading-[1.04] text-amber-950 break-words sm:text-6xl">{creator.name}</h1>
               {creator.bio && <p className="mt-4 max-w-xl text-lg leading-relaxed text-amber-900">{creator.bio}</p>}
               <div className="mt-6">
@@ -97,11 +98,11 @@ export default async function CreatorPage({ params }: Props) {
 
       <Container size="xl" className="mt-16 lg:mt-24">
         <div className="mb-8 flex items-baseline justify-between gap-4 border-b border-amber-950 pb-4">
-          <h2 className="text-3xl font-medium text-amber-950 sm:text-4xl">Retseptlar</h2>
-          <p className="text-sm text-amber-600">{recipes.length} ta</p>
+          <h2 className="text-3xl font-medium text-amber-950 sm:text-4xl">{t("nav.recipes")}</h2>
+          <p className="text-sm text-amber-600">{t("common.count", { count: recipes.length })}</p>
         </div>
         {recipes.length === 0 ? (
-          <p className="py-10 text-amber-900">Hali retseptlar nashr etilmagan.</p>
+          <p className="py-10 text-amber-900">{t("creator.noRecipes")}</p>
         ) : (
           <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
             {recipes.map((r, i) => (
@@ -113,12 +114,12 @@ export default async function CreatorPage({ params }: Props) {
 
       <Container size="xl" className="mt-20 lg:mt-28">
         <div className="mb-2 flex items-baseline justify-between gap-4">
-          <h2 className="text-3xl font-medium text-amber-950 sm:text-4xl">Pishirganlar fikri</h2>
-          {rating.count > 0 && <p className="text-sm text-amber-600">{formatNumber(rating.count)} ta baho</p>}
+          <h2 className="text-3xl font-medium text-amber-950 sm:text-4xl">{t("detail.reviews")}</h2>
+          {rating.count > 0 && <p className="text-sm text-amber-600">{t("review.count", { count: rating.count })}</p>}
         </div>
-        <p className="mb-8 max-w-2xl text-amber-900">Faqat shu ijodkorning retseptini oxirigacha pishirgan odamlar baho va rasm qoldira oladi.</p>
+        <p className="mb-8 max-w-2xl text-amber-900">{t("creator.reviewsNote")}</p>
         {reviews.length === 0 ? (
-          <p className="border-y border-amber-200 py-10 text-amber-600">Hali baholar yo‘q. Retseptlardan birini pishirib, birinchi bo‘lib baho qoldiring.</p>
+          <p className="border-y border-amber-200 py-10 text-amber-600">{t("creator.noReviews")}</p>
         ) : (
           <ReviewList reviews={reviews} showRecipe />
         )}

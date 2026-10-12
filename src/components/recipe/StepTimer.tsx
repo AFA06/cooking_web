@@ -2,9 +2,11 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/i18n/client";
 import { formatClock } from "@/lib/format";
 
 export function StepTimer({ seconds, dark = false }: { seconds: number; dark?: boolean }) {
+  const t = useT();
   const [remaining, setRemaining] = React.useState(seconds);
   const [running, setRunning] = React.useState(false);
 
@@ -28,20 +30,20 @@ export function StepTimer({ seconds, dark = false }: { seconds: number; dark?: b
 
   return (
     <div className={`flex flex-wrap items-center gap-x-5 gap-y-3 border-y py-4 ${dark ? "border-white/20" : "border-amber-200"}`}>
-      <span className="font-mono text-4xl sm:text-5xl tabular-nums" role="timer" aria-label={`Taymer ${formatClock(remaining)}`}>
+      <span className="font-mono text-4xl sm:text-5xl tabular-nums" role="timer" aria-label={t("timer.label", { time: formatClock(remaining) })}>
         {formatClock(remaining)}
       </span>
       <div className="flex gap-2">
         <Button size="md" variant={running ? "outline" : "primary"} onClick={() => setRunning((r) => !r)} disabled={done}
           className={dark && running ? "border-white/50 text-white hover:bg-white/10" : ""}>
-          {done ? "Vaqt tugadi" : running ? "To‘xtatish" : untouched ? "Taymerni boshlash" : "Davom etish"}
+          {done ? t("timer.done") : running ? t("timer.stop") : untouched ? t("timer.start") : t("timer.resume")}
         </Button>
         <Button size="md" variant="ghost" className={dark ? "text-white hover:bg-white/10" : ""}
           onClick={() => { setRunning(false); setRemaining(seconds); }}>
-          Qayta
+          {t("timer.reset")}
         </Button>
       </div>
-      {done && <span role="status" className="font-medium">Taymer tugadi</span>}
+      {done && <span role="status" className="font-medium">{t("timer.finished")}</span>}
     </div>
   );
 }

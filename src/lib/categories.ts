@@ -1,11 +1,11 @@
-/** Dish categories a recipe belongs to, in the order they are listed everywhere. Keys match the `recipe_category` DB enum. */
+/** Dish categories a recipe belongs to, in the order they are listed everywhere. Keys match the `recipe_category` DB enum; labels are message keys. */
 export const RECIPE_CATEGORIES = [
-  { key: "soup", label: "Suyuq ovqatlar" },
-  { key: "main", label: "Quyuq ovqatlar" },
-  { key: "salad", label: "Salatlar" },
-  { key: "bakery", label: "Pishiriqlar" },
-  { key: "dessert", label: "Shirinliklar" },
-  { key: "drink", label: "Ichimliklar" },
+  { key: "soup", label: "cat.soup" },
+  { key: "main", label: "cat.main" },
+  { key: "salad", label: "cat.salad" },
+  { key: "bakery", label: "cat.bakery" },
+  { key: "dessert", label: "cat.dessert" },
+  { key: "drink", label: "cat.drink" },
 ] as const;
 
 export type RecipeCategory = (typeof RECIPE_CATEGORIES)[number]["key"];

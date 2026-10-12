@@ -6,6 +6,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { SocialIcon } from "@/components/creator/SocialLinks";
 import { updateCreatorProfile } from "@/app/dashboard/actions";
+import { useT } from "@/i18n/client";
 import { SOCIAL_PLATFORMS, normalizeSocialUrl, type SocialLinks, type SocialPlatform } from "@/lib/social";
 
 const field = "mt-1.5 w-full min-h-12 rounded-xl border border-amber-300 bg-amber-100 px-4 py-2.5 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
@@ -17,6 +18,7 @@ interface Props {
 
 export function CreatorProfileEditor({ initial }: Props) {
   const router = useRouter();
+  const t = useT();
   const [name, setName] = React.useState(initial.name);
   const [bio, setBio] = React.useState(initial.bio);
   const [avatarUrl, setAvatarUrl] = React.useState(initial.avatarUrl);
@@ -33,7 +35,7 @@ export function CreatorProfileEditor({ initial }: Props) {
   const addLink = () => {
     if (!adding) return;
     const url = normalizeSocialUrl(adding, draft);
-    if (!url) return setLinkError(`Bu ${addingConfig?.label} profili havolasiga o‘xshamaydi. Havolani yoki foydalanuvchi nomini kiriting.`);
+    if (!url) return setLinkError(t("profile.badLink", { label: addingConfig?.label ?? "" }));
     setLinks((current) => ({ ...current, [adding]: url }));
     setAdding("");
     setDraft("");
@@ -46,7 +48,7 @@ export function CreatorProfileEditor({ initial }: Props) {
     startTransition(async () => {
       const result = await updateCreatorProfile({ name, bio, avatarUrl, socialLinks: links as Record<string, string> });
       if (result.error) return setMessage({ kind: "error", text: result.error });
-      setMessage({ kind: "ok", text: "Profil saqlandi." });
+      setMessage({ kind: "ok", text: t("profile.saved") });
       router.refresh();
     });
   };
@@ -54,26 +56,26 @@ export function CreatorProfileEditor({ initial }: Props) {
   return (
     <form onSubmit={save} className="space-y-10">
       <section className="space-y-5">
-        <h2 className="text-2xl font-medium text-amber-950">Asosiy ma’lumotlar</h2>
+        <h2 className="text-2xl font-medium text-amber-950">{t("profile.basics")}</h2>
         <div>
-          <label htmlFor="name" className={label}>Ko‘rinadigan ism</label>
+          <label htmlFor="name" className={label}>{t("profile.displayName")}</label>
           <input id="name" required maxLength={80} value={name} onChange={(e) => setName(e.target.value)} className={field} />
         </div>
         <div>
-          <label htmlFor="bio" className={label}>Tanishtiruv</label>
-          <textarea id="bio" rows={4} maxLength={500} value={bio} onChange={(e) => setBio(e.target.value)} placeholder="Qanday taomlar pishirasiz? Tajribangiz haqida qisqacha." className={field} />
+          <label htmlFor="bio" className={label}>{t("profile.intro")}</label>
+          <textarea id="bio" rows={4} maxLength={500} value={bio} onChange={(e) => setBio(e.target.value)} placeholder={t("profile.introPlaceholder")} className={field} />
           <p className="mt-1 text-xs text-amber-600">{bio.length} / 500</p>
         </div>
         <div>
-          <label htmlFor="avatar" className={label}>Profil rasmi havolasi</label>
+          <label htmlFor="avatar" className={label}>{t("profile.avatarUrl")}</label>
           <input id="avatar" type="url" maxLength={1000} value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://…" className={field} />
-          <p className="mt-1 text-xs text-amber-600">Rasm yuklash hozircha mavjud emas — rasm havolasini kiriting.</p>
+          <p className="mt-1 text-xs text-amber-600">{t("profile.noUpload")}</p>
         </div>
       </section>
 
       <section>
-        <h2 className="text-2xl font-medium text-amber-950">Ijtimoiy tarmoqlar</h2>
-        <p className="mt-1 text-amber-900">Qo‘shilgan hisoblar ommaviy profilingizda, tanishtiruv ostida ko‘rinadi.</p>
+        <h2 className="text-2xl font-medium text-amber-950">{t("profile.socials")}</h2>
+        <p className="mt-1 text-amber-900">{t("profile.socialsNote")}</p>
 
         {Object.keys(links).length > 0 && (
           <ul className="mt-5 divide-y divide-amber-200 border-y border-amber-200">
@@ -90,7 +92,7 @@ export function CreatorProfileEditor({ initial }: Props) {
                   type="button"
                   onClick={() => setLinks((current) => Object.fromEntries(Object.entries(current).filter(([key]) => key !== p.key)) as SocialLinks)}
                   className="flex h-11 w-11 items-center justify-center rounded-full text-amber-600 hover:bg-amber-100 hover:text-red-700"
-                  aria-label={`${p.label} hisobini olib tashlash`}
+                  aria-label={t("profile.removeAccount", { label: p.label })}
                 >
                   <Trash2 className="h-4 w-4" aria-hidden="true" />
                 </button>
@@ -101,7 +103,7 @@ export function CreatorProfileEditor({ initial }: Props) {
 
         {available.length > 0 && (
           <div className="mt-5 rounded-2xl bg-amber-100 p-5">
-            <p className={label}>Ijtimoiy tarmoq qo‘shish</p>
+            <p className={label}>{t("social.add")}</p>
             <div className="mt-3 flex flex-wrap gap-2">
               {available.map((p) => (
                 <button
@@ -122,7 +124,7 @@ export function CreatorProfileEditor({ initial }: Props) {
             </div>
             {addingConfig && (
               <div className="mt-4">
-                <label htmlFor="social-link" className={label}>{addingConfig.label} profilingiz havolasi</label>
+                <label htmlFor="social-link" className={label}>{t("profile.linkLabel", { label: addingConfig.label })}</label>
                 <div className="mt-1.5 flex flex-col gap-2 sm:flex-row">
                   <input
                     id="social-link"
@@ -140,7 +142,7 @@ export function CreatorProfileEditor({ initial }: Props) {
                   />
                   <Button type="button" onClick={addLink}>
                     <Plus className="h-4 w-4" aria-hidden="true" />
-                    Qo‘shish
+                    {t("profile.add")}
                   </Button>
                 </div>
                 {linkError && <p role="alert" className="mt-2 text-sm font-medium text-red-700">{linkError}</p>}
@@ -151,7 +153,7 @@ export function CreatorProfileEditor({ initial }: Props) {
       </section>
 
       <div className="flex flex-wrap items-center gap-4 border-t border-amber-200 pt-6">
-        <Button type="submit" size="lg" loading={pending}>Profilni saqlash</Button>
+        <Button type="submit" size="lg" loading={pending}>{t("profile.saveProfile")}</Button>
         {message && (
           <p role={message.kind === "error" ? "alert" : "status"} className={`text-sm font-medium ${message.kind === "error" ? "text-red-700" : "text-sage-700"}`}>
             {message.text}

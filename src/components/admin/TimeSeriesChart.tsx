@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { useLocale, useT } from "@/i18n/client";
 import { formatDayKey, formatNumber } from "@/lib/format";
 
 interface Point {
@@ -19,6 +20,8 @@ function niceMax(max: number): number {
 }
 
 export function TimeSeriesChart({ data, label, height = 280 }: { data: Point[]; label: string; height?: number }) {
+  const t = useT();
+  const locale = useLocale();
   const wrapRef = React.useRef<HTMLDivElement>(null);
   const [width, setWidth] = React.useState(0);
   const [hover, setHover] = React.useState<number | null>(null);
@@ -59,7 +62,7 @@ export function TimeSeriesChart({ data, label, height = 280 }: { data: Point[]; 
           width={width}
           height={height}
           role="img"
-          aria-label={`${label}: ${data.length} kun ichida jami ${formatNumber(total)}`}
+          aria-label={t("adm.chartAria", { label, days: data.length, total: formatNumber(total) })}
           onPointerMove={onMove}
           onPointerLeave={() => setHover(null)}
           className="touch-none select-none"
@@ -81,7 +84,7 @@ export function TimeSeriesChart({ data, label, height = 280 }: { data: Point[]; 
                 textAnchor={i === 0 ? "start" : i === data.length - 1 ? "end" : "middle"}
                 className="fill-amber-600 text-[11px]"
               >
-                {formatDayKey(d.day)}
+                {formatDayKey(d.day, locale)}
               </text>
             ) : null,
           )}
@@ -101,7 +104,7 @@ export function TimeSeriesChart({ data, label, height = 280 }: { data: Point[]; 
           className="pointer-events-none absolute top-0 -translate-x-1/2 whitespace-nowrap rounded-md bg-amber-950 px-3 py-2 text-xs text-amber-50 shadow-lg"
           style={{ left: tooltipLeft }}
         >
-          <span className="block text-amber-300">{formatDayKey(active.day)}</span>
+          <span className="block text-amber-300">{formatDayKey(active.day, locale)}</span>
           <span className="block text-sm font-semibold tabular-nums">
             {formatNumber(active.value)} <span className="font-normal text-amber-200">{label.toLowerCase()}</span>
           </span>

@@ -3,9 +3,11 @@
 import * as React from "react";
 import { Check, Share2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/i18n/client";
 
 /** Uses the device share sheet where there is one, otherwise copies the link. */
 export function ShareButton({ title, path }: { title: string; path: string }) {
+  const t = useT();
   const [copied, setCopied] = React.useState(false);
 
   const share = async () => {
@@ -26,7 +28,7 @@ export function ShareButton({ title, path }: { title: string; path: string }) {
   return (
     <Button type="button" size="lg" variant="outline" onClick={share}>
       {copied ? <Check className="h-4 w-4" aria-hidden="true" /> : <Share2 className="h-4 w-4" aria-hidden="true" />}
-      <span aria-live="polite">{copied ? "Havola nusxalandi" : "Ulashish"}</span>
+      <span aria-live="polite">{copied ? t("share.copied") : t("share.share")}</span>
     </Button>
   );
 }

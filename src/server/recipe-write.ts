@@ -61,14 +61,14 @@ export async function persistRecipe(o: PersistOptions): Promise<{ error: string 
           : eq(schema.recipes.id, o.recipeId),
       )
       .limit(1);
-    if (!existing) return { error: "Retsept topilmadi." };
+    if (!existing) return { error: "err.recipeNotFound" };
     await db
       .update(schema.recipes)
       .set({ ...fields, publishedAt: o.publish ? (existing.publishedAt ?? new Date()) : existing.publishedAt })
       .where(eq(schema.recipes.id, existing.id));
     ({ id, slug } = existing);
   } else {
-    if (!o.creatorId) return { error: "Ijodkor tanlanmagan." };
+    if (!o.creatorId) return { error: "err.noCreator" };
     slug = await uniqueSlug(d.title);
     const [row] = await db
       .insert(schema.recipes)

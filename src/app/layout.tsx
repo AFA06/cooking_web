@@ -1,5 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Literata, Onest } from "next/font/google";
+import { LOCALE_INFO } from "@/i18n/core";
+import { I18nProvider } from "@/i18n/client";
+import { getLocale, getMessages, getT } from "@/i18n/server";
 import { SITE_URL } from "@/lib/site-url";
 import "./globals.css";
 
@@ -15,50 +18,27 @@ const literata = Literata({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Damda — sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
-    template: "%s | Damda",
-  },
-  description:
-    "Pishirayotganda YouTube’ga qaytmang. Haqiqiy oshpaz va ijodkorlarning retseptlari — masalliq, miqdor, taymer va keyingi qadam bilan. Bepul va premium retseptlar.",
-  keywords: ["retseptlar", "o‘zbek taomlari", "qadam-baqadam retsept", "osh", "lag‘mon", "pazandalik"],
-  authors: [{ name: "Damda" }],
-  creator: "Damda",
-  publisher: "Damda",
-  formatDetection: {
-    email: false,
-    address: false,
-    telephone: false,
-  },
-  metadataBase: new URL(SITE_URL),
-  openGraph: {
-    type: "website",
-    locale: "uz_UZ",
-    url: SITE_URL,
-    siteName: "Damda",
-    title: "Damda — sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
-    description:
-      "Pishirayotganda YouTube’ga qaytmang. Haqiqiy ijodkorlarning retseptlari qadam-baqadam yo‘l-yo‘riq bilan.",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Damda — sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
-    description:
-      "Pishirayotganda YouTube’ga qaytmang. Haqiqiy ijodkorlarning retseptlari qadam-baqadam yo‘l-yo‘riq bilan.",
-  },
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
+export async function generateMetadata(): Promise<Metadata> {
+  const [t, locale] = await Promise.all([getT(), getLocale()]);
+  const title = t("meta.title");
+  return {
+    title: { default: title, template: "%s | Damda" },
+    description: t("meta.description"),
+    keywords: t("meta.keywords").split(", "),
+    authors: [{ name: "Damda" }],
+    creator: "Damda",
+    publisher: "Damda",
+    formatDetection: { email: false, address: false, telephone: false },
+    metadataBase: new URL(SITE_URL),
+    openGraph: { type: "website", locale: LOCALE_INFO[locale].og, url: SITE_URL, siteName: "Damda", title, description: t("meta.shortDescription") },
+    twitter: { card: "summary_large_image", title, description: t("meta.shortDescription") },
+    robots: {
       index: true,
       follow: true,
-      "max-video-preview": -1,
-      "max-image-preview": "large",
-      "max-snippet": -1,
+      googleBot: { index: true, follow: true, "max-video-preview": -1, "max-image-preview": "large", "max-snippet": -1 },
     },
-  },
-};
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -68,14 +48,15 @@ export const viewport: Viewport = {
   initialScale: 1,
   };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const [locale, t] = await Promise.all([getLocale(), getT()]);
   return (
     <html
-      lang="uz"
+      lang={LOCALE_INFO[locale].html}
       className={`${onest.variable} ${literata.variable} h-full antialiased`}
     >
       <head>
@@ -86,9 +67,11 @@ export default function RootLayout({
           href="#main-content"
           className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:bg-amber-100 focus:px-4 focus:py-2"
         >
-          Asosiy tarkibga o‘tish
+          {t("nav.skip")}
         </a>
-        {children}
+        <I18nProvider locale={locale} messages={getMessages(locale)}>
+          {children}
+        </I18nProvider>
       </body>
     </html>
   );

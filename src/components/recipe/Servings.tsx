@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Check, Minus, Plus } from "lucide-react";
 import { Button, type ButtonProps } from "@/components/ui/Button";
+import { useT } from "@/i18n/client";
 import { formatMinutes } from "@/lib/format";
 import { MAX_SERVINGS, MIN_SERVINGS, clampServings, scaleQuantity, scaleTimes } from "@/lib/scaling";
 import { cn } from "@/lib/utils";
@@ -44,26 +45,27 @@ export function ServingsProvider({ base, initial, children }: { base: number; in
 }
 
 export function ServingsStepper() {
+  const t = useT();
   const { base, servings, step, reset } = useServings();
   const round = "flex h-11 w-11 items-center justify-center rounded-full border border-sage-500/40 bg-amber-100 text-amber-950 transition-colors hover:border-amber-950 disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
     <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
-      <div className="flex items-center gap-3" role="group" aria-label="Porsiyalar soni">
-        <button type="button" className={round} onClick={() => step(-1)} disabled={servings <= MIN_SERVINGS} aria-label="Porsiyani kamaytirish">
+      <div className="flex items-center gap-3" role="group" aria-label={t("servings.group")}>
+        <button type="button" className={round} onClick={() => step(-1)} disabled={servings <= MIN_SERVINGS} aria-label={t("servings.dec")}>
           <Minus className="h-4 w-4" aria-hidden="true" />
         </button>
         <p className="min-w-[6.5rem] text-center" aria-live="polite">
           <span className="font-serif text-2xl font-semibold text-amber-950 tabular-nums">{servings}</span>
-          <span className="ml-1.5 text-amber-900">kishilik</span>
+          <span className="ml-1.5 text-amber-900">{t("servings.unit")}</span>
         </p>
-        <button type="button" className={round} onClick={() => step(1)} disabled={servings >= MAX_SERVINGS} aria-label="Porsiyani ko‘paytirish">
+        <button type="button" className={round} onClick={() => step(1)} disabled={servings >= MAX_SERVINGS} aria-label={t("servings.inc")}>
           <Plus className="h-4 w-4" aria-hidden="true" />
         </button>
       </div>
       {servings !== base && (
         <button type="button" onClick={reset} className="text-sm font-medium text-amber-700 underline underline-offset-4 hover:text-amber-800">
-          Asl retsept: {base} kishilik
+          {t("servings.original", { count: base })}
         </button>
       )}
     </div>
@@ -113,10 +115,11 @@ export function ScaledIngredients({ ingredients }: { ingredients: RecipeIngredie
 
 /** Compact scaled amounts for the ingredients one step uses. */
 export function StepIngredients({ ingredients }: { ingredients: RecipeIngredient[] }) {
+  const t = useT();
   const { factor } = useServings();
   if (ingredients.length === 0) return null;
   return (
-    <ul className="flex flex-wrap gap-2" aria-label="Shu qadam uchun masalliqlar">
+    <ul className="flex flex-wrap gap-2" aria-label={t("servings.stepIngredients")}>
       {ingredients.map((i) => (
         <li key={i.id} className="rounded-full bg-sage-50 px-3 py-1.5 text-sm text-sage-900">
           <span className="font-semibold tabular-nums">
@@ -133,12 +136,13 @@ type TimePart = "total" | "prep" | "cook";
 
 /** A time that follows the chosen servings; marked as an estimate once it differs from the recipe. */
 export function ScaledTime({ prepMinutes, cookMinutes, part }: { prepMinutes: number; cookMinutes: number; part: TimePart }) {
+  const t = useT();
   const { factor } = useServings();
   const minutes = scaleTimes(prepMinutes, cookMinutes, factor)[part];
   return (
     <>
-      {factor !== 1 && minutes > 0 && <span title="Porsiya o‘zgargani uchun taxminiy vaqt">≈ </span>}
-      {formatMinutes(minutes)}
+      {factor !== 1 && minutes > 0 && <span title={t("servings.estimate")}>≈ </span>}
+      {formatMinutes(minutes, t)}
     </>
   );
 }

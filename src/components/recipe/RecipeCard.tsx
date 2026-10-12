@@ -1,9 +1,12 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { ChefHat, Clock, Star, Users } from "lucide-react";
 import { CaloriesBadge } from "@/components/recipe/NutritionFacts";
 import { BookmarkButton } from "@/components/recipe/BookmarkButton";
-import { DIFFICULTY_LABEL, formatMinutes, formatNumber, formatPrice } from "@/lib/format";
+import { useT } from "@/i18n/client";
+import { DIFFICULTY_KEY, formatMinutes, formatNumber, formatPrice } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import type { Recipe } from "@/types/recipe";
@@ -19,13 +22,14 @@ interface Props {
 }
 
 export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = "portrait", sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw", priority }: Props) {
+  const t = useT();
   const total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
-  const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency) : null;
+  const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency, t) : null;
   const { creator } = recipe;
   const facts = [
-    { label: "Vaqt", value: formatMinutes(total), icon: Clock },
-    { label: "Porsiya", value: `${recipe.servings} kishilik`, icon: Users },
-    { label: "Qiyinligi", value: DIFFICULTY_LABEL[recipe.difficulty], icon: ChefHat },
+    { label: t("card.facts.time"), value: formatMinutes(total, t), icon: Clock },
+    { label: t("card.facts.servings"), value: t("card.servingsValue", { count: recipe.servings }), icon: Users },
+    { label: t("recipes.filterDifficulty"), value: t(DIFFICULTY_KEY[recipe.difficulty]), icon: ChefHat },
   ];
 
   return (
@@ -45,7 +49,7 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
             recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-amber-50",
           )}
         >
-          {recipe.isPremium ? "Premium" : "Bepul"}
+          {recipe.isPremium ? t("filter.premium") : t("filter.free")}
           {price && (
             <>
               <span className="h-3 w-px bg-amber-50/40" aria-hidden="true" />
@@ -60,7 +64,7 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
               {recipe.rating.count > 0 && (
                 <span className="flex items-center gap-1">
                   <Star className="h-3.5 w-3.5 fill-clay-400 text-clay-400" aria-hidden="true" />
-                  <span className="sr-only">Baho: </span>
+                  <span className="sr-only">{t("card.rating")} </span>
                   {recipe.rating.average.toFixed(1).replace(".", ",")}
                   <span className="font-normal text-amber-600">({formatNumber(recipe.rating.count)})</span>
                 </span>
@@ -68,7 +72,7 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
               {recipe.cookedCount > 0 && (
                 <span className="flex items-center gap-1">
                   <ChefHat className="h-3.5 w-3.5 text-amber-700" strokeWidth={2} aria-hidden="true" />
-                  {formatNumber(recipe.cookedCount)} marta pishirilgan
+                  {t("card.cooked", { count: recipe.cookedCount })}
                 </span>
               )}
             </p>

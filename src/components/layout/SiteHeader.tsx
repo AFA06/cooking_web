@@ -4,39 +4,42 @@ import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { MobileMenu } from "@/components/layout/MobileMenu";
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { logout } from "@/app/auth/actions";
 import { NAVIGATION_LINKS, PLATFORM_CONFIG } from "@/lib/constants";
 
 export async function SiteHeader() {
-  const user = await getCurrentUser();
+  const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   const isCreator = user?.role === "creator" || user?.role === "admin";
   const isAdmin = user?.role === "admin";
 
   const personalItems = [
-    { label: "Mening oshxonam", href: PLATFORM_CONFIG.urls.account },
-    { label: "Xaridlar", href: PLATFORM_CONFIG.urls.shopping },
+    { label: t("nav.myKitchen"), href: PLATFORM_CONFIG.urls.account },
+    { label: t("nav.shopping"), href: PLATFORM_CONFIG.urls.shopping },
   ];
+  const publicItems = NAVIGATION_LINKS.public.map((l) => ({ label: t(l.label), href: l.href }));
   // Signed-in visitors get their own pages right in the bar, after the public links.
-  const barItems = [...NAVIGATION_LINKS.public, ...(user ? personalItems : [])];
+  const barItems = [...publicItems, ...(user ? personalItems : [])];
 
   const mobileItems = [
-    ...NAVIGATION_LINKS.public,
+    ...publicItems,
     ...(user
       ? [
-          ...(isCreator ? [{ label: "Retsept yaratish", href: "/dashboard/recipes/new" }, { label: "Ijodkor paneli", href: "/dashboard" }] : []),
-          ...(isAdmin ? [{ label: "Admin paneli", href: "/admin" }] : []),
+          ...(isCreator ? [{ label: t("nav.createRecipe"), href: "/dashboard/recipes/new" }, { label: t("nav.creatorPanel"), href: "/dashboard" }] : []),
+          ...(isAdmin ? [{ label: t("nav.adminPanel"), href: "/admin" }] : []),
           ...personalItems,
-          { label: "Profil sozlamalari", href: "/account/settings" },
+          { label: t("nav.settings"), href: "/account/settings" },
         ]
-      : [{ label: "Ro‘yxatdan o‘tish", href: PLATFORM_CONFIG.urls.signup }]),
+      : [{ label: t("nav.signup"), href: PLATFORM_CONFIG.urls.signup }]),
   ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-amber-200/70 bg-amber-50/85 backdrop-blur-md">
       <Container size="xl">
-        <nav className="flex h-16 items-center gap-6" aria-label="Asosiy menyu">
-          <Link href="/" className="flex items-center gap-2" aria-label={`${PLATFORM_CONFIG.name} — bosh sahifa`}>
+        <nav className="flex h-16 items-center gap-6" aria-label={t("nav.main")}>
+          <Link href="/" className="flex items-center gap-2" aria-label={t("nav.homeLabel", { name: PLATFORM_CONFIG.name })}>
             <span className="h-2.5 w-2.5 rounded-full bg-clay-400" aria-hidden="true" />
             <span className="font-serif text-[1.6rem] font-semibold leading-none tracking-tight text-amber-950">{PLATFORM_CONFIG.name}</span>
           </Link>
@@ -51,12 +54,13 @@ export async function SiteHeader() {
             ))}
           </ul>
 
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ml-auto flex items-center gap-1 sm:gap-2">
+            <LanguageSwitcher />
             {user ? (
               <>
                 {isCreator && (
                   <Button size="sm" asChild className="hidden sm:inline-flex">
-                    <Link href="/dashboard/recipes/new"><Plus className="h-4 w-4" aria-hidden="true" />Retsept yaratish</Link>
+                    <Link href="/dashboard/recipes/new"><Plus className="h-4 w-4" aria-hidden="true" />{t("nav.createRecipe")}</Link>
                   </Button>
                 )}
                 <UserMenu name={user.name} email={user.email} isCreator={isCreator} isAdmin={isAdmin} />
@@ -64,17 +68,17 @@ export async function SiteHeader() {
             ) : (
               <>
                 <Link href={PLATFORM_CONFIG.urls.login} className="flex h-10 items-center px-3 text-[0.95rem] font-medium text-amber-950 hover:text-amber-700">
-                  Kirish
+                  {t("nav.login")}
                 </Link>
                 <Button size="sm" asChild className="hidden min-[420px]:inline-flex">
-                  <Link href={PLATFORM_CONFIG.urls.signup}>Ro‘yxatdan o‘tish</Link>
+                  <Link href={PLATFORM_CONFIG.urls.signup}>{t("nav.signup")}</Link>
                 </Button>
               </>
             )}
             <MobileMenu items={mobileItems}>
               {user && (
                 <form action={logout} className="border-t border-amber-200 pt-2">
-                  <button type="submit" className="block w-full py-4 text-left text-lg font-medium text-amber-950">Chiqish</button>
+                  <button type="submit" className="block w-full py-4 text-left text-lg font-medium text-amber-950">{t("nav.logout")}</button>
                 </form>
               )}
             </MobileMenu>

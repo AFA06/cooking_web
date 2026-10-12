@@ -2,6 +2,7 @@ import * as React from "react";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight, Search, TrendingDown, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getT } from "@/i18n/server";
 import { formatNumber } from "@/lib/format";
 
 export function PageHeader({
@@ -73,10 +74,11 @@ export function percentChange(current: number, previous: number): number | null 
   return Math.round(((current - previous) / previous) * 100);
 }
 
-export function Delta({ current, previous }: { current: number; previous: number }) {
+export async function Delta({ current, previous }: { current: number; previous: number }) {
+  const t = await getT();
   const change = percentChange(current, previous);
-  if (change === null) return <span className="text-xs font-medium text-emerald-700">Yangi</span>;
-  if (change === 0) return <span className="text-xs text-amber-600">O‘zgarishsiz</span>;
+  if (change === null) return <span className="text-xs font-medium text-emerald-700">{t("adm.new")}</span>;
+  if (change === 0) return <span className="text-xs text-amber-600">{t("adm.same")}</span>;
   const up = change > 0;
   const Icon = up ? TrendingUp : TrendingDown;
   return (
@@ -100,7 +102,7 @@ export function Sparkline({ values, className }: { values: number[]; className?:
   );
 }
 
-export function StatTile({
+export async function StatTile({
   label,
   value,
   suffix,
@@ -117,6 +119,7 @@ export function StatTile({
   series?: number[];
   hint?: string;
 }) {
+  const t = await getT();
   return (
     <div className="flex flex-col rounded-lg border border-amber-200 bg-amber-100 p-5 sm:p-6">
       <p className="text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">{label}</p>
@@ -128,7 +131,7 @@ export function StatTile({
         {current !== undefined && previous !== undefined && (
           <>
             <Delta current={current} previous={previous} />
-            <span className="text-xs text-amber-600">o‘tgan davrga nisbatan</span>
+            <span className="text-xs text-amber-600">{t("adm.vsPrev")}</span>
           </>
         )}
         {hint && <span className="text-xs text-amber-600">{hint}</span>}
@@ -210,26 +213,27 @@ export function SearchForm({ action, defaultValue, placeholder, hidden }: { acti
   );
 }
 
-export function Pagination({ page, total, pageSize, hrefFor }: { page: number; total: number; pageSize: number; hrefFor: (page: number) => string }) {
+export async function Pagination({ page, total, pageSize, hrefFor }: { page: number; total: number; pageSize: number; hrefFor: (page: number) => string }) {
+  const t = await getT();
   const pages = Math.max(1, Math.ceil(total / pageSize));
   if (pages <= 1) return null;
   const linkCls = "inline-flex h-10 items-center gap-1 rounded-md border border-amber-200 bg-amber-100 px-3 text-sm text-amber-950 hover:bg-amber-100";
   const disabledCls = "inline-flex h-10 items-center gap-1 rounded-md border border-amber-100 px-3 text-sm text-amber-400";
   return (
-    <nav aria-label="Sahifalar" className="flex items-center justify-between gap-4 border-t border-amber-100 px-5 py-4 sm:px-6">
+    <nav aria-label={t("adm.pages")} className="flex items-center justify-between gap-4 border-t border-amber-100 px-5 py-4 sm:px-6">
       <p className="text-sm text-amber-600">
-        {page} / {pages} sahifa · jami {formatNumber(total)} ta
+        {t("adm.pageOf", { page, pages, total: formatNumber(total) })}
       </p>
       <div className="flex gap-2">
         {page > 1 ? (
-          <Link href={hrefFor(page - 1)} className={linkCls}><ChevronLeft className="h-4 w-4" aria-hidden="true" />Oldingi</Link>
+          <Link href={hrefFor(page - 1)} className={linkCls}><ChevronLeft className="h-4 w-4" aria-hidden="true" />{t("adm.prev")}</Link>
         ) : (
-          <span className={disabledCls} aria-disabled="true"><ChevronLeft className="h-4 w-4" aria-hidden="true" />Oldingi</span>
+          <span className={disabledCls} aria-disabled="true"><ChevronLeft className="h-4 w-4" aria-hidden="true" />{t("adm.prev")}</span>
         )}
         {page < pages ? (
-          <Link href={hrefFor(page + 1)} className={linkCls}>Keyingi<ChevronRight className="h-4 w-4" aria-hidden="true" /></Link>
+          <Link href={hrefFor(page + 1)} className={linkCls}>{t("common.next")}<ChevronRight className="h-4 w-4" aria-hidden="true" /></Link>
         ) : (
-          <span className={disabledCls} aria-disabled="true">Keyingi<ChevronRight className="h-4 w-4" aria-hidden="true" /></span>
+          <span className={disabledCls} aria-disabled="true">{t("common.next")}<ChevronRight className="h-4 w-4" aria-hidden="true" /></span>
         )}
       </div>
     </nav>

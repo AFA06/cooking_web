@@ -4,6 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { LegalConsent } from "@/components/legal/LegalConsent";
+import { useT } from "@/i18n/client";
 import type { AuthState } from "@/app/auth/actions";
 
 interface Props {
@@ -16,6 +17,7 @@ const inputClass =
   "mt-1.5 h-14 w-full rounded-xl border border-amber-300 bg-amber-100 px-4 text-lg text-amber-950 transition-colors placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
 
 export function AuthForm({ mode, action, next }: Props) {
+  const t = useT();
   const [state, formAction, pending] = React.useActionState(action, {});
   const [showPassword, setShowPassword] = React.useState(false);
   const isSignup = mode === "signup";
@@ -26,16 +28,16 @@ export function AuthForm({ mode, action, next }: Props) {
       <input type="hidden" name="next" value={next} />
       {isSignup && (
         <div>
-          <label htmlFor="name" className="text-sm font-medium text-amber-950">Ism</label>
+          <label htmlFor="name" className="text-sm font-medium text-amber-950">{t("auth.name")}</label>
           <input id="name" name="name" type="text" autoComplete="name" required className={inputClass} />
         </div>
       )}
       <div>
-        <label htmlFor="email" className="text-sm font-medium text-amber-950">Email</label>
+        <label htmlFor="email" className="text-sm font-medium text-amber-950">{t("auth.email")}</label>
         <input id="email" name="email" type="email" autoComplete="email" required className={inputClass} />
       </div>
       <div>
-        <label htmlFor="password" className="text-sm font-medium text-amber-950">Parol</label>
+        <label htmlFor="password" className="text-sm font-medium text-amber-950">{t("auth.password")}</label>
         <div className="relative">
           <input
             id="password"
@@ -49,7 +51,7 @@ export function AuthForm({ mode, action, next }: Props) {
           <button
             type="button"
             onClick={() => setShowPassword((v) => !v)}
-            aria-label={showPassword ? "Parolni yashirish" : "Parolni ko‘rsatish"}
+            aria-label={showPassword ? t("auth.hidePw") : t("auth.showPw")}
             aria-pressed={showPassword}
             className="absolute right-3 top-1.5 flex h-11 w-11 items-center justify-center rounded-lg text-amber-700 hover:text-amber-950 focus-visible:outline-2 focus-visible:outline-amber-950"
           >
@@ -60,7 +62,7 @@ export function AuthForm({ mode, action, next }: Props) {
             </svg>
           </button>
         </div>
-        {isSignup && <p className="mt-1.5 text-sm text-amber-600">Kamida 8 ta belgi.</p>}
+        {isSignup && <p className="mt-1.5 text-sm text-amber-600">{t("auth.min8")}</p>}
       </div>
       {state.error && (
         <p role="alert" className="text-sm text-red-700">
@@ -69,12 +71,12 @@ export function AuthForm({ mode, action, next }: Props) {
       )}
       {isSignup && <LegalConsent />}
       <Button type="submit" size="xl" className="w-full rounded-full" loading={pending}>
-        {isSignup ? "Hisob yaratish" : "Kirish"}
+        {isSignup ? t("auth.createAccount") : t("nav.login")}
       </Button>
       <p className="text-sm text-amber-900">
-        {isSignup ? "Hisobingiz bormi? " : "Yangimisiz? "}
+        {isSignup ? `${t("auth.haveAccount")} ` : `${t("auth.newHere")} `}
         <Link href={`${isSignup ? "/auth/login" : "/auth/signup"}${suffix}`} className="font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
-          {isSignup ? "Kirish" : "Hisob yaratish"}
+          {isSignup ? t("nav.login") : t("auth.createAccount")}
         </Link>
       </p>
     </form>

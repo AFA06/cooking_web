@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
+import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { getCurrentCreator } from "@/server/creator";
 import { persistRecipe } from "@/server/recipe-write";
@@ -16,15 +17,16 @@ export interface ActionResult {
 }
 
 const profileSchema = z.object({
-  name: z.string().trim().min(2, "Ko‘rinadigan ismni kiriting").max(80),
+  name: z.string().trim().min(2, "err.nameDisplay").max(80),
   bio: z.string().trim().max(500).optional().default(""),
 });
 
 export async function becomeCreator(_: ActionResult, formData: FormData): Promise<ActionResult> {
+  const t = await getT();
   const user = await getCurrentUser();
-  if (!user) return { error: "Avval tizimga kiring." };
+  if (!user) return { error: t("err.signInFirst") };
   const parsed = profileSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
 
   const [existing] = await db.select({ id: schema.creators.id }).from(schema.creators).where(eq(schema.creators.userId, user.id)).limit(1);
   if (existing) redirect("/dashboard");
@@ -47,10 +49,11 @@ export async function saveRecipe(
   input: RecipeInput,
   publish: boolean,
 ): Promise<{ error: string } | { id: string }> {
+  const t = await getT();
   const ctx = await getCurrentCreator();
-  if (!ctx) return { error: "Retsept nashr etish uchun ijodkor profili kerak." };
+  if (!ctx) return { error: t("err.needCreator") };
   const parsed = recipeInputSchema.safeParse(input);
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
   const result = await persistRecipe({
     recipeId,
     creatorId: ctx.creator.id,
@@ -58,7 +61,7 @@ export async function saveRecipe(
     data: parsed.data,
     publish,
   });
-  if ("error" in result) return result;
+  if ("error" in result) return { error: t(result.error) };
 
   revalidatePath("/dashboard");
   revalidatePath("/recipes");
@@ -78,25 +81,26 @@ export async function setRecipeStatus(recipeId: string, status: "draft" | "publi
 }
 
 const creatorProfileSchema = z.object({
-  name: z.string().trim().min(2, "Ism juda qisqa").max(80),
-  bio: z.string().trim().max(500, "Tanishtiruv 500 ta belgidan oshmasligi kerak"),
+  name: z.string().trim().min(2, "err.nameShort").max(80),
+  bio: z.string().trim().max(500, "err.bioLong"),
   avatarUrl: z
     .string()
     .trim()
     .max(1000)
-    .refine((v) => v === "" || /^https?:\/\//i.test(v), "Rasm havolasi http:// yoki https:// bilan boshlanishi kerak"),
+    .refine((v) => v === "" || /^https?:\/\//i.test(v), "err.imgUrl"),
 });
 
 /** Saves the creator's public profile: name, bio, photo and social accounts. */
 export async function updateCreatorProfile(input: { name: string; bio: string; avatarUrl: string; socialLinks: Record<string, string> }): Promise<ActionResult & { ok?: true }> {
+  const t = await getT();
   const ctx = await getCurrentCreator();
-  if (!ctx) return { error: "Ijodkor profili topilmadi." };
+  if (!ctx) return { error: t("err.creatorMissing") };
   const parsed = creatorProfileSchema.safeParse(input);
-  if (!parsed.success) return { error: parsed.error.issues[0].message };
+  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
 
   const socialLinks = cleanSocialLinks(input.socialLinks);
   const rejected = Object.keys(input.socialLinks).filter((key) => input.socialLinks[key].trim() !== "" && !(key in socialLinks));
-  if (rejected.length > 0) return { error: "Ijtimoiy tarmoq havolasi noto‘g‘ri. Profil havolasini yoki foydalanuvchi nomini kiriting." };
+  if (rejected.length > 0) return { error: t("err.socialBad") };
 
   await db
     .update(schema.creators)

@@ -1,3 +1,4 @@
+import { getT } from "@/i18n/server";
 import { CheckboxField, Field, TextArea, TextInput } from "@/components/admin/ui";
 
 interface Values {
@@ -9,30 +10,31 @@ interface Values {
   isFeatured?: boolean;
 }
 
-export function CreatorFields({ values = {}, slugOptional = false }: { values?: Values; slugOptional?: boolean }) {
+export async function CreatorFields({ values = {}, slugOptional = false }: { values?: Values; slugOptional?: boolean }) {
+  const t = await getT();
   return (
     <>
       <div className="grid gap-5 sm:grid-cols-2">
-        <Field label="Ko‘rinadigan ism" htmlFor="name">
+        <Field label={t("profile.displayName")} htmlFor="name">
           <TextInput id="name" name="name" required maxLength={80} defaultValue={values.name ?? ""} />
         </Field>
         <Field
-          label="Sahifa manzili"
+          label={t("adm.f.slug")}
           htmlFor="slug"
-          hint={slugOptional ? "Bo‘sh qoldirilsa, ismdan yaratiladi. /creators/manzil" : "Ommaviy havola: /creators/manzil. O‘zgartirilsa, eski havolalar ishlamaydi."}
+          hint={slugOptional ? t("adm.f.slugOptional") : t("adm.f.slugHint")}
         >
           <TextInput id="slug" name="slug" maxLength={60} pattern="[a-z0-9-]*" required={!slugOptional} defaultValue={values.slug ?? ""} />
         </Field>
       </div>
-      <Field label="Tanishtiruv" htmlFor="bio">
+      <Field label={t("profile.intro")} htmlFor="bio">
         <TextArea id="bio" name="bio" rows={3} maxLength={500} defaultValue={values.bio ?? ""} />
       </Field>
-      <Field label="Profil rasmi havolasi" htmlFor="avatarUrl" hint="https:// bilan boshlanadigan rasm havolasi. Ixtiyoriy.">
+      <Field label={t("profile.avatarUrl")} htmlFor="avatarUrl" hint={t("adm.f.avatarHint")}>
         <TextInput id="avatarUrl" name="avatarUrl" type="url" maxLength={1000} defaultValue={values.avatarUrl ?? ""} />
       </Field>
       <div className="grid gap-3 sm:grid-cols-2">
-        <CheckboxField name="isFoundingCreator" label="Asoschi ijodkor" hint="Asoschilik davrida komissiyasiz" defaultChecked={values.isFoundingCreator} />
-        <CheckboxField name="isFeatured" label="Tavsiya etilgan" hint="Tanlangan ijodkorlar qatorida ko‘rsatiladi" defaultChecked={values.isFeatured} />
+        <CheckboxField name="isFoundingCreator" label={t("creator.foundingCreator")} hint={t("adm.f.foundingHint")} defaultChecked={values.isFoundingCreator} />
+        <CheckboxField name="isFeatured" label={t("adm.f.featured")} hint={t("adm.f.featuredHint")} defaultChecked={values.isFeatured} />
       </div>
     </>
   );

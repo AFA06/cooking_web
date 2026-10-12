@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Star } from "lucide-react";
 import { StatusPill, table } from "@/components/admin/ui";
+import { getT } from "@/i18n/server";
 import { formatNumber, formatPrice } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { RecipeStat } from "@/server/admin";
@@ -8,19 +9,20 @@ import { setRecipeFeatured, setRecipeStatusAsAdmin } from "@/app/admin/actions";
 
 const quickBtn = "inline-flex min-h-9 items-center rounded-md border border-amber-200 px-2.5 text-xs font-medium text-amber-950 hover:bg-amber-100";
 
-export function RecipeTable({ recipes, showCreator = true }: { recipes: RecipeStat[]; showCreator?: boolean }) {
+export async function RecipeTable({ recipes, showCreator = true }: { recipes: RecipeStat[]; showCreator?: boolean }) {
+  const t = await getT();
   return (
     <div className={table.wrap}>
       <table className={table.root}>
         <thead>
           <tr>
-            <th className={table.th}>Retsept</th>
-            {showCreator && <th className={table.th}>Ijodkor</th>}
-            <th className={table.th}>Holati</th>
-            <th className={cn(table.th, table.thNum)}>Ko‘rishlar</th>
-            <th className={cn(table.th, table.thNum)}>Saqlashlar</th>
-            <th className={cn(table.th, table.thNum)}>Pishirishlar</th>
-            <th className={table.th}><span className="sr-only">Amallar</span></th>
+            <th className={table.th}>{t("dash.col.recipe")}</th>
+            {showCreator && <th className={table.th}>{t("role.creator")}</th>}
+            <th className={table.th}>{t("dash.col.status")}</th>
+            <th className={cn(table.th, table.thNum)}>{t("dash.col.views")}</th>
+            <th className={cn(table.th, table.thNum)}>{t("dash.col.saves")}</th>
+            <th className={cn(table.th, table.thNum)}>{t("adm.cooks")}</th>
+            <th className={table.th}><span className="sr-only">{t("dash.col.actions")}</span></th>
           </tr>
         </thead>
         <tbody>
@@ -31,7 +33,7 @@ export function RecipeTable({ recipes, showCreator = true }: { recipes: RecipeSt
                 <td className={cn(table.td, "min-w-[14rem] max-w-xs")}>
                   <Link href={`/admin/recipes/${r.id}`} className="font-medium break-words hover:text-amber-700 hover:underline">{r.title}</Link>
                   <span className="mt-0.5 block text-xs text-amber-600">
-                    {r.isPremium ? `Premium · ${r.priceAmount ? formatPrice(r.priceAmount, "UZS") : "narxsiz"}` : "Bepul"}
+                    {r.isPremium ? `${t("filter.premium")} · ${r.priceAmount ? formatPrice(r.priceAmount, "UZS", t) : t("adm.unpriced")}` : t("filter.free")}
                   </span>
                 </td>
                 {showCreator && (
@@ -39,7 +41,7 @@ export function RecipeTable({ recipes, showCreator = true }: { recipes: RecipeSt
                     <Link href={`/admin/creators/${r.creatorId}`} className="text-amber-900 hover:underline">{r.creator}</Link>
                   </td>
                 )}
-                <td className={table.td}><StatusPill tone={published ? "good" : "neutral"}>{published ? "Nashr etilgan" : "Qoralama"}</StatusPill></td>
+                <td className={table.td}><StatusPill tone={published ? "good" : "neutral"}>{published ? t("dash.published") : t("dash.draft")}</StatusPill></td>
                 <td className={cn(table.td, table.tdNum)}>{formatNumber(r.views)}</td>
                 <td className={cn(table.td, table.tdNum)}>{formatNumber(r.saves)}</td>
                 <td className={cn(table.td, table.tdNum)}>
@@ -52,17 +54,17 @@ export function RecipeTable({ recipes, showCreator = true }: { recipes: RecipeSt
                       <button
                         type="submit"
                         aria-pressed={r.isFeatured}
-                        aria-label={r.isFeatured ? "Tavsiyadan olib tashlash" : "Tavsiya qilish"}
-                        title={r.isFeatured ? "Tavsiya etilgan" : "Tavsiya qilish"}
+                        aria-label={r.isFeatured ? t("adm.unfeature") : t("adm.feature")}
+                        title={r.isFeatured ? t("adm.f.featured") : t("adm.feature")}
                         className={cn("flex h-9 w-9 items-center justify-center rounded-md border", r.isFeatured ? "border-amber-700 bg-amber-700 text-amber-50" : "border-amber-200 text-amber-500 hover:bg-amber-100")}
                       >
                         <Star className="h-4 w-4" fill={r.isFeatured ? "currentColor" : "none"} aria-hidden="true" />
                       </button>
                     </form>
                     <form action={setRecipeStatusAsAdmin.bind(null, r.id, published ? "draft" : "published")}>
-                      <button type="submit" className={quickBtn}>{published ? "Yashirish" : "Nashr etish"}</button>
+                      <button type="submit" className={quickBtn}>{published ? t("adm.hide") : t("dash.publish")}</button>
                     </form>
-                    <Link href={`/admin/recipes/${r.id}`} className={quickBtn}>Tahrirlash</Link>
+                    <Link href={`/admin/recipes/${r.id}`} className={quickBtn}>{t("dash.edit")}</Link>
                   </div>
                 </td>
               </tr>

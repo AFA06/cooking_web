@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import { Pencil, Plus, Trash2 } from "lucide-react";
 import { createCookbook, deleteCookbook, renameCookbook } from "@/app/account/cookbooks/actions";
 import { Button } from "@/components/ui/Button";
+import { useT } from "@/i18n/client";
 
 const field = "h-12 w-full max-w-sm rounded-xl border border-amber-300 bg-amber-100 px-4 text-amber-950 placeholder:text-amber-500 focus:border-amber-950 focus:outline-none";
 
 /** A name field with save and cancel, shared by "new cookbook" and "rename". */
 function NameForm({ initial, submitLabel, onSubmit, onCancel }: { initial: string; submitLabel: string; onSubmit: (name: string) => Promise<{ error: string } | object>; onCancel: () => void }) {
+  const t = useT();
   const [name, setName] = React.useState(initial);
   const [error, setError] = React.useState<string | null>(null);
   const [pending, startTransition] = React.useTransition();
@@ -25,9 +27,9 @@ function NameForm({ initial, submitLabel, onSubmit, onCancel }: { initial: strin
   return (
     <form onSubmit={submit}>
       <div className="flex flex-wrap items-center gap-2">
-        <input autoFocus maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder="Masalan: Bayram dasturxoni" aria-label="Kitob nomi" className={field} />
+        <input autoFocus maxLength={60} value={name} onChange={(e) => setName(e.target.value)} placeholder={t("dialog.namePlaceholder")} aria-label={t("cookbook.nameLabel")} className={field} />
         <Button type="submit" loading={pending} disabled={name.trim() === ""}>{submitLabel}</Button>
-        <Button type="button" variant="ghost" onClick={onCancel}>Bekor qilish</Button>
+        <Button type="button" variant="ghost" onClick={onCancel}>{t("common.cancel")}</Button>
       </div>
       {error && <p role="alert" className="mt-2 text-sm font-medium text-red-700">{error}</p>}
     </form>
@@ -36,6 +38,7 @@ function NameForm({ initial, submitLabel, onSubmit, onCancel }: { initial: strin
 
 /** "New cookbook" on Mening oshxonam: a button that turns into a name field. */
 export function NewCookbook() {
+  const t = useT();
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
 
@@ -43,14 +46,14 @@ export function NewCookbook() {
     return (
       <Button variant="outline" onClick={() => setOpen(true)}>
         <Plus className="h-4 w-4" aria-hidden="true" />
-        Yangi kitob
+        {t("dialog.newCookbook")}
       </Button>
     );
   }
   return (
     <NameForm
       initial=""
-      submitLabel="Yaratish"
+      submitLabel={t("cookbook.create")}
       onCancel={() => setOpen(false)}
       onSubmit={async (name) => {
         const result = await createCookbook(name, null);
@@ -66,6 +69,7 @@ export function NewCookbook() {
 
 /** Rename and delete for one cookbook, shown on its own page. */
 export function CookbookControls({ id, name }: { id: string; name: string }) {
+  const t = useT();
   const router = useRouter();
   const [mode, setMode] = React.useState<"idle" | "renaming" | "deleting">("idle");
   const [error, setError] = React.useState<string | null>(null);
@@ -75,7 +79,7 @@ export function CookbookControls({ id, name }: { id: string; name: string }) {
     return (
       <NameForm
         initial={name}
-        submitLabel="Saqlash"
+        submitLabel={t("common.save")}
         onCancel={() => setMode("idle")}
         onSubmit={async (next) => {
           const result = await renameCookbook(id, next);
@@ -101,19 +105,19 @@ export function CookbookControls({ id, name }: { id: string; name: string }) {
       <div className="flex flex-wrap items-center gap-2">
         {mode === "deleting" ? (
           <>
-            <span className="text-amber-900">Kitob o‘chirilsinmi? Retseptlarning o‘zi qoladi.</span>
-            <Button variant="destructive" loading={pending} onClick={remove}>Ha, o‘chirish</Button>
-            <Button variant="ghost" onClick={() => setMode("idle")}>Yo‘q</Button>
+            <span className="text-amber-900">{t("cookbook.confirmDelete")}</span>
+            <Button variant="destructive" loading={pending} onClick={remove}>{t("cookbook.yesDelete")}</Button>
+            <Button variant="ghost" onClick={() => setMode("idle")}>{t("common.no")}</Button>
           </>
         ) : (
           <>
             <Button variant="outline" onClick={() => setMode("renaming")}>
               <Pencil className="h-4 w-4" aria-hidden="true" />
-              Nomini o‘zgartirish
+              {t("cookbook.rename")}
             </Button>
             <Button variant="ghost" onClick={() => setMode("deleting")}>
               <Trash2 className="h-4 w-4" aria-hidden="true" />
-              Kitobni o‘chirish
+              {t("cookbook.delete")}
             </Button>
           </>
         )}

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getT } from "@/i18n/server";
 import { RecipesBrowser } from "@/components/recipe/RecipesBrowser";
 import { parseCategories } from "@/lib/categories";
 import { ALL, DIFFICULTIES, PRICE_FILTERS, TIME_FILTERS } from "@/lib/filters";
@@ -8,11 +9,10 @@ import { getSavedRecipeIds } from "@/server/user-data";
 
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
-  title: "Retseptlar",
-  description: "Ijodkorlarning qadam-baqadam retseptlarini ko‘ring. Bepul va premium retseptlar.",
-  alternates: { canonical: "/recipes" },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getT();
+  return { title: t("nav.recipes"), description: t("meta.recipesDesc"), alternates: { canonical: "/recipes" } };
+}
 
 interface SearchParams {
   q?: string;
@@ -38,7 +38,7 @@ export default async function RecipesPage({ searchParams }: { searchParams: Prom
         query: sp.q?.slice(0, 80) ?? "",
         difficulty: oneOf(sp.difficulty, DIFFICULTIES),
         price: oneOf(sp.price, PRICE_FILTERS),
-        time: TIME_FILTERS.find((t) => String(t.max) === sp.time)?.label ?? ALL,
+        time: TIME_FILTERS.find((t) => String(t.max) === sp.time)?.key ?? ALL,
         categories: parseCategories(sp.category),
       }}
     />

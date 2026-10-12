@@ -1,6 +1,5 @@
 export const PLATFORM_CONFIG = {
   name: "Damda",
-  tagline: "Sevimli ijodkorlaringizdan qadam-baqadam retseptlar",
   urls: {
     recipes: "/recipes",
     becomeCreator: "/creators/join",
@@ -22,26 +21,27 @@ export const PLATFORM_CONFIG = {
     currency: "UZS",
     examples: [10000, 20000],
   },
-  supportedLocales: ["uz", "ru", "en"] as const,
+  supportedLocales: ["uz", "ru", "en", "kz"] as const,
   defaultLocale: "uz" as const,
 } as const;
 
 export type SupportedLocale = (typeof PLATFORM_CONFIG.supportedLocales)[number];
 
+/** Link labels are message keys: translate them with t(label). */
 export const NAVIGATION_LINKS = {
   public: [
-    { label: "Bosh sahifa", href: "/" },
-    { label: "Retseptlar", href: PLATFORM_CONFIG.urls.recipes },
-    { label: "Ijodkor bo‘lish", href: PLATFORM_CONFIG.urls.becomeCreator },
+    { label: "nav.home", href: "/" },
+    { label: "nav.recipes", href: PLATFORM_CONFIG.urls.recipes },
+    { label: "nav.becomeCreator", href: PLATFORM_CONFIG.urls.becomeCreator },
   ],
   footer: {
     product: [
-      { label: "Retseptlar", href: PLATFORM_CONFIG.urls.recipes },
-        { label: "Ijodkor bo‘lish", href: PLATFORM_CONFIG.urls.becomeCreator },
+      { label: "nav.recipes", href: PLATFORM_CONFIG.urls.recipes },
+      { label: "nav.becomeCreator", href: PLATFORM_CONFIG.urls.becomeCreator },
     ],
     legal: [
-      { label: "Foydalanish shartlari", href: "/terms" },
-      { label: "Maxfiylik siyosati", href: "/privacy" },
+      { label: "nav.terms", href: "/terms" },
+      { label: "nav.privacy", href: "/privacy" },
     ],
   },
 } as const;

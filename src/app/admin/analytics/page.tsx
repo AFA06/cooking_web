@@ -4,45 +4,48 @@ import { RangeTabs } from "@/components/admin/RangeTabs";
 import { TimeSeriesChart } from "@/components/admin/TimeSeriesChart";
 import { PageHeader, Panel, table } from "@/components/admin/ui";
 import { RANGE_LABEL, comparePeriods } from "@/lib/admin-stats";
+import { getLocale, getT } from "@/i18n/server";
 import { formatDayKey, formatNumber } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import { getDailySeries, getTopRecipes, listCreatorsAdmin, parseRange, requireAdminPage } from "@/server/admin";
 
-export const metadata: Metadata = { title: "Statistika" };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("adm.nav.stats") };
+}
 
 const percent = (part: number, whole: number) => (whole === 0 ? 0 : Math.round((part / whole) * 100));
 
 export default async function AdminAnalyticsPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
-  await requireAdminPage();
+  const [, t, locale] = await Promise.all([requireAdminPage(), getT(), getLocale()]);
   const range = parseRange((await searchParams).range);
   const [series, recipes, creators] = await Promise.all([getDailySeries(range * 2), getTopRecipes(range, 15), listCreatorsAdmin()]);
   const p = comparePeriods(series, range);
 
   const funnel = [
-    { label: "Retseptni ko‘rdi", value: p.total("views") },
-    { label: "Saqladi", value: p.total("saves") },
-    { label: "Pishirishni boshladi", value: p.total("cooks") },
-    { label: "Oxirigacha pishirdi", value: p.total("completions") },
+    { label: t("adm.funnel.viewed"), value: p.total("views") },
+    { label: t("adm.funnel.saved"), value: p.total("saves") },
+    { label: t("adm.funnel.started"), value: p.total("cooks") },
+    { label: t("adm.funnel.finished"), value: p.total("completions") },
   ];
   const funnelMax = Math.max(...funnel.map((f) => f.value), 1);
 
   const charts = [
-    { metric: "views", label: "Ko‘rishlar" },
-    { metric: "signups", label: "Ro‘yxatdan o‘tishlar" },
-    { metric: "cooks", label: "Pishirish boshlangan" },
-    { metric: "completions", label: "Pishirish tugatilgan" },
+    { metric: "views", label: t("dash.col.views") },
+    { metric: "signups", label: t("adm.chart.signups") },
+    { metric: "cooks", label: t("adm.tile.cooksStarted") },
+    { metric: "completions", label: t("adm.chart.cooksDone") },
   ] as const;
 
   return (
     <>
       <PageHeader
-        eyebrow="Tahlil"
-        title="Statistika"
-        description={`So‘nggi ${RANGE_LABEL[range]} bo‘yicha faollik, konversiya va natijalar.`}
+        eyebrow={t("adm.analysis")}
+        title={t("adm.nav.stats")}
+        description={t("adm.statsDesc", { range: t(RANGE_LABEL[range]) })}
         actions={<RangeTabs base="/admin/analytics" range={range} />}
       />
 
-      <Panel title="Konversiya voronkasi" description="O‘quvchi retseptni ko‘rishdan to pishirib bo‘lishgacha bosib o‘tadigan yo‘l">
+      <Panel title={t("adm.funnelTitle")} description={t("adm.funnelNote")}>
         <ol className="space-y-5">
           {funnel.map((step, i) => (
             <li key={step.label} className="grid items-center gap-x-4 gap-y-1.5 sm:grid-cols-[14rem_1fr_9rem]">
@@ -60,29 +63,29 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
             </li>
           ))}
         </ol>
-        <p className="mt-5 text-xs text-amber-600">Foiz — oldingi bosqichga nisbatan ulush. Saqlash va pishirish faqat tizimga kirgan foydalanuvchilar uchun hisoblanadi.</p>
+        <p className="mt-5 text-xs text-amber-600">{t("adm.funnelFoot")}</p>
       </Panel>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
         {charts.map((c) => (
-          <Panel key={c.metric} title={c.label} description={`Jami ${formatNumber(p.total(c.metric))} · oldingi davrda ${formatNumber(p.previousTotal(c.metric))}`}>
+          <Panel key={c.metric} title={c.label} description={t("adm.chartTotal", { total: formatNumber(p.total(c.metric)), prev: formatNumber(p.previousTotal(c.metric)) })}>
             <TimeSeriesChart data={p.points(c.metric)} label={c.label} height={220} />
           </Panel>
         ))}
       </div>
 
-      <Panel className="mt-6" title="Retseptlar natijasi" description={`So‘nggi ${RANGE_LABEL[range]}, ko‘rishlar bo‘yicha`} flush>
+      <Panel className="mt-6" title={t("adm.recipePerf")} description={t("adm.recipePerfNote", { range: t(RANGE_LABEL[range]) })} flush>
         <div className={table.wrap}>
           <table className={table.root}>
             <thead>
               <tr>
-                <th className={table.th}>Retsept</th>
-                <th className={table.th}>Ijodkor</th>
-                <th className={cn(table.th, table.thNum)}>Ko‘rishlar</th>
-                <th className={cn(table.th, table.thNum)}>Saqlashlar</th>
-                <th className={cn(table.th, table.thNum)}>Boshlangan</th>
-                <th className={cn(table.th, table.thNum)}>Tugatilgan</th>
-                <th className={cn(table.th, table.thNum)}>Tugatish</th>
+                <th className={table.th}>{t("dash.col.recipe")}</th>
+                <th className={table.th}>{t("role.creator")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("dash.col.views")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("dash.col.saves")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("account.started")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("account.completed")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("adm.completion")}</th>
               </tr>
             </thead>
             <tbody>
@@ -102,17 +105,17 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
         </div>
       </Panel>
 
-      <Panel className="mt-6" title="Ijodkorlar reytingi" description="Butun davr uchun, ko‘rishlar bo‘yicha" flush>
+      <Panel className="mt-6" title={t("adm.creatorRank")} description={t("adm.rankNote")} flush>
         <div className={table.wrap}>
           <table className={table.root}>
             <thead>
               <tr>
-                <th className={table.th}>Ijodkor</th>
-                <th className={cn(table.th, table.thNum)}>Retseptlar</th>
-                <th className={cn(table.th, table.thNum)}>Ko‘rishlar</th>
-                <th className={cn(table.th, table.thNum)}>Saqlashlar</th>
-                <th className={cn(table.th, table.thNum)}>Pishirishlar</th>
-                <th className={cn(table.th, table.thNum)}>Tugatish</th>
+                <th className={table.th}>{t("role.creator")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("nav.recipes")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("dash.col.views")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("dash.col.saves")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("adm.cooks")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("adm.completion")}</th>
               </tr>
             </thead>
             <tbody>
@@ -135,23 +138,23 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
       </Panel>
 
       <details className="mt-6 rounded-lg border border-amber-200 bg-amber-100">
-        <summary className="px-5 py-4 font-serif text-xl font-medium text-amber-950 sm:px-6">Kunlik ma’lumotlar jadvali</summary>
+        <summary className="px-5 py-4 font-serif text-xl font-medium text-amber-950 sm:px-6">{t("adm.dailyTable")}</summary>
         <div className={cn(table.wrap, "border-t border-amber-100")}>
           <table className={table.root}>
             <thead>
               <tr>
-                <th className={table.th}>Kun</th>
-                <th className={cn(table.th, table.thNum)}>Ko‘rishlar</th>
-                <th className={cn(table.th, table.thNum)}>Ro‘yxatdan o‘tish</th>
-                <th className={cn(table.th, table.thNum)}>Saqlashlar</th>
-                <th className={cn(table.th, table.thNum)}>Boshlangan</th>
-                <th className={cn(table.th, table.thNum)}>Tugatilgan</th>
+                <th className={table.th}>{t("adm.day")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("dash.col.views")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("adm.signupsCol")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("dash.col.saves")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("account.started")}</th>
+                <th className={cn(table.th, table.thNum)}>{t("account.completed")}</th>
               </tr>
             </thead>
             <tbody>
               {[...p.current].reverse().map((d) => (
                 <tr key={d.day} className={table.tr}>
-                  <td className={table.td}>{formatDayKey(d.day)}</td>
+                  <td className={table.td}>{formatDayKey(d.day, locale)}</td>
                   <td className={cn(table.td, table.tdNum)}>{formatNumber(d.views)}</td>
                   <td className={cn(table.td, table.tdNum)}>{formatNumber(d.signups)}</td>
                   <td className={cn(table.td, table.tdNum)}>{formatNumber(d.saves)}</td>

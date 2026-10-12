@@ -7,17 +7,18 @@ import { Container } from "@/components/ui/Container";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { EmailForm, PasswordForm, ProfileForm } from "@/components/account/SettingsForms";
 import { db, schema } from "@/db";
+import { getLocale, getT } from "@/i18n/server";
 import { formatDate } from "@/lib/format";
 import { formatPhone } from "@/lib/profile";
 import { getCurrentUser } from "@/server/auth";
 
-export const metadata: Metadata = { title: "Profil sozlamalari", robots: { index: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  return { title: (await getT())("nav.settings"), robots: { index: false } };
+}
 export const dynamic = "force-dynamic";
 
-const ROLE_LABEL = { user: "Foydalanuvchi", creator: "Ijodkor", admin: "Admin" } as const;
-
 export default async function SettingsPage() {
-  const user = await getCurrentUser();
+  const [user, t, locale] = await Promise.all([getCurrentUser(), getT(), getLocale()]);
   if (!user) redirect("/auth/login?next=/account/settings");
   const [details] = await db
     .select({ username: schema.users.username, phone: schema.users.phone, createdAt: schema.users.createdAt })
@@ -29,12 +30,12 @@ export default async function SettingsPage() {
     {
       id: "profil",
       icon: UserRound,
-      title: "Shaxsiy ma’lumotlar",
-      note: "Ismingiz retsept baholarida ko‘rinadi.",
+      title: t("settings.personal"),
+      note: t("settings.personalNote"),
       form: <ProfileForm initial={{ name: user.name, username: details.username ?? "", phone: details.phone ? formatPhone(details.phone) : "" }} />,
     },
-    { id: "email", icon: Mail, title: "Email", note: "Tizimga shu email bilan kirasiz.", form: <EmailForm email={user.email} /> },
-    { id: "parol", icon: KeyRound, title: "Parol", note: "O‘zgartirilgach, boshqa qurilmalardagi sessiyalar yopiladi.", form: <PasswordForm /> },
+    { id: "email", icon: Mail, title: t("settings.emailTitle"), note: t("settings.emailNote"), form: <EmailForm email={user.email ?? ""} /> },
+    { id: "parol", icon: KeyRound, title: t("settings.passwordTitle"), note: t("settings.passwordNote"), form: <PasswordForm /> },
   ];
 
   return (
@@ -43,19 +44,19 @@ export default async function SettingsPage() {
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <Link href="/account" className="inline-flex items-center gap-2 text-sm font-medium text-amber-600 transition-colors hover:text-amber-950">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />
-            Mening oshxonam
+            {t("nav.myKitchen")}
           </Link>
           <span className="mt-8 flex h-28 w-28 items-center justify-center rounded-full bg-sage-500 font-serif text-5xl font-medium text-amber-50" aria-hidden="true">
             {user.name.slice(0, 1).toUpperCase()}
           </span>
-          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">Profil sozlamalari</p>
+          <p className="mt-6 text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{t("nav.settings")}</p>
           <h1 className="mt-3 break-words font-serif text-[2.6rem] font-medium leading-[1.05] text-amber-950 sm:text-5xl">{user.name}</h1>
           {details.username && <p className="mt-2 text-lg text-amber-600">@{details.username}</p>}
           <dl className="mt-8 divide-y divide-amber-200 border-y border-amber-200 text-[0.95rem]">
             {[
-              ["Email", user.email],
-              ["Hisob turi", ROLE_LABEL[user.role]],
-              ["A’zo bo‘lgan sana", formatDate(details.createdAt)],
+              [t("auth.email"), user.email ?? "—"],
+              [t("settings.accountType"), t(`role.${user.role}`)],
+              [t("settings.member"), formatDate(details.createdAt, locale)],
             ].map(([term, value]) => (
               <div key={term} className="flex items-baseline justify-between gap-4 py-3">
                 <dt className="text-amber-600">{term}</dt>

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
+import { useT } from "@/i18n/client";
 
 interface Item {
   label: string;
@@ -9,6 +10,7 @@ interface Item {
 }
 
 export function MobileMenu({ items, children }: { items: Item[]; children?: React.ReactNode }) {
+  const t = useT();
   const [open, setOpen] = React.useState(false);
   React.useEffect(() => {
     if (!open) return;
@@ -23,7 +25,7 @@ export function MobileMenu({ items, children }: { items: Item[]; children?: Reac
         type="button"
         aria-expanded={open}
         aria-controls="mobile-menu"
-        aria-label={open ? "Menyuni yopish" : "Menyuni ochish"}
+        aria-label={open ? t("nav.closeMenu") : t("nav.openMenu")}
         onClick={() => setOpen((o) => !o)}
         className="flex h-11 w-11 items-center justify-center text-amber-950"
       >
@@ -32,7 +34,7 @@ export function MobileMenu({ items, children }: { items: Item[]; children?: Reac
         </svg>
       </button>
       {open && (
-        <nav id="mobile-menu" aria-label="Mobil menyu" className="absolute left-0 right-0 top-16 border-b border-amber-200 bg-amber-50 px-5 pb-4" onClick={() => setOpen(false)}>
+        <nav id="mobile-menu" aria-label={t("nav.mobile")} className="absolute left-0 right-0 top-16 border-b border-amber-200 bg-amber-50 px-5 pb-4" onClick={() => setOpen(false)}>
           <ul className="divide-y divide-amber-200">
             {items.map((i) => (
               <li key={i.href}>

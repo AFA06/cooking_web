@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { Container } from "@/components/ui/Container";
 import { LEGAL, type LegalDoc } from "@/content/legal";
-
-const DATE = new Intl.DateTimeFormat("uz-UZ", { day: "numeric", month: "long", year: "numeric" });
+import { LOCALE_INFO } from "@/i18n/core";
+import { getLocale, getT } from "@/i18n/server";
 
 interface Props {
   doc: LegalDoc;
@@ -11,16 +11,17 @@ interface Props {
 }
 
 /** One layout for every legal text: a contents list beside the reading column, anchored sections. */
-export function LegalDocument({ doc, other }: Props) {
-  const updated = DATE.format(new Date(`${LEGAL.updatedAt}T00:00:00`));
+export async function LegalDocument({ doc, other }: Props) {
+  const [t, locale] = await Promise.all([getT(), getLocale()]);
+  const updated = new Intl.DateTimeFormat(LOCALE_INFO[locale].intl, { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${LEGAL.updatedAt}T00:00:00`));
 
   return (
     <Container size="xl" className="grid gap-10 py-12 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:gap-20 lg:py-16">
       <aside className="lg:sticky lg:top-28 lg:self-start">
-        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">Hujjat</p>
+        <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{t("legal.document")}</p>
         <h1 className="mt-3 font-serif text-4xl font-medium leading-[1.08] text-amber-950 sm:text-5xl">{doc.title}</h1>
-        <p className="mt-4 text-sm text-amber-600">Oxirgi yangilanish: {updated}</p>
-        <nav aria-label="Mundarija" className="mt-8 hidden lg:block">
+        <p className="mt-4 text-sm text-amber-600">{t("legal.updated", { date: updated })}</p>
+        <nav aria-label={t("legal.contents")} className="mt-8 hidden lg:block">
           <ol className="space-y-2 border-l border-amber-200 pl-4 text-sm">
             {doc.sections.map((s) => (
               <li key={s.id}>
@@ -36,12 +37,12 @@ export function LegalDocument({ doc, other }: Props) {
 
         {LEGAL.isDraft && (
           <p role="note" className="mt-6 rounded-xl border border-amber-300 bg-amber-100 px-4 py-3 text-sm text-amber-900">
-            Bu hujjatning namunaviy matni; yakuniy yuridik matn e’lon qilinishidan oldin almashtiriladi.
+            {t("legal.draftNote")}
           </p>
         )}
 
-        <nav aria-label="Mundarija" className="mt-8 rounded-2xl bg-amber-100/60 p-5 lg:hidden">
-          <p className="text-sm font-semibold text-amber-950">Mundarija</p>
+        <nav aria-label={t("legal.contents")} className="mt-8 rounded-2xl bg-amber-100/60 p-5 lg:hidden">
+          <p className="text-sm font-semibold text-amber-950">{t("legal.contents")}</p>
           <ol className="mt-3 space-y-2 text-sm">
             {doc.sections.map((s) => (
               <li key={s.id}>
@@ -73,7 +74,7 @@ export function LegalDocument({ doc, other }: Props) {
         </div>
 
         <p className="mt-6 border-t border-amber-200 pt-6 text-sm text-amber-600">
-          Savollaringiz bormi? <a href={`mailto:${LEGAL.contactEmail}`} className="font-semibold text-amber-700 underline underline-offset-4">{LEGAL.contactEmail}</a>
+          {t("legal.questions")} <a href={`mailto:${LEGAL.contactEmail}`} className="font-semibold text-amber-700 underline underline-offset-4">{LEGAL.contactEmail}</a>
           {" · "}
           <Link href={other.href} className="font-semibold text-amber-700 underline underline-offset-4">{other.label}</Link>
         </p>
