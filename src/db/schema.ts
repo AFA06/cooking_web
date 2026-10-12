@@ -280,6 +280,18 @@ export const purchases = pgTable(
   (t) => [index("purchases_user_idx").on(t.userId)],
 );
 
+/** Sliding-window counters for throttling: failed logins, signups, uploads. Keys are keyed hashes, never raw values. */
+export const authEvents = pgTable(
+  "auth_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    kind: text("kind").notNull(),
+    keyHash: text("key_hash").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("auth_events_lookup_idx").on(t.kind, t.keyHash, t.createdAt)],
+);
+
 export const analyticsEvents = pgTable(
   "analytics_events",
   {

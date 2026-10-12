@@ -259,6 +259,7 @@
     "err": {
       "email": "To‘g‘ri email kiriting",
       "exists": "Bu email bilan hisob allaqachon mavjud. Tizimga kirib ko‘ring.",
+      "locked": "Juda ko‘p noto‘g‘ri urinish: hisob himoya uchun vaqtincha bloklandi. Iltimos, {time} kuting va qayta urinib ko‘ring.",
       "name": "Ismingizni kiriting",
       "pwEnter": "Parolingizni kiriting",
       "pwShort": "Parol kamida 8 ta belgidan iborat bo‘lishi kerak",

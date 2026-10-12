@@ -27,6 +27,15 @@ export function AuthForm({ mode, action, next }: Props) {
     <form action={formAction} className="mt-8 space-y-5">
       <input type="hidden" name="next" value={next} />
       {isSignup && (
+        // Bot trap: invisible to people and to screen readers, tempting to scripts.
+        <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+          <label>
+            Contact
+            <input type="text" name="hp_contact" tabIndex={-1} autoComplete="off" defaultValue="" />
+          </label>
+        </div>
+      )}
+      {isSignup && (
         <div>
           <label htmlFor="name" className="text-sm font-medium text-amber-950">{t("auth.name")}</label>
           <input id="name" name="name" type="text" autoComplete="name" required className={inputClass} />

@@ -259,6 +259,7 @@
     "err": {
       "email": "Enter a valid email",
       "exists": "An account with this email already exists. Try signing in.",
+      "locked": "Too many wrong attempts: your account is temporarily locked for protection. Please wait {time} and try again.",
       "name": "Enter your name",
       "pwEnter": "Enter your password",
       "pwShort": "The password must be at least 8 characters",

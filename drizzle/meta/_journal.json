@@ -71,6 +71,13 @@
       "when": 1791803547288,
       "tag": "0009_lucky_nebula",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791806105273,
+      "tag": "0010_tranquil_captain_cross",
+      "breakpoints": true
     }
   ]
 }

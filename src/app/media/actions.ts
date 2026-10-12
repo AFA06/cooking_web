@@ -4,6 +4,8 @@ import { count, eq } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
+import { WINDOW, allow } from "@/server/rate-limit";
+import { keyedHash } from "@/server/security";
 import { getCreatorForUser } from "@/server/creator";
 
 /** The browser shrinks a photo to about this much base64 before sending it. */
@@ -20,6 +22,7 @@ export async function uploadImage(base64: string): Promise<{ url: string } | { e
   if (!user) return { error: t("err.signInFirst") };
   const isCreator = user.role === "admin" || !!(await getCreatorForUser(user.id));
   if (!isCreator) return { error: t("err.needCreator") };
+  if (!(await allow("upload", keyedHash("user", user.id), 60, WINDOW.hour))) return { error: t("auth.a.tooMany") };
 
   if (typeof base64 !== "string" || base64.length > MAX_BASE64_LENGTH || !/^[A-Za-z0-9+/]+=*$/.test(base64)) return { error: t("err.photoBig") };
   const bytes = Buffer.from(base64, "base64");
