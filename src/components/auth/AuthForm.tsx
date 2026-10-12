@@ -16,6 +16,7 @@ const inputClass =
 
 export function AuthForm({ mode, action, next }: Props) {
   const [state, formAction, pending] = React.useActionState(action, {});
+  const [showPassword, setShowPassword] = React.useState(false);
   const isSignup = mode === "signup";
   const suffix = next ? `?next=${encodeURIComponent(next)}` : "";
 
@@ -34,15 +35,30 @@ export function AuthForm({ mode, action, next }: Props) {
       </div>
       <div>
         <label htmlFor="password" className="text-sm font-medium text-amber-950">Parol</label>
-        <input
-          id="password"
-          name="password"
-          type="password"
-          autoComplete={isSignup ? "new-password" : "current-password"}
-          required
-          minLength={isSignup ? 8 : undefined}
-          className={inputClass}
-        />
+        <div className="relative">
+          <input
+            id="password"
+            name="password"
+            type={showPassword ? "text" : "password"}
+            autoComplete={isSignup ? "new-password" : "current-password"}
+            required
+            minLength={isSignup ? 8 : undefined}
+            className={`${inputClass} pr-14`}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            aria-label={showPassword ? "Parolni yashirish" : "Parolni ko‘rsatish"}
+            aria-pressed={showPassword}
+            className="absolute right-3 top-1.5 flex h-11 w-11 items-center justify-center rounded-lg text-amber-700 hover:text-amber-950 focus-visible:outline-2 focus-visible:outline-amber-950"
+          >
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z" />
+              <circle cx="12" cy="12" r="3" />
+              {showPassword && <path d="M3 3l18 18" />}
+            </svg>
+          </button>
+        </div>
         {isSignup && <p className="mt-1.5 text-sm text-amber-600">Kamida 8 ta belgi.</p>}
       </div>
       {state.error && (
