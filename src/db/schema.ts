@@ -98,6 +98,8 @@ export const recipes = pgTable(
     tags: text("tags").array().notNull().default([]),
     /** A YouTube or Vimeo link, or a direct video file, shown on the recipe page. */
     videoUrl: text("video_url"),
+    /** Hidden tips that only buyers (and the creator) can read; kept out of the public recipe object. */
+    secretNotes: text("secret_notes"),
     status: recipeStatusEnum("status").notNull().default("draft"),
     isFeatured: boolean("is_featured").notNull().default(false),
     publishedAt: timestamp("published_at", { withTimezone: true }),

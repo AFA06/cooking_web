@@ -33,6 +33,8 @@ export async function persistRecipe(o: PersistOptions): Promise<{ error: string 
     coverAlt: d.title,
     galleryUrls: d.galleryUrls,
     videoUrl: d.videoUrl || null,
+    // Insider notes only make sense on a paid recipe; a free one never keeps them.
+    secretNotes: d.isPremium && d.secretNotes ? d.secretNotes : null,
     servings: d.servings,
     prepTimeMinutes: d.prepTimeMinutes,
     cookTimeMinutes: d.cookTimeMinutes,

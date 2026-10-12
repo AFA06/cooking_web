@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Check, Circle, Clock, Film, Plus } from "lucide-react";
+import { Check, Circle, Clock, Film, Lock, Plus } from "lucide-react";
 import { ImageUploader } from "@/components/dashboard/ImageUploader";
 import { Button } from "@/components/ui/Button";
 import { useT } from "@/i18n/client";
@@ -30,6 +30,7 @@ export interface EditorInitial {
   coverUrl: string;
   galleryUrls: string[];
   videoUrl: string;
+  secretNotes: string;
   servings: string;
   prepTimeMinutes: string;
   cookTimeMinutes: string;
@@ -54,6 +55,7 @@ export const EMPTY_RECIPE: EditorInitial = {
   coverUrl: "",
   galleryUrls: [],
   videoUrl: "",
+  secretNotes: "",
   servings: "4",
   prepTimeMinutes: "15",
   cookTimeMinutes: "30",
@@ -89,6 +91,7 @@ function toInput(v: EditorInitial): RecipeInput {
     coverUrl: v.coverUrl,
     galleryUrls: v.galleryUrls.map((url) => url.trim()).filter(Boolean),
     videoUrl: v.videoUrl.trim(),
+    secretNotes: v.secretNotes,
     servings: Number(v.servings),
     prepTimeMinutes: Number(v.prepTimeMinutes),
     cookTimeMinutes: Number(v.cookTimeMinutes),
@@ -221,6 +224,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
     { key: "steps", label: t("ed.steps"), done: v.steps.some((s) => s.title.trim() && s.instruction.trim()), required: true },
     { key: "video", label: t("ed.video"), done: !!video, required: false },
     { key: "nutrition", label: t("ed.check.nutrition"), done: v.calories !== "", required: false },
+    ...(v.isPremium ? [{ key: "secrets", label: t("ed.check.secrets"), done: v.secretNotes.trim() !== "", required: false }] : []),
   ];
   const ready = checks.filter((c) => c.required).every((c) => c.done);
   const total = v.prepTimeMinutes && v.cookTimeMinutes ? Number(v.prepTimeMinutes) + Number(v.cookTimeMinutes) : 0;
@@ -507,18 +511,63 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
           </Button>
         </Section>
 
-        {/* 5 — price */}
+        {/* 5 — price and secrets */}
         <Section n={5} title={t("ed.sec.pricing")}>
-          <label className="flex min-h-11 cursor-pointer items-center gap-3 text-amber-950">
-            <input type="checkbox" className="h-5 w-5 accent-amber-700" checked={v.isPremium} onChange={(e) => set("isPremium", e.target.checked)} />
-            <span className="text-lg font-medium">{t("ed.premium")}</span>
-          </label>
+          <div role="radiogroup" aria-label={t("ed.type")} className="grid gap-3 sm:grid-cols-2">
+            {([
+              { premium: false, title: t("filter.free"), note: t("ed.typeFreeNote") },
+              { premium: true, title: t("filter.premium"), note: t("ed.typePremiumNote") },
+            ] as const).map((option) => {
+              const selected = v.isPremium === option.premium;
+              return (
+                <button
+                  key={String(option.premium)}
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  onClick={() => set("isPremium", option.premium)}
+                  className={cn(
+                    "rounded-2xl border-2 p-5 text-left transition-colors",
+                    selected ? "border-amber-700 bg-amber-100" : "border-amber-200 hover:border-amber-400",
+                  )}
+                >
+                  <span className="flex items-center gap-2 font-serif text-xl font-semibold text-amber-950">
+                    <span className={cn("flex h-5 w-5 items-center justify-center rounded-full border-2", selected ? "border-amber-700 bg-amber-700" : "border-amber-400")} aria-hidden="true">
+                      {selected && <Check className="h-3 w-3 text-amber-50" strokeWidth={4} />}
+                    </span>
+                    {option.title}
+                  </span>
+                  <span className="mt-2 block text-sm leading-relaxed text-amber-600">{option.note}</span>
+                </button>
+              );
+            })}
+          </div>
+
           {v.isPremium && (
-            <div className="max-w-xs">
-              <label htmlFor="price" className={label}>{t("ed.price")}</label>
-              <input id="price" type="number" min={1} className={cn(field, "mt-1.5")} value={v.priceAmount} onChange={(e) => set("priceAmount", e.target.value)} />
-              <p className="mt-2 text-xs text-amber-600">{t("ed.premiumNote")}</p>
-            </div>
+            <>
+              <div className="max-w-xs">
+                <label htmlFor="price" className={label}>{t("ed.price")}</label>
+                <input id="price" type="number" min={1} className={cn(field, "mt-1.5")} value={v.priceAmount} onChange={(e) => set("priceAmount", e.target.value)} />
+                <p className="mt-2 text-xs text-amber-600">{t("ed.premiumNote")}</p>
+              </div>
+              <div>
+                <label htmlFor="secrets" className={cn(label, "flex items-center gap-2")}>
+                  <Lock className="h-4 w-4 text-amber-700" aria-hidden="true" />
+                  {t("ed.secrets")}
+                </label>
+                <p className="mt-1 text-sm text-amber-600">{t("ed.secretsHint")}</p>
+                <textarea
+                  id="secrets"
+                  rows={6}
+                  maxLength={4000}
+                  className={cn(field, "mt-2")}
+                  value={v.secretNotes}
+                  placeholder={t("ed.secretsPh")}
+                  onChange={(e) => set("secretNotes", e.target.value)}
+                />
+                <p className="mt-1 text-xs tabular-nums text-amber-600">{v.secretNotes.length} / 4000</p>
+              </div>
+            </>
           )}
         </Section>
 

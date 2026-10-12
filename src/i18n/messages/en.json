@@ -483,6 +483,10 @@
     "readyTitle": "Ready to start in the kitchen?",
     "reviews": "What cooks say",
     "reviewsNote": "Only people who cooked the recipe all the way through write here: their result, rating and advice.",
+    "secretsFor": "For buyers only",
+    "secretsLocked": "{name}'s insider tips unlock with the full guide.",
+    "secretsOwner": "You see this as the author",
+    "secretsTitle": "The chef's secrets",
     "servingsHint": "How many are you cooking for? Amounts adjust automatically.",
     "servingsYield": {
       "one": "{count} serving",
@@ -528,6 +532,7 @@
     "category": "Category",
     "check": {
       "nutrition": "Nutrition (optional)",
+      "secrets": "Insider secrets (premium)",
       "title": "Title and description"
     },
     "checkTitle": "Readiness",
@@ -571,6 +576,9 @@
       "media": "Photos and video",
       "pricing": "Pricing and publishing"
     },
+    "secrets": "Insider secrets (buyers only)",
+    "secretsHint": "The things nobody tells you: little techniques, substitutions, how to avoid mistakes. Only people who bought the recipe see this.",
+    "secretsPh": "For example: heat the oil to 180°, otherwise the dough sticks…",
     "servings": "Servings",
     "stepImage": "Image link (optional)",
     "stepIngs": "Numbers of the ingredients used",
@@ -587,6 +595,9 @@
     "tipOptional": "Tip (optional)",
     "title": "Title",
     "toDraft": "Back to draft",
+    "type": "Recipe type",
+    "typeFreeNote": "Open to everyone — great for growing your audience.",
+    "typePremiumNote": "Ingredients and the first steps are free; the full guide and secrets are paid.",
     "unitPh": "Unit",
     "untitled": "Recipe title",
     "up": "Move up",
@@ -1023,14 +1034,55 @@
     "quickest": "Quickest to make"
   },
   "studio": {
+    "allRecipes": "All recipes →",
+    "avgOrder": "Average order",
+    "backToSite": "Back to the site",
+    "buyers": "Buyers",
+    "commission": "Platform commission: {pct}%",
     "empty": "No recipes yet",
     "emptyText": "Create your first recipe — with photos, a video and steps.",
     "eyebrow": "Creator studio",
     "getStarted": "Get started",
+    "gross": "Gross revenue",
     "hasVideo": "Has video",
     "hello": "Hello, {name}",
+    "latest": "Latest recipes",
     "lead": "Create recipes, add photos and videos, and follow how they perform.",
+    "nav": {
+      "group": "Studio",
+      "profile": "Profile",
+      "reviews": "Reviews",
+      "sales": "Sales",
+      "sections": "Studio sections"
+    },
+    "net": "Your share",
     "noCover": "No cover",
+    "noSales": "No sales yet",
+    "noSalesText": "Publish a premium recipe — purchases will show up here. Sales start once the payment system is connected.",
+    "orders": "Purchases",
+    "overviewTitle": "Studio",
+    "price": "Price",
+    "recentBuyers": "Recent buyers",
+    "recipes": {
+      "desc": "All your recipes: edit, publish and see how they do.",
+      "search": "Search your recipes"
+    },
+    "revenueOverTime": "Revenue over time",
+    "reviews": {
+      "desc": "Ratings and photos from people who cooked your recipes."
+    },
+    "sales": {
+      "desc": "How many times your premium recipes sold, who bought them and what you earned.",
+      "paymentsNote": "The payment system isn't connected yet: sales are counted once it is.",
+      "premiumHint": "Tip: add insider secrets to a premium recipe — that's what buyers value most.",
+      "title": "Sales and earnings"
+    },
+    "salesByRecipe": "Sales by recipe",
+    "sold": "Sold",
+    "stats": {
+      "desc": "How your recipes performed over the last {range}.",
+      "sales": "Sales"
+    },
     "todo": {
       "profile": "Complete your profile: name, intro and photo",
       "publish": "Publish a recipe",

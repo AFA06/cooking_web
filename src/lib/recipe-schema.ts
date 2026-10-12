@@ -32,6 +32,7 @@ export const recipeInputSchema = z
     carbGrams: z.coerce.number().int().min(0).max(1000).nullable(),
     isPremium: z.boolean(),
     priceAmount: z.coerce.number().int().min(0).max(100_000_000).nullable(),
+    secretNotes: z.string().trim().max(4000),
     tags: z.array(z.string().trim().min(1).max(30)).max(10),
     ingredients: z
       .array(

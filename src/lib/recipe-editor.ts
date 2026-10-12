@@ -10,6 +10,7 @@ export function toEditorInitial({ recipe: r, ingredients, steps }: RecipeForEdit
     coverUrl: r.coverUrl,
     galleryUrls: r.galleryUrls,
     videoUrl: r.videoUrl ?? "",
+    secretNotes: r.secretNotes ?? "",
     servings: String(r.servings),
     prepTimeMinutes: String(r.prepTimeMinutes),
     cookTimeMinutes: String(r.cookTimeMinutes),

@@ -477,6 +477,10 @@
     "readyTitle": "Oshxonada boshlashga tayyormisiz?",
     "reviews": "Pishirganlar fikri",
     "reviewsNote": "Bu yerda faqat retseptni oxirigacha pishirgan odamlar yozadi: natijasi, bahosi va maslahati.",
+    "secretsFor": "Faqat xaridorlar uchun",
+    "secretsLocked": "{name}ning yashirin maslahatlari to‘liq qo‘llanma bilan ochiladi.",
+    "secretsOwner": "Siz buni muallif sifatida ko‘ryapsiz",
+    "secretsTitle": "Oshpaz sirlari",
     "servingsHint": "Necha kishiga pishirasiz? Miqdorlar shunga qarab o‘zgaradi.",
     "servingsYield": {
       "other": "{count} porsiya"
@@ -520,6 +524,7 @@
     "category": "Toifa",
     "check": {
       "nutrition": "Ozuqaviy qiymat (ixtiyoriy)",
+      "secrets": "Yashirin ma’lumotlar (premium)",
       "title": "Sarlavha va tavsif"
     },
     "checkTitle": "Tayyorlik",
@@ -563,6 +568,9 @@
       "media": "Rasm va video",
       "pricing": "Narx va nashr"
     },
+    "secrets": "Yashirin ma’lumotlar (faqat xaridorlar uchun)",
+    "secretsHint": "Hech kim aytmaydigan sirlar: ustalik nozikliklari, almashtirish usullari, xatolardan saqlanish. Faqat sotib olganlar ko‘radi.",
+    "secretsPh": "Masalan: Yog‘ni 180° gacha qizdiring, aks holda xamir yopishadi…",
     "servings": "Porsiya",
     "stepImage": "Rasm havolasi (ixtiyoriy)",
     "stepIngs": "Ishlatiladigan masalliq raqamlari",
@@ -579,6 +587,9 @@
     "tipOptional": "Maslahat (ixtiyoriy)",
     "title": "Sarlavha",
     "toDraft": "Qoralamaga qaytarish",
+    "type": "Retsept turi",
+    "typeFreeNote": "Hamma ochiq ko‘radi va pishiradi — auditoriya o‘sishi uchun yaxshi.",
+    "typePremiumNote": "Masalliqlar va dastlabki qadamlar bepul, to‘liq qo‘llanma va sirlar — pullik.",
     "unitPh": "Birlik",
     "untitled": "Retsept nomi",
     "up": "Yuqoriga",
@@ -1009,14 +1020,55 @@
     "quickest": "Eng tez tayyor bo‘ladigan"
   },
   "studio": {
+    "allRecipes": "Barcha retseptlar →",
+    "avgOrder": "O‘rtacha chek",
+    "backToSite": "Saytga qaytish",
+    "buyers": "Xaridorlar",
+    "commission": "Platforma komissiyasi: {pct}%",
     "empty": "Hali retseptlar yo‘q",
     "emptyText": "Birinchi retseptingizni yarating — rasm, video va qadamlar bilan.",
     "eyebrow": "Ijodkor studiyasi",
     "getStarted": "Boshlash uchun",
+    "gross": "Umumiy tushum",
     "hasVideo": "Video bor",
     "hello": "Salom, {name}",
+    "latest": "So‘nggi retseptlar",
     "lead": "Retseptlaringizni yarating, rasm va video qo‘shing va natijalarni kuzating.",
+    "nav": {
+      "group": "Studiya",
+      "profile": "Profil",
+      "reviews": "Fikrlar",
+      "sales": "Sotuvlar",
+      "sections": "Studiya bo‘limlari"
+    },
+    "net": "Sizning ulushingiz",
     "noCover": "Muqova yo‘q",
+    "noSales": "Hali sotuvlar yo‘q",
+    "noSalesText": "Premium retsept nashr eting — xaridlar shu yerda ko‘rinadi. To‘lov tizimi ulangach, sotuvlar boshlanadi.",
+    "orders": "Xaridlar soni",
+    "overviewTitle": "Studiya",
+    "price": "Narxi",
+    "recentBuyers": "Oxirgi xaridorlar",
+    "recipes": {
+      "desc": "Barcha retseptlaringiz: tahrirlash, nashr etish va natijalar.",
+      "search": "Retseptlaringiz bo‘yicha qidirish"
+    },
+    "revenueOverTime": "Daromad dinamikasi",
+    "reviews": {
+      "desc": "Retseptlaringizni pishirganlarning baholari va rasmlari."
+    },
+    "sales": {
+      "desc": "Premium retseptlaringiz nechta sotilgani, kim sotib olgani va qancha ishlaganingiz.",
+      "paymentsNote": "To‘lov tizimi hozircha ulanmagan: sotuvlar shu tizim ulangach hisoblanadi.",
+      "premiumHint": "Maslahat: premium retseptga yashirin sirlar qo‘shing — xaridorlar aynan shuni qadrlaydi.",
+      "title": "Sotuvlar va daromad"
+    },
+    "salesByRecipe": "Retseptlar bo‘yicha sotuvlar",
+    "sold": "Sotilgan",
+    "stats": {
+      "desc": "So‘nggi {range} ichida retseptlaringiz qanday ishladi.",
+      "sales": "Sotuvlar"
+    },
     "todo": {
       "profile": "Profilingizni to‘ldiring: ism, tanishtiruv va rasm",
       "publish": "Retseptni nashr eting",

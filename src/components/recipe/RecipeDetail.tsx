@@ -12,6 +12,7 @@ import { ShareButton } from "@/components/recipe/ShareButton";
 import { getLocale, getT } from "@/i18n/server";
 import { LOCALE_INFO, type Locale, type TFunction } from "@/i18n/core";
 import { parseVideoUrl } from "@/lib/video";
+import type { RecipeSecrets } from "@/server/secrets";
 import { DIFFICULTY_KEY, formatMinutes, formatPrice, toIsoDuration } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -122,9 +123,11 @@ interface Props {
   eligibility: ReviewEligibility | null;
   /** Servings this recipe is on the visitor's shopping list for, if it is. */
   shoppingServings: number | null;
+  /** Insider notes of a premium recipe; null for free recipes. */
+  secrets: RecipeSecrets | null;
 }
 
-export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds, reviews, rating, eligibility, shoppingServings }: Props) {
+export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds, reviews, rating, eligibility, shoppingServings, secrets }: Props) {
   const [t, locale] = await Promise.all([getT(), getLocale()]);
   const { creator } = recipe;
   const times = { prepMinutes: recipe.prepTimeMinutes, cookMinutes: recipe.cookTimeMinutes };
@@ -335,6 +338,21 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                   ))}
                 </ol>
               </>
+            )}
+
+            {secrets?.exists && (
+              <section aria-labelledby="secrets-heading" className="mt-12 rounded-[1.75rem] border-2 border-dashed border-amber-700/60 bg-clay-100/50 p-7 sm:p-9">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+                  <Lock className="h-4 w-4" aria-hidden="true" />
+                  {secrets.notes ? (secrets.asOwner ? t("detail.secretsOwner") : t("detail.secretsFor")) : t("detail.secretsFor")}
+                </p>
+                <h3 id="secrets-heading" className="mt-3 font-serif text-3xl font-medium text-amber-950">{t("detail.secretsTitle")}</h3>
+                {secrets.notes ? (
+                  <p className="mt-4 whitespace-pre-line text-xl leading-relaxed text-amber-950">{secrets.notes}</p>
+                ) : (
+                  <p className="mt-3 text-lg text-amber-900">{t("detail.secretsLocked", { name: creator.name })}</p>
+                )}
+              </section>
             )}
 
             {!recipe.isPremium && (
