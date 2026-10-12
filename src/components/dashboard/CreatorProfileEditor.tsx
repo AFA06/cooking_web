@@ -4,7 +4,7 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { SocialIcon } from "@/components/creator/SocialLinks";
+import { SocialIcon } from "@/components/creator/SocialIcon";
 import { updateCreatorProfile } from "@/app/dashboard/actions";
 import { useT } from "@/i18n/client";
 import { SOCIAL_PLATFORMS, normalizeSocialUrl, type SocialLinks, type SocialPlatform } from "@/lib/social";
