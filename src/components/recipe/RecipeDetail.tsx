@@ -270,7 +270,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
         )}
 
         <Container size="xl" className="mt-16 grid items-start gap-12 lg:mt-24 lg:grid-cols-[23rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[26rem_minmax(0,1fr)] xl:gap-20">
-          <section aria-labelledby="ingredients-heading" className="rounded-[1.75rem] bg-sage-50 p-6 sm:p-8 lg:sticky lg:top-24">
+          <section aria-labelledby="ingredients-heading" className="rounded-[1.75rem] bg-sage-50 p-6 sm:p-8">
             <div className="flex items-baseline justify-between gap-4">
               <h2 id="ingredients-heading" className="text-3xl font-medium text-amber-950">{t("detail.ingredients")}</h2>
               <p className="text-sm text-sage-600">{t("detail.ingredientsCount", { count: recipe.ingredients.length })}</p>
