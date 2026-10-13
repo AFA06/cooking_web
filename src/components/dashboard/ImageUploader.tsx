@@ -37,9 +37,11 @@ export function ImageUploader({ value, onChange, shape = "wide", compact = false
   const [linkOpen, setLinkOpen] = React.useState(false);
   const [link, setLink] = React.useState("");
 
-  const unmounted = React.useRef(new AbortController());
+  // Uploads in flight are dropped when the box goes away (its step was deleted, or the page was left).
+  const leaving = React.useRef<AbortController | null>(null);
   React.useEffect(() => {
-    const controller = unmounted.current;
+    const controller = new AbortController();
+    leaving.current = controller;
     return () => controller.abort();
   }, []);
 
@@ -51,6 +53,7 @@ export function ImageUploader({ value, onChange, shape = "wide", compact = false
 
   const take = async (file: File | undefined) => {
     if (!file || !file.type.startsWith("image/")) return;
+    const signal = leaving.current?.signal ?? new AbortController().signal;
     setError(null);
     setBusy(true);
     onBusy?.(true);
@@ -59,7 +62,7 @@ export function ImageUploader({ value, onChange, shape = "wide", compact = false
       let result: { url: string } | { error: string };
       if (stored) {
         try {
-          result = { url: await uploadMedia("image", jpegBlob(base64), { signal: unmounted.current.signal }) };
+          result = { url: await uploadMedia("image", jpegBlob(base64), { signal }) };
         } catch (problem) {
           // Until file storage is set up, photos are kept the old way.
           if (!(problem instanceof UploadError && problem.code === "storage_off")) throw problem;
@@ -71,7 +74,7 @@ export function ImageUploader({ value, onChange, shape = "wide", compact = false
       if ("error" in result) setError(result.error);
       else replace(result.url);
     } catch (problem) {
-      if (!unmounted.current.signal.aborted) setError(problem instanceof UploadError ? problem.message : t("review.photoFail"));
+      if (!signal.aborted) setError(problem instanceof UploadError ? problem.message : t("review.photoFail"));
     } finally {
       setBusy(false);
       onBusy?.(false);
