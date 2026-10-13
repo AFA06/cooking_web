@@ -65,6 +65,8 @@ function steps(rows: StepInput[]): RecipeStep[] {
     order: i + 1,
     title: r.title,
     instruction: r.instruction,
+    // Sample data: the first steps of the demo recipes are open, like a creator would pick them.
+    isFree: i < 3,
     mediaUrl: r.photo ? IMG(r.photo, 800) : undefined,
     mediaType: r.photo ? ("image" as const) : undefined,
     timerSeconds: r.minutes ? r.minutes * 60 : undefined,

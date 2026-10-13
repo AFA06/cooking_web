@@ -461,7 +461,7 @@
     "paymentSoon": "To‘lov tez orada ulanadi",
     "paymentSoonNote": "Hozircha saqlab qo‘ying — to‘lov ochilganda kutubxonangizda bo‘ladi.",
     "premiumIntro": {
-      "other": "Masalliqlar va dastlabki {count} qadam bepul."
+      "other": "Masalliqlar va {count} ta qadam bepul."
     },
     "premiumRecipe": "Premium retsept",
     "premiumStep": "Premium qadam",
@@ -495,7 +495,8 @@
     "updateRating": "Bahoyingizni yangilang",
     "video": "Video",
     "videoTitle": "{title} — video",
-    "withTimer": "Taymer bilan · {time}"
+    "withTimer": "Taymer bilan · {time}",
+    "premiumIntroNone": "Masalliqlar bepul; qadamlar to‘liq qo‘llanmada."
   },
   "dialog": {
     "createSave": "Yaratish va saqlash",
@@ -526,7 +527,8 @@
     "check": {
       "nutrition": "Ozuqaviy qiymat (ixtiyoriy)",
       "secrets": "Yashirin ma’lumotlar (premium)",
-      "title": "Sarlavha va tavsif"
+      "title": "Sarlavha va tavsif",
+      "freeStep": "Kamida bitta bepul qadam"
     },
     "checkTitle": "Tayyorlik",
     "cookMin": "Pishirish (daq.)",
@@ -599,7 +601,11 @@
     "videoHint": "YouTube yoki Vimeo havolasi, yoki .mp4 fayl havolasi. Video retsept sahifasida ko‘rsatiladi.",
     "videoOk": "Video tanildi",
     "stepVideo": "Qadam videosi (ixtiyoriy)",
-    "stepVideoHint": "Bu qadam qanday bajarilishini qisqa videoda ko‘rsating, {mb} MB gacha. Ikkalasini ham qo‘shsangiz, avval rasm ko‘rinadi, bosilganda video ijro etiladi."
+    "stepVideoHint": "Bu qadam qanday bajarilishini qisqa videoda ko‘rsating, {mb} MB gacha. Ikkalasini ham qo‘shsangiz, avval rasm ko‘rinadi, bosilganda video ijro etiladi.",
+    "stepAccess": "Bu qadamni kim o‘qiy oladi",
+    "stepFree": "Bepul",
+    "stepPremium": "Premium",
+    "stepsAccessNote": "Qaysi qadamlar hamma uchun bepul ekanini o‘zingiz tanlaysiz. {total} tadan {free} tasi bepul, qolganlari retseptni sotib olgach ochiladi."
   },
   "email": {
     "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",

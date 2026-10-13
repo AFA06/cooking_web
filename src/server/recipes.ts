@@ -61,6 +61,7 @@ function toRecipe(
         order: s.position,
         title: s.title,
         instruction: s.instruction,
+        isFree: s.isFree,
         mediaUrl: s.mediaUrl ?? undefined,
         mediaType: s.mediaUrl ? ("image" as const) : undefined,
         videoUrl: s.videoUrl ?? undefined,

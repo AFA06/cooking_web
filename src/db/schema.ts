@@ -183,6 +183,8 @@ export const recipeSteps = pgTable(
     instruction: text("instruction").notNull(),
     mediaUrl: text("media_url"),
     videoUrl: text("video_url"),
+    /** On a premium recipe: the creator lets everyone read this step before buying. Ignored on free recipes. */
+    isFree: boolean("is_free").notNull().default(false),
     timerSeconds: integer("timer_seconds"),
     temperatureCelsius: integer("temperature_celsius"),
     tip: text("tip"),

@@ -64,6 +64,7 @@ async function main() {
         position: s.order,
         title: s.title,
         instruction: s.instruction,
+        isFree: s.isFree,
         mediaUrl: s.mediaUrl,
         timerSeconds: s.timerSeconds,
         temperatureCelsius: s.temperatureCelsius,

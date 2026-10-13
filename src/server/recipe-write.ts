@@ -92,6 +92,7 @@ export async function persistRecipe(o: PersistOptions): Promise<{ error: string 
       position: n + 1,
       title: s.title,
       instruction: s.instruction,
+      isFree: s.isFree,
       mediaUrl: s.mediaUrl || null,
       videoUrl: s.videoUrl || null,
       timerSeconds: s.timerMinutes > 0 ? s.timerMinutes * 60 : null,

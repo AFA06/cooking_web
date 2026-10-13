@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { Check, Circle, Clock, Film, Lock, Plus } from "lucide-react";
+import { Check, Circle, Clock, Film, Lock, LockOpen, Plus } from "lucide-react";
 import { ImageUploader } from "@/components/dashboard/ImageUploader";
 import { VideoUploader } from "@/components/dashboard/VideoUploader";
 import { Button } from "@/components/ui/Button";
@@ -17,6 +17,8 @@ type Ingredient = { name: string; quantity: string; unit: string };
 type Step = {
   title: string;
   instruction: string;
+  /** Premium recipes only: readers can see this step before buying. */
+  isFree: boolean;
   mediaUrl: string;
   videoUrl: string;
   timerMinutes: string;
@@ -72,7 +74,7 @@ export const EMPTY_RECIPE: EditorInitial = {
   tags: "",
   status: "draft",
   ingredients: [{ name: "", quantity: "", unit: "" }],
-  steps: [{ title: "", instruction: "", mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" }],
+  steps: [{ title: "", instruction: "", isFree: false, mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" }],
 };
 
 const field =
@@ -110,6 +112,7 @@ function toInput(v: EditorInitial): RecipeInput {
     steps: v.steps.map((s) => ({
       title: s.title,
       instruction: s.instruction,
+      isFree: s.isFree,
       mediaUrl: s.mediaUrl,
       videoUrl: s.videoUrl,
       timerMinutes: Number(s.timerMinutes || 0),
@@ -136,7 +139,7 @@ interface RecipeEditorProps {
 }
 
 const MAX_GALLERY = 5;
-const BLANK_STEP: Step = { title: "", instruction: "", mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" };
+const BLANK_STEP: Step = { title: "", instruction: "", isFree: false, mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" };
 
 const parsePositions = (value: string) =>
   value
@@ -228,6 +231,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
     { key: "steps", label: t("ed.steps"), done: v.steps.some((s) => s.title.trim() && s.instruction.trim()), required: true },
     { key: "video", label: t("ed.video"), done: !!video, required: false },
     { key: "nutrition", label: t("ed.check.nutrition"), done: v.calories !== "", required: false },
+    ...(v.isPremium ? [{ key: "freeStep", label: t("ed.check.freeStep"), done: v.steps.some((s) => s.isFree), required: false }] : []),
     ...(v.isPremium ? [{ key: "secrets", label: t("ed.check.secrets"), done: v.secretNotes.trim() !== "", required: false }] : []),
   ];
   const ready = checks.filter((c) => c.required).every((c) => c.done);
@@ -425,7 +429,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
         </Section>
 
         {/* 4 — steps */}
-        <Section n={4} title={t("ed.steps")}>
+        <Section n={4} title={t("ed.steps")} note={v.isPremium ? t("ed.stepsAccessNote", { free: v.steps.filter((s) => s.isFree).length, total: v.steps.length }) : undefined}>
           <div className="space-y-5">
             {v.steps.map((s, i) => {
               const picked = parsePositions(s.ingredientPositions);
@@ -435,7 +439,38 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-clay-400 text-sm text-amber-50">{i + 1}</span>
                     {t("ed.stepN", { n: i + 1 })}
                   </legend>
-                  <div className="mt-2 space-y-4">
+                  {v.isPremium && (
+                    <div role="radiogroup" aria-label={t("ed.stepAccess")} className="mt-2 grid max-w-md grid-cols-2 gap-2">
+                      {([
+                        { free: true, text: t("ed.stepFree"), Icon: LockOpen },
+                        { free: false, text: t("ed.stepPremium"), Icon: Lock },
+                      ] as const).map(({ free, text, Icon }) => {
+                        const selected = s.isFree === free;
+                        return (
+                          <button
+                            key={String(free)}
+                            type="button"
+                            role="radio"
+                            aria-checked={selected}
+                            onClick={() => setStep(i, { isFree: free })}
+                            className={cn(
+                              "flex h-12 items-center justify-center gap-2 rounded-xl border-2 px-3 text-base font-semibold transition-colors",
+                              selected
+                                ? free
+                                  ? "border-sage-600 bg-sage-100 text-sage-900"
+                                  : "border-amber-700 bg-amber-100 text-amber-950"
+                                : "border-amber-200 text-amber-700 hover:border-amber-400",
+                            )}
+                          >
+                            <Icon className="h-5 w-5" aria-hidden="true" />
+                            {text}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  <div className="mt-4 space-y-4">
                     <div>
                       <label className={label} htmlFor={`st-title-${i}`}>{t("ed.title")}</label>
                       <input id={`st-title-${i}`} className={cn(field, "mt-1.5")} value={s.title} onChange={(e) => setStep(i, { title: e.target.value })} />

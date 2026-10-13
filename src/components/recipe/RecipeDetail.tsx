@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { NutritionFacts } from "@/components/recipe/NutritionFacts";
@@ -133,9 +134,11 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
   const { creator } = recipe;
   const times = { prepMinutes: recipe.prepTimeMinutes, cookMinutes: recipe.cookTimeMinutes };
   const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency, t) : null;
-  const previewCount = recipe.isPremium ? Math.min(PLATFORM_CONFIG.premium.freePreviewSteps, recipe.steps.length) : recipe.steps.length;
-  const openSteps = recipe.steps.slice(0, previewCount);
-  const lockedSteps = recipe.steps.slice(previewCount);
+  // On a premium recipe the creator marks each step free or premium; a free recipe shows everything.
+  const isOpen = (step: Recipe["steps"][number]) => !recipe.isPremium || step.isFree;
+  const openCount = recipe.steps.filter(isOpen).length;
+  const lockedCount = recipe.steps.length - openCount;
+  const firstLocked = recipe.steps.findIndex((step) => !isOpen(step));
   const ingredientsById = new Map(recipe.ingredients.map((i) => [i.id, i]));
   const video = recipe.videoUrl ? parseVideoUrl(recipe.videoUrl) : null;
 
@@ -225,7 +228,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                 {recipe.isPremium ? (
                   <div className="rounded-2xl bg-amber-100 p-5">
                     <p className="font-medium text-amber-950">
-                      {t("detail.premiumIntro", { count: previewCount })}
+                      {openCount > 0 ? t("detail.premiumIntro", { count: openCount }) : t("detail.premiumIntroNone")}
                       {price && <> {t("detail.fullGuide")} <span className="font-serif text-xl font-semibold text-amber-700">{price}</span>.</>}
                     </p>
                     <Button asChild size="lg" className="mt-4 w-full sm:w-auto">
@@ -288,39 +291,37 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
             </div>
 
             <ol>
-              {openSteps.map((step) => (
-                <li key={step.id} className="grid gap-x-6 gap-y-4 border-b border-amber-200 py-10 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
-                  <p className="font-serif text-6xl font-medium leading-none text-clay-400 tabular-nums sm:text-7xl" aria-hidden="true">
-                    {String(step.order).padStart(2, "0")}
-                  </p>
-                  <div className="min-w-0 space-y-4">
-                    <StepFacts step={step} t={t} />
-                    <h3 className="text-2xl font-medium leading-snug text-amber-950 sm:text-[1.75rem]">
-                      <span className="sr-only">{t("detail.stepLabel", { n: step.order })} </span>
-                      {step.title}
-                    </h3>
-                    <p className="max-w-2xl text-lg leading-relaxed text-amber-900">{step.instruction}</p>
-                    <StepIngredients ingredients={(step.ingredientIds ?? []).map((id) => ingredientsById.get(id)).filter((i) => i !== undefined)} />
-                    <StepMedia step={step} sizes="(max-width: 1024px) 100vw, 45vw" className="max-w-2xl rounded-2xl" />
-                    {step.tip && (
-                      <p className="max-w-2xl rounded-2xl bg-clay-100/60 px-5 py-4 text-amber-950">
-                        <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{t("detail.tip")}</span>
-                        {step.tip}
-                      </p>
+              {recipe.steps.map((step, index) =>
+                isOpen(step) ? (
+                  <li key={step.id} className="grid gap-x-6 gap-y-4 border-b border-amber-200 py-10 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
+                    <p className="font-serif text-6xl font-medium leading-none text-clay-400 tabular-nums sm:text-7xl" aria-hidden="true">
+                      {String(step.order).padStart(2, "0")}
+                    </p>
+                    <div className="min-w-0 space-y-4">
+                      <StepFacts step={step} t={t} />
+                      <h3 className="text-2xl font-medium leading-snug text-amber-950 sm:text-[1.75rem]">
+                        <span className="sr-only">{t("detail.stepLabel", { n: step.order })} </span>
+                        {step.title}
+                      </h3>
+                      <p className="max-w-2xl text-lg leading-relaxed text-amber-900">{step.instruction}</p>
+                      <StepIngredients ingredients={(step.ingredientIds ?? []).map((id) => ingredientsById.get(id)).filter((i) => i !== undefined)} />
+                      <StepMedia step={step} sizes="(max-width: 1024px) 100vw, 45vw" className="max-w-2xl rounded-2xl" />
+                      {step.tip && (
+                        <p className="max-w-2xl rounded-2xl bg-clay-100/60 px-5 py-4 text-amber-950">
+                          <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{t("detail.tip")}</span>
+                          {step.tip}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ) : (
+                  <Fragment key={step.id}>
+                    {index === firstLocked && (
+                      <li className="list-none py-10">
+                        <UnlockCard recipe={recipe} lockedCount={lockedCount} price={price} t={t} />
+                      </li>
                     )}
-                  </div>
-                </li>
-              ))}
-            </ol>
-
-            {lockedSteps.length > 0 && (
-              <>
-                <div className="py-10">
-                  <UnlockCard recipe={recipe} lockedCount={lockedSteps.length} price={price} t={t} />
-                </div>
-                <ol start={previewCount + 1} aria-label={t("detail.premiumSteps")}>
-                  {lockedSteps.map((step) => (
-                    <li key={step.id} className="grid items-center gap-x-6 border-t border-amber-200 py-6 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
+                    <li className="grid items-center gap-x-6 border-t border-amber-200 py-6 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
                       <p className="font-serif text-4xl font-medium leading-none text-amber-300 tabular-nums sm:text-5xl" aria-hidden="true">
                         {String(step.order).padStart(2, "0")}
                       </p>
@@ -332,10 +333,10 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                         <Lock className="h-5 w-5 shrink-0 text-amber-400" aria-label={t("detail.premiumStep")} />
                       </div>
                     </li>
-                  ))}
-                </ol>
-              </>
-            )}
+                  </Fragment>
+                ),
+              )}
+            </ol>
 
             {secrets?.exists && (
               <section aria-labelledby="secrets-heading" className="mt-12 rounded-[1.75rem] border-2 border-dashed border-amber-700/60 bg-clay-100/50 p-7 sm:p-9">

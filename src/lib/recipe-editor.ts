@@ -28,6 +28,7 @@ export function toEditorInitial({ recipe: r, ingredients, steps }: RecipeForEdit
     steps: steps.map((s) => ({
       title: s.title,
       instruction: s.instruction,
+      isFree: s.isFree,
       mediaUrl: s.mediaUrl ?? "",
       videoUrl: s.videoUrl ?? "",
       timerMinutes: s.timerSeconds ? String(Math.round(s.timerSeconds / 60)) : "",

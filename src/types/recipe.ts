@@ -15,6 +15,8 @@ export interface RecipeStep {
   order: number;
   title: string;
   instruction: string;
+  /** On a premium recipe, whether this step is open to everyone; the creator decides step by step. */
+  isFree: boolean;
   mediaUrl?: string;
   mediaType?: "image" | "video";
   /** A clip showing this step: an upload or a link, see lib/video. The photo, when there is one, is its poster. */

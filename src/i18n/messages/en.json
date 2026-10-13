@@ -465,8 +465,8 @@
     "paymentSoon": "Payments are coming soon",
     "paymentSoonNote": "Save it for now — it will be in your library once payments open.",
     "premiumIntro": {
-      "one": "Ingredients and the first {count} step are free.",
-      "other": "Ingredients and the first {count} steps are free."
+      "one": "Ingredients and {count} step are free.",
+      "other": "Ingredients and {count} steps are free."
     },
     "premiumRecipe": "Premium recipe",
     "premiumStep": "Premium step",
@@ -503,7 +503,8 @@
     "updateRating": "Update your rating",
     "video": "Video",
     "videoTitle": "{title} — video",
-    "withTimer": "With timer · {time}"
+    "withTimer": "With timer · {time}",
+    "premiumIntroNone": "Ingredients are free; the steps are in the full guide."
   },
   "dialog": {
     "createSave": "Create and save",
@@ -534,7 +535,8 @@
     "check": {
       "nutrition": "Nutrition (optional)",
       "secrets": "Insider secrets (premium)",
-      "title": "Title and description"
+      "title": "Title and description",
+      "freeStep": "At least one free step"
     },
     "checkTitle": "Readiness",
     "cookMin": "Cooking (min)",
@@ -607,7 +609,11 @@
     "videoHint": "A YouTube or Vimeo link, or a link to an .mp4 file. The video is shown on the recipe page.",
     "videoOk": "Video recognised",
     "stepVideo": "Step video (optional)",
-    "stepVideoHint": "Show how this step is done in a short clip, up to {mb} MB. If you add both, the photo is shown first and the video plays when tapped."
+    "stepVideoHint": "Show how this step is done in a short clip, up to {mb} MB. If you add both, the photo is shown first and the video plays when tapped.",
+    "stepAccess": "Who can read this step",
+    "stepFree": "Free",
+    "stepPremium": "Premium",
+    "stepsAccessNote": "You choose which steps readers see for free. {free} of {total} are free; the rest unlock after they buy the recipe."
   },
   "email": {
     "body": "{label}: {code}\n\nThe code is valid for {minutes} minutes. Do not share it with anyone.\nIf you did not make this request, ignore this email.",
