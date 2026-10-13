@@ -1015,7 +1015,16 @@
       "other": "{count} ta mahsulot olish kerak"
     },
     "updateTo": "Ro‘yxatni {count} kishilikka yangilash",
-    "yesClear": "Ha, tozalash"
+    "yesClear": "Ha, tozalash",
+    "pickHint": "Faqat kerakli retsept mahsulotlarini ko‘rish uchun retseptni bosing. Bir nechtasini tanlasangiz, mahsulotlar jamlanadi.",
+    "showingPicked": "{total} ta retseptdan {count} tasi ko‘rsatilmoqda",
+    "allShown": "Barcha retseptlar ko‘rsatilmoqda",
+    "showAll": "Hammasini ko‘rsatish",
+    "pickRecipe": "{title} mahsulotlarini ko‘rsatish",
+    "openRecipe": "{title} retseptini ochish",
+    "clearPicked": "Tanlangan retseptlarni olib tashlash",
+    "confirmClearPicked": "Tanlangan retseptlar ro‘yxatdan olib tashlansinmi?",
+    "yesRemove": "Ha, olib tashlash"
   },
   "site": {
     "tagline": "Sevimli ijodkorlaringizdan qadam-baqadam retseptlar"

@@ -3,15 +3,19 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Check, X } from "lucide-react";
+import { Check, ExternalLink, X } from "lucide-react";
 import { clearShoppingList, removeFromShoppingList, setShoppingChecked } from "@/app/shopping/actions";
 import { Button } from "@/components/ui/Button";
 import { useLocale, useT } from "@/i18n/client";
-import { mergeShoppingRows, type ShoppingLine, type ShoppingRow } from "@/lib/shopping";
+import { mergeShoppingRows, rowsForPicked, type ShoppingLine, type ShoppingRow } from "@/lib/shopping";
 import { cn } from "@/lib/utils";
 import type { ShoppingRecipe } from "@/server/shopping";
 
-type Change = { type: "check"; ids: string[]; checked: boolean } | { type: "removeRecipe"; recipeId: string } | { type: "clear"; scope: "bought" | "all" };
+type Change =
+  | { type: "check"; ids: string[]; checked: boolean }
+  | { type: "removeRecipe"; recipeId: string }
+  /** `recipeIds` limits it to those recipes; without it the whole list is cleared. */
+  | { type: "clear"; scope: "bought" | "all"; recipeIds?: string[] };
 
 /** What the list looks like once a change lands, shown at once while the server catches up. */
 function applyChange(rows: ShoppingRow[], change: Change): ShoppingRow[] {
@@ -21,7 +25,7 @@ function applyChange(rows: ShoppingRow[], change: Change): ShoppingRow[] {
     case "removeRecipe":
       return rows.filter((row) => row.recipeId !== change.recipeId);
     case "clear":
-      return change.scope === "all" ? [] : rows.filter((row) => !row.checked);
+      return rows.filter((row) => !((!change.recipeIds || change.recipeIds.includes(row.recipeId)) && (change.scope === "all" || row.checked)));
   }
 }
 
@@ -57,6 +61,8 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
   const [current, apply] = React.useOptimistic(rows, applyChange);
   const [, startTransition] = React.useTransition();
   const [confirmingClear, setConfirmingClear] = React.useState(false);
+  // Recipes the shopper tapped to see only their products. Empty means every recipe on the list.
+  const [picked, setPicked] = React.useState<ReadonlySet<string>>(new Set());
   const [error, setError] = React.useState<string | null>(null);
 
   const run = (change: Change, action: () => Promise<{ ok: true } | { error: string }>) =>
@@ -66,16 +72,29 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
       setError("error" in result ? result.error : null);
     });
 
-  const lines = mergeShoppingRows(current, locale);
+  const onList = recipes.filter((recipe) => current.some((row) => row.recipeId === recipe.id));
+  // A recipe that left the list can no longer be picked.
+  const pickedIds = new Set(onList.filter((recipe) => picked.has(recipe.id)).map((recipe) => recipe.id));
+  const filtering = pickedIds.size > 0;
+  const shownRecipes = filtering ? onList.filter((recipe) => pickedIds.has(recipe.id)) : onList;
+
+  const lines = mergeShoppingRows(rowsForPicked(current, pickedIds), locale);
   const toBuy = lines.filter((line) => !line.checked);
   const bought = lines.filter((line) => line.checked);
-  const shownRecipes = recipes.filter((recipe) => current.some((row) => row.recipeId === recipe.id));
   const titles = new Map(recipes.map((recipe) => [recipe.id, recipe.title]));
-  // Saying which dish a product is for only helps when there is more than one dish.
+  // Saying which dish a product is for only helps when there is more than one dish on show.
   const noteFor = (line: ShoppingLine) => (shownRecipes.length > 1 ? line.recipeIds.map((id) => titles.get(id)).join(" · ") : null);
+  const togglePicked = (id: string) =>
+    setPicked((previous) => {
+      const next = new Set(previous);
+      if (!next.delete(id)) next.add(id);
+      return next;
+    });
+  /** Clearing only touches what is on screen: the picked recipes, or the whole list when none is picked. */
+  const scope = filtering ? [...pickedIds] : undefined;
   const toggle = (line: ShoppingLine) => run({ type: "check", ids: line.ids, checked: !line.checked }, () => setShoppingChecked(line.ids, !line.checked));
 
-  if (lines.length === 0) return <p className="mt-10 text-lg text-amber-900" role="status">{t("shopping.cleared")}</p>;
+  if (current.length === 0) return <p className="mt-10 text-lg text-amber-900" role="status">{t("shopping.cleared")}</p>;
 
   return (
     <>
@@ -90,28 +109,76 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
         )}
       </p>
 
-      <ul className="mt-8 flex flex-wrap gap-3" aria-label={t("shopping.recipesList")}>
-        {shownRecipes.map((recipe) => (
-          <li key={recipe.id} className="flex items-center gap-3 rounded-2xl bg-amber-100 p-2 pr-1">
-            <Link href={`/recipes/${recipe.slug}`} className="group flex min-w-0 items-center gap-3">
-              <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-amber-200">
-                <Image src={recipe.coverUrl} alt="" fill sizes="48px" className="object-cover" />
-              </span>
-              <span className="min-w-0">
-                <span className="block max-w-[14rem] truncate font-medium text-amber-950 group-hover:text-amber-700">{recipe.title}</span>
-                <span className="block text-sm text-amber-600">{recipe.servings} {t("servings.unit")}</span>
-              </span>
-            </Link>
-            <button
-              type="button"
-              onClick={() => run({ type: "removeRecipe", recipeId: recipe.id }, () => removeFromShoppingList(recipe.id))}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-amber-600 transition-colors hover:bg-amber-200 hover:text-amber-950"
-              aria-label={t("shopping.removeRecipe", { title: recipe.title })}
+      {onList.length > 1 && (
+        <div className="mt-8 flex flex-wrap items-center justify-between gap-x-6 gap-y-2">
+          <p className="max-w-xl text-sm text-amber-700">{t("shopping.pickHint")}</p>
+          <p className="flex items-center gap-3 text-sm font-medium text-amber-950" aria-live="polite">
+            {filtering ? t("shopping.showingPicked", { count: pickedIds.size, total: onList.length }) : t("shopping.allShown")}
+            {filtering && (
+              <button type="button" onClick={() => setPicked(new Set())} className="rounded-full px-3 py-2 text-amber-700 underline underline-offset-4 hover:text-amber-950">
+                {t("shopping.showAll")}
+              </button>
+            )}
+          </p>
+        </div>
+      )}
+
+      <ul className={cn("flex flex-wrap gap-3", onList.length > 1 ? "mt-3" : "mt-8")} aria-label={t("shopping.recipesList")}>
+        {onList.map((recipe) => {
+          const isPicked = pickedIds.has(recipe.id);
+          return (
+            <li
+              key={recipe.id}
+              className={cn(
+                "flex items-center gap-1 rounded-2xl border-2 p-1.5 transition-colors",
+                isPicked ? "border-amber-700 bg-amber-100" : filtering ? "border-amber-200 bg-transparent" : "border-transparent bg-amber-100",
+              )}
             >
-              <X className="h-4 w-4" aria-hidden="true" />
-            </button>
-          </li>
-        ))}
+              <button
+                type="button"
+                aria-pressed={isPicked}
+                aria-label={t("shopping.pickRecipe", { title: recipe.title })}
+                disabled={onList.length < 2}
+                onClick={() => togglePicked(recipe.id)}
+                className="flex min-w-0 items-center gap-3 rounded-xl p-0.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-700 disabled:cursor-default"
+              >
+                <span className="relative h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-amber-200">
+                  <Image src={recipe.coverUrl} alt="" fill sizes="48px" className={cn("object-cover transition-opacity", filtering && !isPicked && "opacity-50")} />
+                </span>
+                <span className="min-w-0">
+                  <span className={cn("block max-w-[12rem] truncate font-medium", filtering && !isPicked ? "text-amber-700" : "text-amber-950")}>{recipe.title}</span>
+                  <span className="block text-sm text-amber-600">{recipe.servings} {t("servings.unit")}</span>
+                </span>
+                {onList.length > 1 && (
+                  <span
+                    className={cn(
+                      "mr-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
+                      isPicked ? "border-amber-700 bg-amber-700 text-amber-50" : "border-amber-400",
+                    )}
+                    aria-hidden="true"
+                  >
+                    {isPicked && <Check className="h-3.5 w-3.5" strokeWidth={3} />}
+                  </span>
+                )}
+              </button>
+              <Link
+                href={`/recipes/${recipe.slug}`}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-amber-600 transition-colors hover:bg-amber-200 hover:text-amber-950"
+                aria-label={t("shopping.openRecipe", { title: recipe.title })}
+              >
+                <ExternalLink className="h-4 w-4" aria-hidden="true" />
+              </Link>
+              <button
+                type="button"
+                onClick={() => run({ type: "removeRecipe", recipeId: recipe.id }, () => removeFromShoppingList(recipe.id))}
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-amber-600 transition-colors hover:bg-amber-200 hover:text-amber-950"
+                aria-label={t("shopping.removeRecipe", { title: recipe.title })}
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
+            </li>
+          );
+        })}
       </ul>
 
       {toBuy.length > 0 && (
@@ -140,16 +207,18 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
 
       <div className="mt-10 flex flex-wrap items-center gap-3">
         {bought.length > 0 && toBuy.length > 0 && (
-          <Button variant="outline" onClick={() => run({ type: "clear", scope: "bought" }, () => clearShoppingList("bought"))}>{t("shopping.clearBought")}</Button>
+          <Button variant="outline" onClick={() => run({ type: "clear", scope: "bought", recipeIds: scope }, () => clearShoppingList("bought", scope))}>{t("shopping.clearBought")}</Button>
         )}
         {confirmingClear ? (
           <>
-            <span className="text-amber-900">{t("shopping.confirmClear")}</span>
-            <Button variant="destructive" onClick={() => run({ type: "clear", scope: "all" }, () => clearShoppingList("all"))}>{t("shopping.yesClear")}</Button>
+            <span className="text-amber-900">{filtering ? t("shopping.confirmClearPicked") : t("shopping.confirmClear")}</span>
+            <Button variant="destructive" onClick={() => run({ type: "clear", scope: "all", recipeIds: scope }, () => clearShoppingList("all", scope))}>
+              {filtering ? t("shopping.yesRemove") : t("shopping.yesClear")}
+            </Button>
             <Button variant="ghost" onClick={() => setConfirmingClear(false)}>{t("common.no")}</Button>
           </>
         ) : (
-          <Button variant={toBuy.length === 0 ? "primary" : "ghost"} onClick={() => setConfirmingClear(true)}>{t("shopping.clear")}</Button>
+          <Button variant={toBuy.length === 0 ? "primary" : "ghost"} onClick={() => setConfirmingClear(true)}>{filtering ? t("shopping.clearPicked") : t("shopping.clear")}</Button>
         )}
       </div>
     </>

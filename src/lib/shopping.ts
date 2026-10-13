@@ -37,11 +37,24 @@ const TO_BASE: Record<string, { unit: string; factor: number }> = {
   l: { unit: "ml", factor: 1000 },
 };
 const LARGE_UNIT: Record<string, string> = { g: "kg", ml: "l" };
+/** How a unit the creators did not write themselves (1500 g shown as kg) is spelled in each language. */
+const UNIT_LABELS: Record<string, Record<string, string>> = {
+  ru: { g: "г", kg: "кг", ml: "мл", l: "л" },
+  kz: { g: "г", kg: "кг", ml: "мл", l: "л" },
+};
 
 function present(total: number, unit: string, label: (canonical: string) => string, locale: string): { quantity: string; unit: string } {
   const large = LARGE_UNIT[unit];
   if (large && total >= 1000) return { quantity: formatQuantity(total / 1000, large, locale), unit: label(large) };
   return { quantity: formatQuantity(total, unit, locale), unit: label(unit) };
+}
+
+/**
+ * The rows to show for the recipes the shopper picked. While nothing is picked every recipe shows;
+ * once some are, only theirs do, and the products they share are still added up by mergeShoppingRows.
+ */
+export function rowsForPicked(rows: ShoppingRow[], picked: ReadonlySet<string>): ShoppingRow[] {
+  return picked.size === 0 ? rows : rows.filter((row) => picked.has(row.recipeId));
 }
 
 /**
@@ -51,14 +64,6 @@ function present(total: number, unit: string, label: (canonical: string) => stri
  */
 export function mergeShoppingRows(rows: ShoppingRow[], locale = "uz"): ShoppingLine[] {
   const groups = new Map<string, { rows: ShoppingRow[]; unit: string; total: number | null }>();
-  // Units are compared in their canonical form but shown the way the creator wrote them.
-  const spelled = new Map<string, string>();
-  for (const row of rows) {
-    const canonical = canonicalUnit(row.unit);
-    if (!spelled.has(canonical) && row.unit.trim()) spelled.set(canonical, row.unit.trim());
-  }
-  const label = (canonical: string) => spelled.get(canonical) ?? canonical;
-
   for (const row of rows) {
     const canonical = canonicalUnit(row.unit);
     const base = TO_BASE[canonical];
@@ -74,12 +79,18 @@ export function mergeShoppingRows(rows: ShoppingRow[], locale = "uz"): ShoppingL
     }
   }
 
-  return [...groups.entries()].map(([key, { rows: members, unit, total }]) => ({
-    key,
-    name: members[0].name,
-    ...(total === null ? { quantity: members[0].quantity, unit: members[0].unit.trim() } : present(total, unit, label, locale)),
-    checked: members[0].checked,
-    ids: members.map((row) => row.id),
-    recipeIds: [...new Set(members.map((row) => row.recipeId))],
-  }));
+  // Units are compared in their canonical form but shown the way the creators wrote them: a line
+  // uses the spelling of its own rows, and only a unit nobody wrote falls back to the language's.
+  return [...groups.entries()].map(([key, { rows: members, unit, total }]) => {
+    const label = (canonical: string) =>
+      members.find((row) => canonicalUnit(row.unit) === canonical)?.unit.trim() || UNIT_LABELS[locale]?.[canonical] || canonical;
+    return {
+      key,
+      name: members[0].name,
+      ...(total === null ? { quantity: members[0].quantity, unit: members[0].unit.trim() } : present(total, unit, label, locale)),
+      checked: members[0].checked,
+      ids: members.map((row) => row.id),
+      recipeIds: [...new Set(members.map((row) => row.recipeId))],
+    };
+  });
 }

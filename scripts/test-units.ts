@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { estimateNutrition, unmatchedAliasKeys } from "../src/lib/nutrition";
 import { canonicalUnit, parseQuantity, scaleQuantity } from "../src/lib/scaling";
-import { mergeShoppingRows, type ShoppingRow } from "../src/lib/shopping";
+import { mergeShoppingRows, rowsForPicked, type ShoppingRow } from "../src/lib/shopping";
 
 /** Ingredient units and amounts: how cooks write them, how they scale and how they are weighed. Run with: npm run test:units */
 const ok = (text: string) => console.log("  ✓", text);
@@ -162,8 +162,28 @@ const russian = mergeShoppingRows([row("1", "Мука", "500", "г"), row("2", "
 assert.deepEqual(russian.map((l) => [l.name, l.quantity, l.unit, l.ids.length]), [["Мука", "1,5", "кг", 2], ["Яйца", "5", "шт", 2]]);
 const english = mergeShoppingRows([row("1", "Flour", "500", "g"), row("2", "Flour", "1", "kilograms"), row("3", "Oil", "2", "tbsp"), row("4", "Oil", "1", "tablespoon")], "en");
 assert.deepEqual(english.map((l) => [l.name, l.quantity, l.unit, l.ids.length]), [["Flour", "1.5", "kilograms", 2], ["Oil", "3", "tbsp", 2]]);
+const alone = mergeShoppingRows([row("1", "Мука", "800", "г"), row("2", "Мука", "700", "г")], "ru");
+assert.deepEqual(alone.map((l) => [l.quantity, l.unit]), [["1,5", "кг"]]);
+const ownSpelling = mergeShoppingRows([{ ...row("1", "Piyoz", "2", "dona"), recipeId: "a" }, { ...row("2", "Qalampir", "2", "ta"), recipeId: "b" }], "uz");
+assert.deepEqual(ownSpelling.map((l) => [l.name, l.unit]), [["Piyoz", "dona"], ["Qalampir", "ta"]]);
 const mixed = mergeShoppingRows([row("1", "Salt", "ta'bga ko'ra", ""), row("2", "Salt", "to taste", "")], "en");
 assert.equal(mixed.length, 2);
 ok("shopping list: 500 г + 1 кг = 1,5 кг; 2 шт + 3 штуки = 5 шт; 500 g + 1 kilograms = 1.5; “to taste” never merges into a number");
+
+
+// picking which recipes of the shopping list to shop for
+const meal = (recipeId: string, id: string, name: string, quantity: string, unit: string): ShoppingRow => ({ ...row(id, name, quantity, unit), recipeId });
+const list = [
+  meal("plov", "1", "Guruch", "500", "g"), meal("plov", "2", "Sabzi", "3", "ta"), meal("plov", "3", "Yog'", "100", "ml"),
+  meal("lagmon", "4", "Sabzi", "2", "ta"), meal("lagmon", "5", "Un", "300", "g"), meal("lagmon", "6", "Yog'", "50", "ml"),
+];
+const show = (picked: string[]) => mergeShoppingRows(rowsForPicked(list, new Set(picked)), "uz").map((l) => `${l.name} ${l.quantity} ${l.unit}`);
+assert.equal(rowsForPicked(list, new Set()).length, 6);
+assert.deepEqual(show([]), ["Guruch 500 g", "Sabzi 5 ta", "Yog' 150 ml", "Un 300 g"]);
+assert.deepEqual(show(["plov"]), ["Guruch 500 g", "Sabzi 3 ta", "Yog' 100 ml"]);
+assert.deepEqual(show(["lagmon"]), ["Sabzi 2 ta", "Un 300 g", "Yog' 50 ml"]);
+assert.deepEqual(show(["plov", "lagmon"]), show([]));
+assert.deepEqual(show(["gone"]), []);
+ok("shopping list: nothing picked shows everything; one recipe shows only its products; two are added together");
 
 console.log("\nAll unit checks passed.");

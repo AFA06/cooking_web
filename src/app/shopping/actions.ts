@@ -84,14 +84,21 @@ export async function setShoppingChecked(ids: string[], checked: boolean): Promi
   return { ok: true };
 }
 
-/** Removes what has been bought, or everything. Recipes left with nothing to buy leave the list too. */
-export async function clearShoppingList(scope: "bought" | "all"): Promise<Result> {
+/**
+ * Removes what has been bought, or everything, on the whole list or only for the given recipes.
+ * Recipes left with nothing to buy leave the list too.
+ */
+export async function clearShoppingList(scope: "bought" | "all", recipeIds?: string[]): Promise<Result> {
   const t = await getT();
   const user = await getCurrentUser();
   if (!user) return { error: t(SIGN_IN) };
+  const only = recipeIds === undefined ? undefined : z.array(uuid).min(1).max(100).safeParse(recipeIds);
+  if (only && !only.success) return { error: t("err.badRequest") };
 
-  const own = eq(items.userId, user.id);
-  await db.delete(items).where(scope === "bought" ? and(own, eq(items.checked, true)) : own);
+  const conditions = [eq(items.userId, user.id)];
+  if (only?.success) conditions.push(inArray(items.recipeId, only.data));
+  if (scope === "bought") conditions.push(eq(items.checked, true));
+  await db.delete(items).where(and(...conditions));
   await db.delete(listed).where(
     and(
       eq(listed.userId, user.id),

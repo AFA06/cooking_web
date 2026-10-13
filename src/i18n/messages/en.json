@@ -1029,7 +1029,16 @@
       "other": "{count} items to buy"
     },
     "updateTo": "Update the list to {count} servings",
-    "yesClear": "Yes, clear it"
+    "yesClear": "Yes, clear it",
+    "pickHint": "Tap a recipe to see only the products for it. Tap several to combine them.",
+    "showingPicked": "Showing {count} of {total} recipes",
+    "allShown": "Showing all recipes",
+    "showAll": "Show all",
+    "pickRecipe": "Show the products for {title}",
+    "openRecipe": "Open {title}",
+    "clearPicked": "Remove the selected recipes",
+    "confirmClearPicked": "Remove the selected recipes from the list?",
+    "yesRemove": "Yes, remove"
   },
   "site": {
     "tagline": "Step-by-step recipes from the creators you love"
