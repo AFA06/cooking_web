@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Check, X } from "lucide-react";
 import { clearShoppingList, removeFromShoppingList, setShoppingChecked } from "@/app/shopping/actions";
 import { Button } from "@/components/ui/Button";
-import { useT } from "@/i18n/client";
+import { useLocale, useT } from "@/i18n/client";
 import { mergeShoppingRows, type ShoppingLine, type ShoppingRow } from "@/lib/shopping";
 import { cn } from "@/lib/utils";
 import type { ShoppingRecipe } from "@/server/shopping";
@@ -53,6 +53,7 @@ function Line({ line, note, onToggle }: { line: ShoppingLine; note: string | nul
 
 export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[]; rows: ShoppingRow[] }) {
   const t = useT();
+  const locale = useLocale();
   const [current, apply] = React.useOptimistic(rows, applyChange);
   const [, startTransition] = React.useTransition();
   const [confirmingClear, setConfirmingClear] = React.useState(false);
@@ -65,7 +66,7 @@ export function ShoppingListView({ recipes, rows }: { recipes: ShoppingRecipe[];
       setError("error" in result ? result.error : null);
     });
 
-  const lines = mergeShoppingRows(current);
+  const lines = mergeShoppingRows(current, locale);
   const toBuy = lines.filter((line) => !line.checked);
   const bought = lines.filter((line) => line.checked);
   const shownRecipes = recipes.filter((recipe) => current.some((row) => row.recipeId === recipe.id));

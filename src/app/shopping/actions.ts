@@ -6,7 +6,7 @@ import { z } from "zod";
 import { db, schema } from "@/db";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { clampServings, parseQuantity, scaleQuantity } from "@/lib/scaling";
-import { getT } from "@/i18n/server";
+import { getLocale, getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { getRecipeById } from "@/server/recipes";
 
@@ -26,6 +26,7 @@ export async function addToShoppingList(recipeId: string, servings: number): Pro
   const recipe = uuid.safeParse(recipeId).success ? await getRecipeById(recipeId) : undefined;
   if (!recipe || recipe.ingredients.length === 0) return { error: t("err.recipeNotFound") };
 
+  const locale = await getLocale();
   const chosen = clampServings(servings, recipe.servings);
   const factor = chosen / recipe.servings;
   const ofRecipe = and(eq(items.userId, user.id), eq(items.recipeId, recipe.id));
@@ -44,7 +45,7 @@ export async function addToShoppingList(recipeId: string, servings: number): Pro
           recipeId: recipe.id,
           position: ingredient.order,
           name: ingredient.name,
-          quantity: scaleQuantity(ingredient.quantity, ingredient.unit, factor),
+          quantity: scaleQuantity(ingredient.quantity, ingredient.unit, factor, locale),
           amount: amount === null ? null : amount * factor,
           unit: ingredient.unit,
         };

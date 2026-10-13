@@ -11,7 +11,7 @@ import { TimerRing } from "@/components/recipe/cooking/TimerRing";
 import { useCookTimers } from "@/components/recipe/cooking/useCookTimers";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { Button } from "@/components/ui/Button";
-import { useT } from "@/i18n/client";
+import { useLocale, useT } from "@/i18n/client";
 import { formatClock } from "@/lib/format";
 import { scaleQuantity } from "@/lib/scaling";
 import { cn } from "@/lib/utils";
@@ -75,6 +75,7 @@ function Confetti() {
 
 export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe; isLoggedIn: boolean; servings: number }) {
   const t = useT();
+  const locale = useLocale();
   const factor = servings / recipe.servings;
   const total = recipe.steps.length;
 
@@ -457,7 +458,7 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
                   {stepIngredients.map((i) => (
                     <li key={i.id} className="flex items-baseline gap-3 rounded-2xl bg-sage-50 px-5 py-4">
                       <span className={cn("shrink-0 font-serif font-semibold tabular-nums text-sage-700", big ? "text-4xl" : "text-3xl")}>
-                        {scaleQuantity(i.quantity, i.unit, factor)}
+                        {scaleQuantity(i.quantity, i.unit, factor, locale)}
                         <span className="ml-1 text-xl font-normal text-sage-600">{i.unit}</span>
                       </span>
                       <span className={cn("min-w-0 text-amber-950", big ? "text-2xl" : "text-xl")}>{i.name}</span>

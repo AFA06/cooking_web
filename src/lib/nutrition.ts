@@ -4,12 +4,19 @@
  * the author to check: free-text ingredients are matched by keyword against the table below,
  * and anything that cannot be weighed is reported back instead of being guessed.
  */
+import { normalizeText } from "@/lib/kitchen-words";
 import { canonicalUnit, parseQuantity } from "@/lib/scaling";
 import type { RecipeNutrition } from "@/types/recipe";
 
 interface Food {
-  /** Lowercase words to look for in the ingredient name; the longest hit across all foods wins. */
+  /** Uzbek (Latin) words to look for inside the ingredient name; the longest hit across all foods wins. */
   names: string[];
+  /** Match `names` as whole words only: for short words that also sit inside other words. */
+  exactNames?: boolean;
+  /** The same food in Russian, Kazakh and English, see ALIASES. Filled in from that table. */
+  aliases?: string[];
+  /** A spice or a vegetable depending on the amount ("pepper"): a pinch or a few grams is a spice and is not counted. */
+  seasoningIfSmall?: boolean;
   /** Per 100 g of the raw product: kcal, protein, fat, carbohydrate. */
   per100: [calories: number, protein: number, fat: number, carbs: number];
   /** Grams in one piece ("2 ta sabzi"). */
@@ -31,12 +38,12 @@ const NEGLIGIBLE = ["tuz", "suv", "zira", "murch", "ziravor", "lavr", "sirka", "
 
 const FOODS: Food[] = [
   { names: ["guruch"], per100: [344, 6.7, 0.7, 78.9], glass: 180, spoon: 20 },
-  { names: ["un"], per100: [364, 10.3, 1.1, 76], glass: 130, spoon: 20 },
+  { names: ["un"], exactNames: true, per100: [364, 10.3, 1.1, 76], glass: 130, spoon: 20 },
   { names: ["kraxmal"], per100: [330, 0.3, 0, 80], spoon: 20 },
   { names: ["makaron", "lag'mon", "ugra", "spagetti", "vermishel"], per100: [337, 10.4, 1.1, 69.7] },
   { names: ["qatlamali xamir", "tayyor xamir"], per100: [340, 6, 18.5, 39.5] },
   { names: ["xamir"], per100: [250, 7, 2, 50] },
-  { names: ["non"], per100: [250, 8, 1, 50], piece: 250 },
+  { names: ["non"], exactNames: true, per100: [250, 8, 1, 50], piece: 250 },
   { names: ["no'xat"], per100: [309, 20, 4.3, 46], glass: 200 },
   { names: ["mosh"], per100: [300, 23.5, 2, 46], glass: 200 },
   { names: ["loviya"], per100: [298, 21, 2, 47], glass: 200 },
@@ -88,19 +95,124 @@ const FOODS: Food[] = [
   { names: ["limon"], per100: [34, 0.9, 0.1, 3], piece: 100 },
   { names: ["banan"], per100: [96, 1.5, 0.5, 21], piece: 120 },
   { names: ["qulupnay", "malina", "olcha", "gilos"], per100: [45, 0.8, 0.4, 9], glass: 150 },
+  // Plain "pepper": the spice in a pinch, the vegetable when it is counted in pieces or weighed in bulk.
+  { names: [], aliases: ["перец", "перцы", "перца", "бұрыш", "pepper"], per100: [27, 1.3, 0, 5.3], piece: 150, seasoningIfSmall: true },
 ];
 
-/** Every way Uzbek text writes the ‘ and ’ marks becomes a plain apostrophe. */
-const normalize = (text: string) => text.toLowerCase().replace(/[‘’ʻʼ`´]/g, "'").trim();
+/** Seasonings, liquids and the like that add nothing worth counting, in Russian, Kazakh and English. */
+const NEGLIGIBLE_ALIASES = [
+  // Russian
+  "соль", "=вода", "=воды", "=воду", "=водой", "специ", "приправ", "уксус", "=сода", "=соды", "дрожж", "=чай", "=чая", "ванил", "кориц",
+  "шафран", "лавров", "=лавр", "зира", "кумин", "куркум", "паприк", "=лед", "=льда", "кориандр", "мускат", "разрыхлител", "гвоздик",
+  "черный перец", "молотый перец", "перец горошком", "чёрный перец",
+  // Kazakh
+  "тұз", "=су", "=суы", "дәмдеуіш", "сірке", "ашытқы", "=шай", "даршын", "запыран", "заппыран", "зире", "зере", "куркума", "паприка", "мұз", 
+  "қара бұрыш",
+  // English
+  "salt", "=water", "spice", "seasoning", "vinegar", "baking soda", "baking powder", "=soda", "yeast", "=tea", "vanilla", "cinnamon", "saffron",
+  "bay leaf", "bay leaves", "cumin", "turmeric", "paprika", "=ice", "coriander", "nutmeg", "cloves", "cardamom",
+  "black pepper", "ground pepper",
+];
+
+/**
+ * The same foods as above in Russian, Kazakh (Cyrillic) and English, keyed by the first Uzbek name.
+ * A word is a stem matched at the start of a word ("морков" finds морковь, моркови, морковка);
+ * "=word" must be the whole word; a longer hit beats a shorter one ("куриная грудка" over "курин").
+ */
+const ALIASES: Record<string, string[]> = {
+  guruch: ["рис", "күріш", "rice"],
+  un: ["мук", "=ұн", "=ұны", "flour"],
+  kraxmal: ["крахмал", "starch", "cornstarch"],
+  makaron: ["макарон", "спагетти", "вермишел", "лапш", "лагман", "кеспе", "pasta", "noodle", "spaghetti", "vermicelli", "macaroni"],
+  "qatlamali xamir": ["слоеное тесто", "слоен", "puff pastry", "қатпарлы қамыр", "готовое тесто", "ready dough"],
+  xamir: ["тест", "dough", "қамыр"],
+  non: ["хлеб", "лаваш", "=нан", "bread", "batard"],
+  "no'xat": ["=нут", "=нута", "=нуту", "=нутом", "ноқат", "chickpea", "garbanzo"],
+  mosh: ["=маш", "=маша", "мәш", "mung"],
+  loviya: ["фасол", "лобия", "лобио", "bean"],
+  "qo'y go'shti": ["баранин", "қой еті", "қой ет", "lamb", "mutton"],
+  "mol go'shti": ["говядин", "телятин", "сиыр еті", "сиыр ет", "бұзау", "beef", "veal"],
+  "tovuq filesi": ["куриное филе", "куриная грудк", "филе курицы", "тауық филесі", "тауық төсі", "chicken breast", "chicken fillet", "chicken filet"],
+  tovuq: ["куриц", "курин", "цыпл", "тауық", "chicken", "poultry"],
+  qiyma: ["фарш", "қиыма", "minced", "mince", "ground beef", "ground lamb", "ground meat", "ground chicken"],
+  "go'sht": ["мяс", "=ет", "=еті", "meat"],
+  baliq: ["рыб", "балық", "fish", "salmon", "tuna"],
+  dumba: ["курдюк", "бараний жир", "құйрық", "tail fat", "lamb fat", "fat tail"],
+  "tuxum sarig'i": ["желток", "сарысы", "yolk"],
+  "tuxum oqi": ["яичный белок", "белок", "ақуыз", "egg white"],
+  tuxum: ["яйц", "яиц", "яичн", "жұмыртқ", "egg"],
+  sut: ["молок", "сүт", "milk"],
+  qatiq: ["кефир", "йогурт", "простокваш", "катык", "қатық", "айран", "ayran", "yogurt", "yoghurt", "kefir", "buttermilk"],
+  qaymoq: ["сметан", "сливк", "қаймақ", "sour cream", "cream"],
+  suzma: ["творог", "сүзбе", "cottage cheese", "quark"],
+  pishloq: ["=сыр", "=сыра", "=сыру", "=сыром", "=сыры", "брынз", "ірімшік", "cheese"],
+  "saryog'": ["сливочн", "сары май", "топлен", "butter", "ghee"],
+  "yog'": ["масло", "растительн", "подсолнечн", "оливков", "өсімдік май", "=май", "=майы", "oil"],
+  sabzi: ["морков", "сәбіз", "carrot"],
+  piyoz: ["=лук", "=лука", "=луку", "=луком", "луковиц", "репчат", "пияз", "onion"],
+  sarimsoq: ["чесн", "сарымсақ", "garlic"],
+  kartoshka: ["картофел", "картошк", "картоп", "potato"],
+  "tomat pastasi": ["томатная паста", "томатной пасты", "паста томатная", "томатн", "томат паст", "қызанақ паст", "tomato paste", "tomato puree", "tomato purée"],
+  pomidor: ["помидор", "томат", "қызанақ", "tomato"],
+  bodring: ["огур", "қияр", "cucumber"],
+  "achchiq qalampir": ["острый перец", "острого перца", "перец острый", "перец остр", "перец чили", "жгучий перец", "чили", "халапеньо", "ащы бұрыш", "chili", "chilli", "chile", "hot pepper", "jalapeno"],
+  qalampir: ["болгар", "сладкий перец", "сладкого перца", "перец сладк", "тәтті бұрыш", "bell pepper", "sweet pepper", "capsicum"],
+  karam: ["капуст", "орамжапырақ", "cabbage"],
+  baqlajon: ["баклажан", "баялды", "eggplant", "aubergine"],
+  oshqovoq: ["тыкв", "кабачк", "кабачок", "цуккини", "асқабақ", "pumpkin", "squash", "zucchini", "courgette"],
+  "sholg'om": ["=репа", "=репы", "=репу", "шалқан", "turnip"],
+  lavlagi: ["свекл", "қызылша", "beet"],
+  turp: ["редис", "редьк", "шалғам", "radish", "daikon"],
+  "ko'k piyoz": ["зелен", "жасыл пияз", "укроп", "кинза", "петрушк", "базилик", "мят", "жалбыз", "райхан", "=көк", "dill", "cilantro", "parsley", "basil", "mint", "herbs", "greens", "green onion", "spring onion", "scallion", "coriander leaves"],
+  shakar: ["сахар", "қант", "sugar"],
+  asal: ["=мед", "=меда", "=меду", "=медом", "=бал", "=балы", "honey"],
+  shokolad: ["шоколад", "chocolate"],
+  kakao: ["какао", "cocoa", "cacao"],
+  mayiz: ["изюм", "мейіз", "raisin", "sultana"],
+  "yong'oq": ["орех", "орешк", "грецк", "арахис", "миндал", "фисташк", "фундук", "кешью", "жаңғақ", "бадам", "пісте", "walnut", "almond", "pistachio", "peanut butter", "peanut", "hazelnut", "cashew", "=nuts", "=nut"],
+  olma: ["яблок", "алма", "apple"],
+  limon: ["лимон", "лайм", "lemon", "lime"],
+  banan: ["банан", "banana"],
+  qulupnay: ["клубник", "малин", "вишн", "черешн", "құлпынай", "таңқурай", "шие", "strawberr", "raspberr", "cherr", "blueberr", "berry", "berries"],
+};
+FOODS.forEach((food) => {
+  if (food.names[0] && ALIASES[food.names[0]]) food.aliases = [...(food.aliases ?? []), ...ALIASES[food.names[0]]];
+});
+
+/** Alias keys that name no food: a typo there silently loses a whole language for that food. For the tests. */
+export const unmatchedAliasKeys = () => Object.keys(ALIASES).filter((key) => !FOODS.some((food) => food.names[0] === key));
+
+const normalize = normalizeText;
+
+const tokensOf = (text: string) => text.split(/[^\p{L}\p{N}']+/u).filter(Boolean);
+const escapeRegex = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
+/** One alias against a normalized name: "=word" is a whole word, anything else is the start of a word. */
+function matchesAlias(text: string, alias: string): boolean {
+  if (alias.startsWith("=")) return tokensOf(text).includes(alias.slice(1));
+  return new RegExp(`(^|[^\\p{L}])${escapeRegex(alias)}`, "u").test(text);
+}
+
+const aliasLength = (alias: string) => alias.replace(/^=/, "").length;
+
+/** A broth is made from meat, not meat: "chicken broth" is water with a little flavour whatever it is made of. */
+const BROTH = ["бульон", "сорпа", "отвар", "broth", "stock", "bouillon"];
 
 function findFood(name: string): Food | "negligible" | null {
   const text = normalize(name);
+  if (BROTH.some((word) => matchesAlias(text, word))) return "negligible";
   let best: { food: Food | "negligible"; length: number } | null = null;
-  const consider = (food: Food | "negligible", word: string) => {
-    if (text.includes(word) && (!best || word.length > best.length)) best = { food, length: word.length };
+  const consider = (food: Food | "negligible", length: number) => {
+    if (!best || length > best.length) best = { food, length };
   };
-  NEGLIGIBLE.forEach((word) => consider("negligible", word));
-  FOODS.forEach((food) => food.names.forEach((word) => consider(food, word)));
+  NEGLIGIBLE.forEach((word) => text.includes(word) && consider("negligible", word.length));
+  NEGLIGIBLE_ALIASES.forEach((alias) => matchesAlias(text, alias) && consider("negligible", aliasLength(alias)));
+  for (const food of FOODS) {
+    for (const word of food.names) {
+      if (food.exactNames ? matchesAlias(text, `=${word}`) : text.includes(word)) consider(food, word.length);
+    }
+    for (const alias of food.aliases ?? []) if (matchesAlias(text, alias)) consider(food, aliasLength(alias));
+  }
   return (best as { food: Food | "negligible" } | null)?.food ?? null;
 }
 
@@ -115,6 +227,8 @@ function toGrams(food: Food, amount: number, unitText: string): number | null {
   const has = (pattern: RegExp) => pattern.test(unit);
   const liquid = food.density !== undefined;
 
+  if (has(/^lb$/)) return amount * 453.6;
+  if (has(/^oz$/)) return amount * 28.35;
   if (has(/^kg\b/)) return amount * 1000;
   if (has(/^(g|gr|gramm?)\b/)) return amount;
   if (has(/^ml\b/)) return liquid ? amount * food.density! : null;
@@ -156,6 +270,8 @@ export function estimateNutrition(ingredients: { name: string; quantity: string;
     if (food === "negligible") continue;
     const amount = parseQuantity(ingredient.quantity);
     const grams = food && amount !== null ? toGrams(food, amount, ingredient.unit) : null;
+    // A pinch or a few grams of plain "pepper" is a spice, not a vegetable.
+    if (food?.seasoningIfSmall && (grams === null || grams <= 10)) continue;
     if (!food || grams === null) {
       skipped.push(ingredient.name.trim());
       continue;

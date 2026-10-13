@@ -6,7 +6,8 @@ import { Check, Circle, Clock, Film, Lock, LockOpen, Plus } from "lucide-react";
 import { ImageUploader } from "@/components/dashboard/ImageUploader";
 import { VideoUploader } from "@/components/dashboard/VideoUploader";
 import { Button } from "@/components/ui/Button";
-import { useT } from "@/i18n/client";
+import { useLocale, useT } from "@/i18n/client";
+import { UNIT_SUGGESTIONS } from "@/lib/kitchen-words";
 import { RECIPE_CATEGORIES, type RecipeCategory } from "@/lib/categories";
 import { estimateNutrition } from "@/lib/nutrition";
 import type { RecipeInput } from "@/lib/recipe-schema";
@@ -174,6 +175,7 @@ function Section({ n, title, note, children }: { n: number; title: string; note?
 
 export function RecipeEditor({ initial, save, basePath, sidebar = true }: RecipeEditorProps) {
   const t = useT();
+  const locale = useLocale();
   const router = useRouter();
   const [v, setV] = React.useState<EditorInitial>(initial);
   const [error, setError] = React.useState<string | null>(null);
@@ -394,7 +396,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
         <Section n={3} title={t("ed.ingredients")}>
           <p className="text-sm leading-relaxed text-amber-600">{t("ed.ingUnitsHint")}</p>
           <datalist id="ing-units">
-            {["g", "kg", "ml", "l", "osh qoshiq", "choy qoshiq", "stakan", "chomich", "hovuch", "tutam", "chimdim", "ta", "bosh", "tish", "bog'"].map((unit) => (
+            {UNIT_SUGGESTIONS[locale].map((unit) => (
               <option key={unit} value={unit} />
             ))}
           </datalist>
