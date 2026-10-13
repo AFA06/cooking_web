@@ -392,6 +392,12 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
 
         {/* 3 — ingredients and nutrition */}
         <Section n={3} title={t("ed.ingredients")}>
+          <p className="text-sm leading-relaxed text-amber-600">{t("ed.ingUnitsHint")}</p>
+          <datalist id="ing-units">
+            {["g", "kg", "ml", "l", "osh qoshiq", "choy qoshiq", "stakan", "chomich", "hovuch", "tutam", "chimdim", "ta", "bosh", "tish", "bog'"].map((unit) => (
+              <option key={unit} value={unit} />
+            ))}
+          </datalist>
           <div className="space-y-3">
             {v.ingredients.map((ing, i) => (
               <div key={i} className="grid grid-cols-[1fr_5rem_5rem] items-end gap-2 sm:grid-cols-[2rem_1fr_6rem_6rem_auto]">
@@ -406,7 +412,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
                 </div>
                 <div>
                   <label className="sr-only" htmlFor={`ing-unit-${i}`}>{t("ed.unitPh")}</label>
-                  <input id={`ing-unit-${i}`} className={field} placeholder={t("ed.unitPh")} value={ing.unit} onChange={(e) => setIngredient(i, { unit: e.target.value })} />
+                  <input id={`ing-unit-${i}`} list="ing-units" className={field} placeholder={t("ed.unitPh")} value={ing.unit} onChange={(e) => setIngredient(i, { unit: e.target.value })} />
                 </div>
                 <div className="col-span-3 flex gap-1 sm:col-span-1">
                   <Button type="button" size="sm" variant="ghost" aria-label={t("ed.up")} disabled={i === 0} onClick={() => reorderIngredients(move(v.ingredients, i, -1), (n) => (n === i + 1 ? i : n === i ? i + 1 : n))}>↑</Button>

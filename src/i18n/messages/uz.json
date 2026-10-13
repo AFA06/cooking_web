@@ -606,7 +606,8 @@
     "stepFree": "Bepul",
     "stepPremium": "Premium",
     "stepsAccessNote": "Qaysi qadamlar hamma uchun bepul ekanini o‘zingiz tanlaysiz. {total} tadan {free} tasi bepul, qolganlari retseptni sotib olgach ochiladi.",
-    "waitUploads": "Saqlashdan oldin yuklash tugashini kuting."
+    "waitUploads": "Saqlashdan oldin yuklash tugashini kuting.",
+    "ingUnitsHint": "Miqdor — raqam (1, 1.5, 1/2) yoki “yarim” kabi so‘z. Birlik: g, kg, ml, l, osh qoshiq, choy qoshiq, chomich, hovuch, chimdim, ta… “Ta’bga ko‘ra” uchun birlikni bo‘sh qoldiring."
   },
   "email": {
     "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",

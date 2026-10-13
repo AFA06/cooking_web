@@ -4,7 +4,7 @@
  * the author to check: free-text ingredients are matched by keyword against the table below,
  * and anything that cannot be weighed is reported back instead of being guessed.
  */
-import { parseQuantity } from "@/lib/scaling";
+import { canonicalUnit, parseQuantity } from "@/lib/scaling";
 import type { RecipeNutrition } from "@/types/recipe";
 
 interface Food {
@@ -104,9 +104,14 @@ function findFood(name: string): Food | "negligible" | null {
   return (best as { food: Food | "negligible" } | null)?.food ?? null;
 }
 
+/** What a ladle (chomich) holds. Kitchen ladles vary a lot; this is the usual home one and is only a starting estimate. */
+const LADLE_ML = 150;
+/** What one handful (hovuch) of a dry or leafy food weighs. */
+const HANDFUL_G = 30;
+
 /** Weight of an amount of a food in grams, or null when the unit cannot be weighed for it. */
 function toGrams(food: Food, amount: number, unitText: string): number | null {
-  const unit = normalize(unitText);
+  const unit = canonicalUnit(unitText);
   const has = (pattern: RegExp) => pattern.test(unit);
   const liquid = food.density !== undefined;
 
@@ -115,6 +120,10 @@ function toGrams(food: Food, amount: number, unitText: string): number | null {
   if (has(/^ml\b/)) return liquid ? amount * food.density! : null;
   if (has(/^(l|litr)\b/)) return liquid ? amount * 1000 * food.density! : null;
   if (has(/stakan|piyola/)) return food.glass !== undefined ? amount * food.glass : liquid ? amount * 200 * food.density! : null;
+  if (has(/^chomich$/)) return liquid ? amount * LADLE_ML * food.density! : food.glass !== undefined ? (amount * food.glass * LADLE_ML) / 200 : null;
+  if (has(/^hovuch$/)) return liquid ? null : amount * HANDFUL_G;
+  if (has(/^tutam$/)) return amount * 2;
+  if (has(/^tomchi$/)) return amount * 0.05;
   if (has(/osh qoshiq/)) return food.spoon !== undefined ? amount * food.spoon : null;
   if (has(/choy qoshiq/)) return food.spoon !== undefined ? (amount * food.spoon) / 3 : null;
   if (has(/chimdim/)) return amount;

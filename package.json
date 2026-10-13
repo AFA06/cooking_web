@@ -14,7 +14,8 @@
     "set-password": "tsx scripts/set-password.ts",
     "create-user": "tsx scripts/create-user.ts",
     "test-recipes": "tsx scripts/test-recipes.ts",
-    "test:media": "tsx --conditions=react-server scripts/test-media.ts"
+    "test:media": "tsx --conditions=react-server scripts/test-media.ts",
+    "test:units": "tsx scripts/test-units.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1150.0",

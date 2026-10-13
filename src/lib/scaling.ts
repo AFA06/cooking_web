@@ -13,24 +13,70 @@ export function clampServings(value: number, fallback: number): number {
 
 type UnitKind = "mass" | "volume" | "largeMetric" | "spoon" | "count";
 
+const APOSTROPHES = /[‘’ʻʼ`´]/g;
+
+/** Other ways of writing the units this file knows, folded to the Latin Uzbek form (whole text must match). */
+const UNIT_ALIASES: [RegExp, string][] = [
+  [/^(g|gr|gramm?|г|гр|грамм?|граммов)$/, "g"],
+  [/^(kg|kilo|kilogramm?|кг|килограмм\w*)$/, "kg"],
+  [/^(ml|millilitr|мл|миллилитр\w*)$/, "ml"],
+  [/^(l|lt|litr|л|литр\w*)$/, "l"],
+  [/^(osh ?qoshiq|ст ?л|столов\w* ложк\w*)$/, "osh qoshiq"],
+  [/^(choy ?qoshiq|ч ?л|чайн\w* ложк\w*)$/, "choy qoshiq"],
+  [/^(stakan\w*|стакан\w*)$/, "stakan"],
+  [/^(chimdim|щепотк\w*)$/, "chimdim"],
+  [/^(hovuch\w*|горст\w*|пригоршн\w*)$/, "hovuch"],
+  [/^(tomchi|капл\w*)$/, "tomchi"],
+  [/^(ta|dona|шт|штук\w*)$/, "ta"],
+  [/^(tish|зубчик\w*)$/, "tish"],
+  [/^(bosh|головк\w*)$/, "bosh"],
+  [/^(bog'|dasta|пучок|пучк\w*)$/, "bog'"],
+];
+
+/**
+ * A unit as the rest of the code understands it. Cooks write the same thing many ways
+ * (cho'mich, chumich, “to'la chomich”, половник, г., ст. л.); this folds them to one form.
+ * Text it does not know is returned cleaned up but otherwise unchanged.
+ */
+export function canonicalUnit(unit: string): string {
+  const text = unit.toLowerCase().replace(APOSTROPHES, "'").replace(/\./g, " ").replace(/\s+/g, " ").trim();
+  // A ladle, however it is qualified ("to'la chomich", "chomich to'ldirib").
+  if (/ch[ou]'?mich|половник|черпак|поварешк/.test(text)) return "chomich";
+  return UNIT_ALIASES.find(([pattern]) => pattern.test(text))?.[1] ?? text;
+}
+
 const UNIT_KINDS: [RegExp, UnitKind][] = [
   [/^(g|gr|gramm?)$/, "mass"],
   [/^ml$/, "volume"],
   [/^(kg|l|litr)$/, "largeMetric"],
-  [/qoshiq|stakan|piyola|chimdim/, "spoon"],
+  // Measures a cook counts in halves and quarters: spoons, glasses, a ladle, a handful, a pinch.
+  [/qoshiq|stakan|piyola|chimdim|chomich|hovuch|tutam|tomchi/, "spoon"],
 ];
 
 function unitKind(unit: string): UnitKind {
-  const normalized = unit.trim().toLowerCase();
+  const normalized = canonicalUnit(unit);
   return UNIT_KINDS.find(([pattern]) => pattern.test(normalized))?.[1] ?? "count";
 }
 
 const FRACTIONS: Record<string, number> = { "½": 0.5, "¼": 0.25, "¾": 0.75, "⅓": 1 / 3, "⅔": 2 / 3 };
 
-/** Reads "2", "1.5", "1,5", "1/2", "1 1/2" or "1½". Returns null for anything else ("ta’bga ko‘ra"). */
+/** Amounts a cook says instead of writing: "yarim chomich" is half a ladle. */
+const WORD_AMOUNTS: Record<string, number> = { yarim: 0.5, chorak: 0.25, "половина": 0.5, "полтора": 1.5, "четверть": 0.25 };
+const NUMBER_WORDS: Record<string, number> = { bir: 1, ikki: 2, uch: 3, "to'rt": 4, besh: 5, olti: 6, yetti: 7, sakkiz: 8, "to'qqiz": 9, "o'n": 10 };
+
+/**
+ * Reads "2", "1.5", "1,5", "1/2", "1 1/2" or "1½", and the words "yarim" (half), "chorak" (quarter),
+ * "bir yarim" (one and a half) and "ikki" (two). Returns null for anything else ("ta’bga ko‘ra").
+ */
 export function parseQuantity(text: string): number | null {
   const value = text.trim().replace(",", ".");
   if (value === "") return null;
+
+  const word = value.toLowerCase().replace(APOSTROPHES, "'").replace(/\s+/g, " ");
+  if (Object.hasOwn(WORD_AMOUNTS, word)) return WORD_AMOUNTS[word];
+  if (Object.hasOwn(NUMBER_WORDS, word)) return NUMBER_WORDS[word];
+  const wholeAndHalf = word.match(/^(\S+) yarim$/);
+  if (wholeAndHalf && Object.hasOwn(NUMBER_WORDS, wholeAndHalf[1])) return NUMBER_WORDS[wholeAndHalf[1]] + 0.5;
 
   const glyph = value.match(/^(\d+)?\s*([½¼¾⅓⅔])$/);
   if (glyph) return Number(glyph[1] ?? 0) + FRACTIONS[glyph[2]];
