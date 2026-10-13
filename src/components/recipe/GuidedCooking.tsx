@@ -1,11 +1,11 @@
 "use client";
 
 import * as React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
 import { ArrowLeft, ArrowRight, BellRing, Check, Clock, ListChecks, Sun, Thermometer, Type, X } from "lucide-react";
 import { finishCookingSession, startCookingSession } from "@/app/recipes/actions";
+import { StepMedia } from "@/components/recipe/StepMedia";
 import { StageRail } from "@/components/recipe/cooking/StageRail";
 import { TimerRing } from "@/components/recipe/cooking/TimerRing";
 import { useCookTimers } from "@/components/recipe/cooking/useCookTimers";
@@ -410,11 +410,7 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
 
             <h1 className={cn("mt-6 break-words font-serif font-medium leading-[1.08] text-amber-950", big ? "text-4xl sm:text-5xl lg:text-6xl" : "text-3xl sm:text-4xl lg:text-5xl")}>{step.title}</h1>
 
-            {step.mediaUrl && (
-              <div className="relative mt-7 aspect-[16/9] w-full max-w-3xl overflow-hidden rounded-3xl bg-amber-100">
-                <Image src={step.mediaUrl} alt={step.title} fill className="object-cover" sizes="(max-width: 1024px) 100vw, 60vw" />
-              </div>
-            )}
+            <StepMedia step={step} sizes="(max-width: 1024px) 100vw, 60vw" className="mt-7 w-full max-w-3xl rounded-3xl" />
 
             <p className={cn("mt-7 max-w-3xl leading-[1.55] text-amber-950", big ? "text-3xl sm:text-4xl lg:text-[2.75rem]" : "text-2xl sm:text-3xl lg:text-4xl")}>{step.instruction}</p>
 

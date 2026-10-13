@@ -29,6 +29,7 @@ export function toEditorInitial({ recipe: r, ingredients, steps }: RecipeForEdit
       title: s.title,
       instruction: s.instruction,
       mediaUrl: s.mediaUrl ?? "",
+      videoUrl: s.videoUrl ?? "",
       timerMinutes: s.timerSeconds ? String(Math.round(s.timerSeconds / 60)) : "",
       temperatureCelsius: s.temperatureCelsius ? String(s.temperatureCelsius) : "",
       tip: s.tip ?? "",

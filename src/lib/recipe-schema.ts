@@ -50,6 +50,7 @@ export const recipeInputSchema = z
           title: z.string().trim().min(1, "err.stepTitle").max(120),
           instruction: z.string().trim().min(1, "err.stepInstr").max(2000),
           mediaUrl: optionalUrl,
+          videoUrl: z.string().trim().max(500).refine((v) => v === "" || parseVideoUrl(v) !== null, "err.videoUrl"),
           timerMinutes: z.coerce.number().int().min(0).max(1440),
           temperatureCelsius: z.coerce.number().int().min(0).max(500),
           tip: z.string().trim().max(500),

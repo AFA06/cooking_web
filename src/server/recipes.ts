@@ -63,6 +63,7 @@ function toRecipe(
         instruction: s.instruction,
         mediaUrl: s.mediaUrl ?? undefined,
         mediaType: s.mediaUrl ? ("image" as const) : undefined,
+        videoUrl: s.videoUrl ?? undefined,
         timerSeconds: s.timerSeconds ?? undefined,
         temperatureCelsius: s.temperatureCelsius ?? undefined,
         tip: s.tip ?? undefined,

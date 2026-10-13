@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { NutritionFacts } from "@/components/recipe/NutritionFacts";
+import { StepMedia } from "@/components/recipe/StepMedia";
 import { ChefHat, Clock, Flame, Lock, Thermometer, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -300,11 +301,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                     </h3>
                     <p className="max-w-2xl text-lg leading-relaxed text-amber-900">{step.instruction}</p>
                     <StepIngredients ingredients={(step.ingredientIds ?? []).map((id) => ingredientsById.get(id)).filter((i) => i !== undefined)} />
-                    {step.mediaUrl && (
-                      <div className="relative aspect-[16/9] max-w-2xl overflow-hidden rounded-2xl bg-amber-100">
-                        <Image src={step.mediaUrl} alt={step.title} fill sizes="(max-width: 1024px) 100vw, 45vw" className="object-cover" />
-                      </div>
-                    )}
+                    <StepMedia step={step} sizes="(max-width: 1024px) 100vw, 45vw" className="max-w-2xl rounded-2xl" />
                     {step.tip && (
                       <p className="max-w-2xl rounded-2xl bg-clay-100/60 px-5 py-4 text-amber-950">
                         <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{t("detail.tip")}</span>

@@ -605,7 +605,9 @@
     "video": "Video (optional)",
     "videoBad": "This link isn't supported",
     "videoHint": "A YouTube or Vimeo link, or a link to an .mp4 file. The video is shown on the recipe page.",
-    "videoOk": "Video recognised"
+    "videoOk": "Video recognised",
+    "stepVideo": "Step video (optional)",
+    "stepVideoHint": "Show how this step is done in a short clip, up to {mb} MB. If you add both, the photo is shown first and the video plays when tapped."
   },
   "email": {
     "body": "{label}: {code}\n\nThe code is valid for {minutes} minutes. Do not share it with anyone.\nIf you did not make this request, ignore this email.",
@@ -654,7 +656,10 @@
     "titleLong": "The title is too long",
     "titleShort": "The title is too short",
     "uploadLimit": "You've reached the limit of uploaded photos.",
-    "videoUrl": "The video link must be a YouTube or Vimeo link, or an .mp4 file over https://"
+    "videoUrl": "The video link must be a YouTube or Vimeo link, or an .mp4 file over https://",
+    "videoBig": "The video is too large (up to {mb} MB)",
+    "videoType": "Only video files (MP4, MOV, WebM) can be uploaded.",
+    "videoLimit": "You've reached the limit of uploaded videos."
   },
   "error": {
     "retry": "Try again",
@@ -1121,6 +1126,9 @@
     "remove": "Remove",
     "replace": "Replace",
     "upload": "Upload a photo",
-    "useLink": "Use link"
+    "useLink": "Use link",
+    "video": "Upload a video",
+    "videoLink": "Or paste a video link",
+    "videoFail": "The video couldn't be uploaded. Try again."
   }
 }

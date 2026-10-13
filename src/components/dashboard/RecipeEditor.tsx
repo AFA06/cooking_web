@@ -4,12 +4,13 @@ import * as React from "react";
 import { useRouter } from "next/navigation";
 import { Check, Circle, Clock, Film, Lock, Plus } from "lucide-react";
 import { ImageUploader } from "@/components/dashboard/ImageUploader";
+import { VideoUploader } from "@/components/dashboard/VideoUploader";
 import { Button } from "@/components/ui/Button";
 import { useT } from "@/i18n/client";
 import { RECIPE_CATEGORIES, type RecipeCategory } from "@/lib/categories";
 import { estimateNutrition } from "@/lib/nutrition";
 import type { RecipeInput } from "@/lib/recipe-schema";
-import { parseVideoUrl } from "@/lib/video";
+import { MAX_VIDEO_BYTES, parseVideoUrl } from "@/lib/video";
 import { cn } from "@/lib/utils";
 
 type Ingredient = { name: string; quantity: string; unit: string };
@@ -17,6 +18,7 @@ type Step = {
   title: string;
   instruction: string;
   mediaUrl: string;
+  videoUrl: string;
   timerMinutes: string;
   temperatureCelsius: string;
   tip: string;
@@ -70,7 +72,7 @@ export const EMPTY_RECIPE: EditorInitial = {
   tags: "",
   status: "draft",
   ingredients: [{ name: "", quantity: "", unit: "" }],
-  steps: [{ title: "", instruction: "", mediaUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" }],
+  steps: [{ title: "", instruction: "", mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" }],
 };
 
 const field =
@@ -109,6 +111,7 @@ function toInput(v: EditorInitial): RecipeInput {
       title: s.title,
       instruction: s.instruction,
       mediaUrl: s.mediaUrl,
+      videoUrl: s.videoUrl,
       timerMinutes: Number(s.timerMinutes || 0),
       temperatureCelsius: Number(s.temperatureCelsius || 0),
       tip: s.tip,
@@ -133,7 +136,7 @@ interface RecipeEditorProps {
 }
 
 const MAX_GALLERY = 5;
-const BLANK_STEP: Step = { title: "", instruction: "", mediaUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" };
+const BLANK_STEP: Step = { title: "", instruction: "", mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" };
 
 const parsePositions = (value: string) =>
   value
@@ -170,7 +173,8 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
   const set = <K extends keyof EditorInitial>(key: K, value: EditorInitial[K]) => setV((p) => ({ ...p, [key]: value }));
   const setIngredient = (i: number, patch: Partial<Ingredient>) =>
     set("ingredients", v.ingredients.map((x, n) => (n === i ? { ...x, ...patch } : x)));
-  const setStep = (i: number, patch: Partial<Step>) => set("steps", v.steps.map((x, n) => (n === i ? { ...x, ...patch } : x)));
+  // A clip can take a while to upload; this must not put back the steps as they were when it started.
+  const setStep = (i: number, patch: Partial<Step>) => setV((p) => ({ ...p, steps: p.steps.map((x, n) => (n === i ? { ...x, ...patch } : x)) }));
   const [nutritionNote, setNutritionNote] = React.useState<string | null>(null);
   const calculateNutrition = () => {
     const { perServing, skipped } = estimateNutrition(v.ingredients, Number(v.servings));
@@ -431,23 +435,34 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-clay-400 text-sm text-amber-50">{i + 1}</span>
                     {t("ed.stepN", { n: i + 1 })}
                   </legend>
-                  <div className="mt-2 grid gap-4 lg:grid-cols-[minmax(0,1fr)_12rem]">
-                    <div className="space-y-4">
-                      <div>
-                        <label className={label} htmlFor={`st-title-${i}`}>{t("ed.title")}</label>
-                        <input id={`st-title-${i}`} className={cn(field, "mt-1.5")} value={s.title} onChange={(e) => setStep(i, { title: e.target.value })} />
-                      </div>
-                      <div>
-                        <label className={label} htmlFor={`st-ins-${i}`}>{t("ed.instruction")}</label>
-                        <textarea id={`st-ins-${i}`} rows={3} className={cn(field, "mt-1.5")} value={s.instruction} onChange={(e) => setStep(i, { instruction: e.target.value })} />
-                      </div>
+                  <div className="mt-2 space-y-4">
+                    <div>
+                      <label className={label} htmlFor={`st-title-${i}`}>{t("ed.title")}</label>
+                      <input id={`st-title-${i}`} className={cn(field, "mt-1.5")} value={s.title} onChange={(e) => setStep(i, { title: e.target.value })} />
                     </div>
+                    <div>
+                      <label className={label} htmlFor={`st-ins-${i}`}>{t("ed.instruction")}</label>
+                      <textarea id={`st-ins-${i}`} rows={3} className={cn(field, "mt-1.5")} value={s.instruction} onChange={(e) => setStep(i, { instruction: e.target.value })} />
+                    </div>
+                  </div>
+
+                  <div className="mt-4 grid max-w-xl gap-4 sm:grid-cols-2">
                     <div>
                       <p className={label}>{t("ed.stepPhoto")}</p>
                       <div className="mt-1.5">
                         <ImageUploader value={s.mediaUrl} compact onChange={(url) => setStep(i, { mediaUrl: url })} label={t("ed.stepPhoto")} />
                       </div>
                     </div>
+                    <div>
+                      <p className={cn(label, "flex items-center gap-1.5")}>
+                        <Film className="h-4 w-4 text-amber-700" aria-hidden="true" />
+                        {t("ed.stepVideo")}
+                      </p>
+                      <div className="mt-1.5">
+                        <VideoUploader value={s.videoUrl} poster={s.mediaUrl} onChange={(url) => setStep(i, { videoUrl: url })} label={t("ed.stepVideo")} />
+                      </div>
+                    </div>
+                    <p className="text-sm text-amber-600 sm:col-span-2">{t("ed.stepVideoHint", { mb: MAX_VIDEO_BYTES / 1024 / 1024 })}</p>
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 gap-3 sm:max-w-md">

@@ -17,6 +17,8 @@ export interface RecipeStep {
   instruction: string;
   mediaUrl?: string;
   mediaType?: "image" | "video";
+  /** A clip showing this step: an upload or a link, see lib/video. The photo, when there is one, is its poster. */
+  videoUrl?: string;
   timerSeconds?: number;
   temperatureCelsius?: number;
   tip?: string;

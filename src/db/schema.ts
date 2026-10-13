@@ -1,6 +1,7 @@
 import {
   boolean,
   check,
+  customType,
   index,
   integer,
   jsonb,
@@ -125,6 +126,39 @@ export const mediaUploads = pgTable(
   (t) => [index("media_uploads_owner_idx").on(t.ownerId)],
 );
 
+const bytea = customType<{ data: Buffer; driverData: string | Uint8Array }>({
+  dataType: () => "bytea",
+  toDriver: (value) => `\\x${value.toString("hex")}`,
+  fromDriver: (value) => (typeof value === "string" ? Buffer.from(value.replace(/^\\x/, ""), "hex") : Buffer.from(value)),
+});
+
+/**
+ * Video clips uploaded by creators, served from /api/video/:id. A clip arrives in parts and is only
+ * shown once every part is in (`ready`).
+ */
+export const videoUploads = pgTable(
+  "video_uploads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: uuid("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    mime: text("mime").notNull().default("video/mp4"),
+    size: integer("size").notNull(),
+    ready: boolean("ready").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("video_uploads_owner_idx").on(t.ownerId)],
+);
+
+export const videoParts = pgTable(
+  "video_parts",
+  {
+    uploadId: uuid("upload_id").notNull().references(() => videoUploads.id, { onDelete: "cascade" }),
+    part: integer("part").notNull(),
+    data: bytea("data").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.uploadId, t.part] })],
+);
+
 export const recipeIngredients = pgTable(
   "recipe_ingredients",
   {
@@ -148,6 +182,7 @@ export const recipeSteps = pgTable(
     title: text("title").notNull(),
     instruction: text("instruction").notNull(),
     mediaUrl: text("media_url"),
+    videoUrl: text("video_url"),
     timerSeconds: integer("timer_seconds"),
     temperatureCelsius: integer("temperature_celsius"),
     tip: text("tip"),

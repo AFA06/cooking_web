@@ -597,7 +597,9 @@
     "video": "Video (ixtiyoriy)",
     "videoBad": "Bu havola qo‘llab-quvvatlanmaydi",
     "videoHint": "YouTube yoki Vimeo havolasi, yoki .mp4 fayl havolasi. Video retsept sahifasida ko‘rsatiladi.",
-    "videoOk": "Video tanildi"
+    "videoOk": "Video tanildi",
+    "stepVideo": "Qadam videosi (ixtiyoriy)",
+    "stepVideoHint": "Bu qadam qanday bajarilishini qisqa videoda ko‘rsating, {mb} MB gacha. Ikkalasini ham qo‘shsangiz, avval rasm ko‘rinadi, bosilganda video ijro etiladi."
   },
   "email": {
     "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",
@@ -646,7 +648,10 @@
     "titleLong": "Sarlavha juda uzun",
     "titleShort": "Sarlavha juda qisqa",
     "uploadLimit": "Yuklangan rasmlar chegarasiga yetdingiz.",
-    "videoUrl": "Video havolasi YouTube, Vimeo yoki https:// bilan boshlanadigan .mp4 fayl bo‘lishi kerak"
+    "videoUrl": "Video havolasi YouTube, Vimeo yoki https:// bilan boshlanadigan .mp4 fayl bo‘lishi kerak",
+    "videoBig": "Video juda katta ({mb} MB gacha)",
+    "videoType": "Faqat video fayli yuklanadi (MP4, MOV, WebM).",
+    "videoLimit": "Yuklangan videolar chegarasiga yetdingiz."
   },
   "error": {
     "retry": "Qayta urinish",
@@ -1107,6 +1112,9 @@
     "remove": "Olib tashlash",
     "replace": "Almashtirish",
     "upload": "Rasm yuklash",
-    "useLink": "Havolani qo‘llash"
+    "useLink": "Havolani qo‘llash",
+    "video": "Video yuklash",
+    "videoLink": "Yoki video havolasini kiriting",
+    "videoFail": "Videoni yuklab bo‘lmadi. Qayta urinib ko‘ring."
   }
 }
