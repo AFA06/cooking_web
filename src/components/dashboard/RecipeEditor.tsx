@@ -522,7 +522,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
                         {t("ed.stepVideo")}
                       </p>
                       <div className="mt-1.5">
-                        <VideoUploader value={s.videoUrl} poster={s.mediaUrl} onBusy={trackUpload} onChange={(url) => setStep(i, { videoUrl: url })} label={t("ed.stepVideo")} />
+                        <VideoUploader value={s.videoUrl} onBusy={trackUpload} onChange={(url) => setStep(i, { videoUrl: url })} label={t("ed.stepVideo")} />
                       </div>
                     </div>
                     <p className="text-sm text-amber-600 sm:col-span-2">{t("ed.stepVideoHint", { mb: maxMegabytes("video") })}</p>

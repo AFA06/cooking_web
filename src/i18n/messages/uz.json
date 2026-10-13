@@ -601,7 +601,7 @@
     "videoHint": "YouTube yoki Vimeo havolasi, yoki .mp4 fayl havolasi. Video retsept sahifasida ko‘rsatiladi.",
     "videoOk": "Video tanildi",
     "stepVideo": "Qadam videosi (ixtiyoriy)",
-    "stepVideoHint": "Bu qadam qanday bajarilishini qisqa videoda ko‘rsating, {mb} MB gacha. Ikkalasini ham qo‘shsangiz, avval rasm ko‘rinadi, bosilganda video ijro etiladi.",
+    "stepVideoHint": "Bu qadam qanday bajarilishini qisqa videoda ko‘rsating, {mb} MB gacha. Ikkalasini ham qo‘shsangiz, rasm va video ketma-ket, alohida ko‘rsatiladi.",
     "stepAccess": "Bu qadamni kim o‘qiy oladi",
     "stepFree": "Bepul",
     "stepPremium": "Premium",
@@ -834,6 +834,7 @@
     "g": "g",
     "kcal": "kkal",
     "perPerson": "1 kishi uchun",
+    "totalFor": "{count} porsiya uchun jami",
     "protein": "Oqsil"
   },
   "profile": {

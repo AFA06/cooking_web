@@ -4,7 +4,6 @@ import * as React from "react";
 
 interface Props {
   src: string;
-  poster?: string;
   label: string;
   className?: string;
 }
@@ -14,15 +13,14 @@ interface Props {
  * when the player trips over one (a long pause, then play) it asks for the clip again and
  * carries on from the same moment.
  */
-export function FileVideo({ src, poster, label, className }: Props) {
+export function FileVideo({ src, label, className }: Props) {
   const [attempt, setAttempt] = React.useState(0);
   const resumeAt = React.useRef(0);
 
   return (
     <video
       key={`${src}#${attempt}`}
-      src={attempt === 0 ? src : `${src}?retry=${attempt}`}
-      poster={poster || undefined}
+      src={`${attempt === 0 ? src : `${src}?retry=${attempt}`}#t=0.001`}
       controls
       preload="metadata"
       playsInline

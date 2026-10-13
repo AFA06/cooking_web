@@ -19,7 +19,7 @@ export interface RecipeStep {
   isFree: boolean;
   mediaUrl?: string;
   mediaType?: "image" | "video";
-  /** A clip showing this step: an upload or a link, see lib/video. The photo, when there is one, is its poster. */
+  /** A clip showing this step: an upload or a link, see lib/video. Shown next to the step photo, never as its cover. */
   videoUrl?: string;
   timerSeconds?: number;
   temperatureCelsius?: number;

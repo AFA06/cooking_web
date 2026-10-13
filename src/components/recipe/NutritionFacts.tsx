@@ -1,6 +1,7 @@
 "use client";
 
 import { Beef, Droplet, Flame, Wheat, type LucideIcon } from "lucide-react";
+import { useServings } from "@/components/recipe/Servings";
 import { useT } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 import type { RecipeNutrition } from "@/types/recipe";
@@ -30,6 +31,9 @@ export function CaloriesBadge({ calories, className }: { calories: number; class
 /** What one person eats — the whole dish divided by its servings — with the nutrient names. */
 export function NutritionFacts({ nutrition, className }: { nutrition: RecipeNutrition; className?: string }) {
   const t = useT();
+  const { servings, base } = useServings();
+  // One serving stays the same however many are cooked; the whole pot is what grows with the portions.
+  const whole = (value: number) => Math.round(value * servings);
   return (
     <div className={className}>
       <p className="text-xs font-medium uppercase tracking-wider text-amber-600">{t("nutrient.perPerson")}</p>
@@ -49,6 +53,15 @@ export function NutritionFacts({ nutrition, className }: { nutrition: RecipeNutr
           </div>
         ))}
       </dl>
+      <p className="mt-3 text-sm text-amber-900 tabular-nums" aria-live="polite">
+        <span className="font-medium">{t("nutrient.totalFor", { count: servings })}:</span>{" "}
+        <span className={cn("font-semibold", servings !== base && "text-amber-700")}>
+          {whole(nutrition.calories)} {t("nutrient.kcal")}
+        </span>
+        <span className="text-amber-600">
+          {" "}· {whole(nutrition.proteinGrams)} {t("nutrient.g")} {t("nutrient.protein").toLowerCase()} · {whole(nutrition.fatGrams)} {t("nutrient.g")} {t("nutrient.fat").toLowerCase()} · {whole(nutrition.carbGrams)} {t("nutrient.g")} {t("nutrient.carbs").toLowerCase()}
+        </span>
+      </p>
     </div>
   );
 }

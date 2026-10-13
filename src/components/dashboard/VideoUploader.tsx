@@ -12,8 +12,6 @@ import { cn } from "@/lib/utils";
 interface Props {
   value: string;
   onChange: (url: string) => void;
-  /** Shown before the clip plays. */
-  poster?: string;
   label?: string;
   /** Told when an upload starts and ends, so the form can wait for it. */
   onBusy?: (busy: boolean) => void;
@@ -26,7 +24,7 @@ type Upload = { file: File; state: "sending" | "checking" | "failed"; progress: 
  * file storage; the creator sees how far along it is, can cancel, and can try again without picking
  * the file a second time. It only counts once the server has checked what arrived.
  */
-export function VideoUploader({ value, onChange, poster, label, onBusy }: Props) {
+export function VideoUploader({ value, onChange, label, onBusy }: Props) {
   const t = useT();
   const input = React.useRef<HTMLInputElement>(null);
   const running = React.useRef<AbortController | null>(null);
@@ -110,7 +108,7 @@ export function VideoUploader({ value, onChange, poster, label, onBusy }: Props)
         </div>
       ) : value ? (
         <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-ink">
-          {video?.kind === "file" && <FileVideo src={video.src} poster={poster} label={label ?? t("up.video")} className="h-full w-full object-contain" />}
+          {video?.kind === "file" && <FileVideo src={video.src} label={label ?? t("up.video")} className="h-full w-full object-contain" />}
           {video && video.kind !== "file" && <iframe src={video.embedUrl} title={label ?? t("up.video")} loading="lazy" allowFullScreen className="h-full w-full" />}
           <div className="absolute right-2 top-2 flex gap-2">
             <button type="button" onClick={() => input.current?.click()} className="flex h-10 items-center rounded-full bg-paper px-3 text-ink">

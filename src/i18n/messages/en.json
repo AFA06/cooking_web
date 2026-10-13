@@ -609,7 +609,7 @@
     "videoHint": "A YouTube or Vimeo link, or a link to an .mp4 file. The video is shown on the recipe page.",
     "videoOk": "Video recognised",
     "stepVideo": "Step video (optional)",
-    "stepVideoHint": "Show how this step is done in a short clip, up to {mb} MB. If you add both, the photo is shown first and the video plays when tapped.",
+    "stepVideoHint": "Show how this step is done in a short clip, up to {mb} MB. If you add both, the photo and the video are shown one under the other.",
     "stepAccess": "Who can read this step",
     "stepFree": "Free",
     "stepPremium": "Premium",
@@ -842,6 +842,7 @@
     "g": "g",
     "kcal": "kcal",
     "perPerson": "Per serving",
+    "totalFor": "Total for {count} servings",
     "protein": "Protein"
   },
   "profile": {
