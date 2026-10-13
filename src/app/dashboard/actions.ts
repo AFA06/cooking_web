@@ -48,7 +48,7 @@ export async function saveRecipe(
   recipeId: string | null,
   input: RecipeInput,
   publish: boolean,
-): Promise<{ error: string } | { id: string }> {
+): Promise<{ error: string } | { id: string; stepIds: string[] }> {
   const t = await getT();
   const ctx = await getCurrentCreator();
   if (!ctx) return { error: t("err.needCreator") };
@@ -60,13 +60,14 @@ export async function saveRecipe(
     ownerOnly: true,
     data: parsed.data,
     publish,
+    actor: ctx.user,
   });
   if ("error" in result) return { error: t(result.error) };
 
   revalidatePath("/dashboard");
   revalidatePath("/recipes");
   revalidatePath(`/recipes/${result.slug}`);
-  return { id: result.id };
+  return { id: result.id, stepIds: result.stepIds };
 }
 
 export async function setRecipeStatus(recipeId: string, status: "draft" | "published"): Promise<void> {

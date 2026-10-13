@@ -22,6 +22,8 @@ export const recipeCategoryEnum = pgEnum("recipe_category", ["soup", "main", "sa
 export const recipeStatusEnum = pgEnum("recipe_status", ["draft", "published"]);
 export const sessionStatusEnum = pgEnum("cooking_session_status", ["in_progress", "completed", "abandoned"]);
 export const purchaseStatusEnum = pgEnum("purchase_status", ["pending", "paid", "failed", "refunded"]);
+export const mediaKindEnum = pgEnum("media_kind", ["image", "video"]);
+export const mediaStatusEnum = pgEnum("media_status", ["pending", "ready"]);
 
 export const users = pgTable(
   "users",
@@ -191,6 +193,37 @@ export const recipeSteps = pgTable(
     ingredientPositions: integer("ingredient_positions").array().notNull().default([]),
   },
   (t) => [index("recipe_steps_recipe_idx").on(t.recipeId)],
+);
+
+/**
+ * A photo or clip kept in file storage (see server/storage). Steps point at it as /api/files/:id;
+ * the storage key never leaves the server. `pending` until the upload has been checked.
+ * It belongs to exactly one step once the recipe is saved; before that, only to whoever uploaded it.
+ * Deleting a user, recipe or step only unlinks the row, so the stored file can still be found and removed.
+ */
+export const mediaAssets = pgTable(
+  "media_assets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: uuid("owner_id").references(() => users.id, { onDelete: "set null" }),
+    recipeId: uuid("recipe_id").references(() => recipes.id, { onDelete: "set null" }),
+    stepId: uuid("step_id").references(() => recipeSteps.id, { onDelete: "set null" }),
+    kind: mediaKindEnum("kind").notNull(),
+    objectKey: text("object_key").notNull(),
+    contentType: text("content_type").notNull(),
+    size: integer("size").notNull(),
+    status: mediaStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("media_assets_key_idx").on(t.objectKey),
+    // A step has at most one photo and one clip.
+    uniqueIndex("media_assets_step_kind_idx").on(t.stepId, t.kind),
+    index("media_assets_owner_idx").on(t.ownerId),
+    index("media_assets_recipe_idx").on(t.recipeId),
+    check("media_assets_size_check", sql`${t.size} > 0`),
+  ],
 );
 
 export const savedRecipes = pgTable(

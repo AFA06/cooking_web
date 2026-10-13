@@ -613,7 +613,8 @@
     "stepAccess": "Who can read this step",
     "stepFree": "Free",
     "stepPremium": "Premium",
-    "stepsAccessNote": "You choose which steps readers see for free. {free} of {total} are free; the rest unlock after they buy the recipe."
+    "stepsAccessNote": "You choose which steps readers see for free. {free} of {total} are free; the rest unlock after they buy the recipe.",
+    "waitUploads": "Wait for the uploads to finish before saving."
   },
   "email": {
     "body": "{label}: {code}\n\nThe code is valid for {minutes} minutes. Do not share it with anyone.\nIf you did not make this request, ignore this email.",
@@ -665,7 +666,12 @@
     "videoUrl": "The video link must be a YouTube or Vimeo link, or an .mp4 file over https://",
     "videoBig": "The video is too large (up to {mb} MB)",
     "videoType": "Only video files (MP4, MOV, WebM) can be uploaded.",
-    "videoLimit": "You've reached the limit of uploaded videos."
+    "videoLimit": "You've reached the limit of uploaded videos.",
+    "storageOff": "File uploads are not set up yet.",
+    "mediaInvalid": "A photo or video on one of the steps can't be used. Upload it again.",
+    "uploadMissing": "The file didn't arrive. Try again.",
+    "photoBigMb": "The photo is too large (up to {mb} MB)",
+    "photoFormat": "Only JPEG, PNG or WebP photos can be uploaded."
   },
   "error": {
     "retry": "Try again",
@@ -1135,6 +1141,8 @@
     "useLink": "Use link",
     "video": "Upload a video",
     "videoLink": "Or paste a video link",
-    "videoFail": "The video couldn't be uploaded. Try again."
+    "videoFail": "The video couldn't be uploaded. Try again.",
+    "retry": "Try again",
+    "checking": "Checking the file…"
   }
 }

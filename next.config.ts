@@ -7,6 +7,9 @@ const isDev = process.env.NODE_ENV === "development";
  * development), the rest is closed down: no plugins, no foreign forms, no framing of our pages, and
  * iframes only for the two video hosts creators can link.
  */
+// The browser sends uploads straight to file storage, so that one origin is allowed for requests.
+const storageOrigin = process.env.R2_ENDPOINT?.trim() || (process.env.R2_ACCOUNT_ID?.trim() ? `https://${process.env.R2_ACCOUNT_ID.trim()}.r2.cloudflarestorage.com` : "");
+
 const csp = [
   "default-src 'self'",
   `script-src 'self' 'unsafe-inline'${isDev ? " 'unsafe-eval'" : ""}`,
@@ -14,7 +17,7 @@ const csp = [
   "img-src 'self' data: blob: https:",
   "media-src 'self' https:",
   "font-src 'self' data:",
-  `connect-src 'self'${isDev ? " ws: wss:" : ""}`,
+  `connect-src 'self'${storageOrigin ? ` ${storageOrigin}` : ""}${isDev ? " ws: wss:" : ""}`,
   "frame-src https://www.youtube-nocookie.com https://player.vimeo.com",
   "object-src 'none'",
   "base-uri 'self'",

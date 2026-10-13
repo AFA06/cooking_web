@@ -10,11 +10,17 @@ import { useT } from "@/i18n/client";
 import { RECIPE_CATEGORIES, type RecipeCategory } from "@/lib/categories";
 import { estimateNutrition } from "@/lib/nutrition";
 import type { RecipeInput } from "@/lib/recipe-schema";
-import { MAX_VIDEO_BYTES, parseVideoUrl } from "@/lib/video";
+import { maxMegabytes } from "@/lib/media";
+import { discardMedia } from "@/lib/media-upload";
+import { parseVideoUrl } from "@/lib/video";
 import { cn } from "@/lib/utils";
 
 type Ingredient = { name: string; quantity: string; unit: string };
 type Step = {
+  /** The step's id in the database once it has been saved; its photo and clip are tied to it. */
+  id: string | null;
+  /** Identifies the step on this page from the moment it is added, through reordering and saving. */
+  key: string;
   title: string;
   instruction: string;
   /** Premium recipes only: readers can see this step before buying. */
@@ -74,7 +80,7 @@ export const EMPTY_RECIPE: EditorInitial = {
   tags: "",
   status: "draft",
   ingredients: [{ name: "", quantity: "", unit: "" }],
-  steps: [{ title: "", instruction: "", isFree: false, mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" }],
+  steps: [{ id: null, key: "first", title: "", instruction: "", isFree: false, mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" }],
 };
 
 const field =
@@ -110,6 +116,7 @@ function toInput(v: EditorInitial): RecipeInput {
     tags: v.tags.split(",").map((t) => t.trim()).filter(Boolean),
     ingredients: v.ingredients,
     steps: v.steps.map((s) => ({
+      id: s.id ?? undefined,
       title: s.title,
       instruction: s.instruction,
       isFree: s.isFree,
@@ -126,7 +133,7 @@ function toInput(v: EditorInitial): RecipeInput {
   };
 }
 
-type SaveAction = (recipeId: string | null, input: RecipeInput, publish: boolean) => Promise<{ error: string } | { id: string }>;
+type SaveAction = (recipeId: string | null, input: RecipeInput, publish: boolean) => Promise<{ error: string } | { id: string; stepIds: string[] }>;
 
 interface RecipeEditorProps {
   initial: EditorInitial;
@@ -139,7 +146,7 @@ interface RecipeEditorProps {
 }
 
 const MAX_GALLERY = 5;
-const BLANK_STEP: Step = { title: "", instruction: "", isFree: false, mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" };
+const blankStep = (): Step => ({ id: null, key: crypto.randomUUID(), title: "", instruction: "", isFree: false, mediaUrl: "", videoUrl: "", timerMinutes: "", temperatureCelsius: "", tip: "", ingredientPositions: "" });
 
 const parsePositions = (value: string) =>
   value
@@ -178,6 +185,14 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
     set("ingredients", v.ingredients.map((x, n) => (n === i ? { ...x, ...patch } : x)));
   // A clip can take a while to upload; this must not put back the steps as they were when it started.
   const setStep = (i: number, patch: Partial<Step>) => setV((p) => ({ ...p, steps: p.steps.map((x, n) => (n === i ? { ...x, ...patch } : x)) }));
+  // Photos and clips still on their way up; the recipe is not saved until they have landed.
+  const [uploads, setUploads] = React.useState(0);
+  const trackUpload = React.useCallback((busy: boolean) => setUploads((n) => Math.max(0, n + (busy ? 1 : -1))), []);
+  const removeStep = (i: number) => {
+    // Files the step uploaded but no saved recipe uses are dropped; saved ones go when the recipe is saved without them.
+    for (const url of [v.steps[i].mediaUrl, v.steps[i].videoUrl]) if (url) discardMedia(url);
+    set("steps", v.steps.filter((_, n) => n !== i));
+  };
   const [nutritionNote, setNutritionNote] = React.useState<string | null>(null);
   const calculateNutrition = () => {
     const { perServing, skipped } = estimateNutrition(v.ingredients, Number(v.servings));
@@ -237,20 +252,25 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
   const ready = checks.filter((c) => c.required).every((c) => c.done);
   const total = v.prepTimeMinutes && v.cookTimeMinutes ? Number(v.prepTimeMinutes) + Number(v.cookTimeMinutes) : 0;
 
-  const submit = (publish: boolean) =>
+  const submit = (publish: boolean) => {
+    if (uploads > 0) return;
     startTransition(async () => {
       setError(null);
       setNotice(null);
+      const sent = v.steps.map((s) => s.key);
       const result = await save(v.id, toInput(v), publish);
       if ("error" in result) {
         setError(result.error);
         return;
       }
-      setV((p) => ({ ...p, id: result.id, status: publish ? "published" : "draft" }));
+      // Each step learns its saved id, so the next save updates it instead of making a new one.
+      const savedId = new Map(sent.map((key, n) => [key, result.stepIds[n]]));
+      setV((p) => ({ ...p, id: result.id, status: publish ? "published" : "draft", steps: p.steps.map((s) => ({ ...s, id: savedId.get(s.key) ?? s.id })) }));
       setNotice(publish ? t("ed.published") : t("ed.draftSaved"));
       if (!v.id) router.replace(`${basePath}/${result.id}`);
       else router.refresh();
     });
+  };
 
   return (
     <form
@@ -434,7 +454,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
             {v.steps.map((s, i) => {
               const picked = parsePositions(s.ingredientPositions);
               return (
-                <fieldset key={i} className="rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5">
+                <fieldset key={s.key} className="rounded-2xl border border-amber-200 bg-amber-50 p-4 sm:p-5">
                   <legend className="flex items-center gap-2 px-2 font-serif text-lg font-semibold text-amber-950">
                     <span className="flex h-7 w-7 items-center justify-center rounded-full bg-clay-400 text-sm text-amber-50">{i + 1}</span>
                     {t("ed.stepN", { n: i + 1 })}
@@ -485,7 +505,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
                     <div>
                       <p className={label}>{t("ed.stepPhoto")}</p>
                       <div className="mt-1.5">
-                        <ImageUploader value={s.mediaUrl} compact onChange={(url) => setStep(i, { mediaUrl: url })} label={t("ed.stepPhoto")} />
+                        <ImageUploader value={s.mediaUrl} compact stored onBusy={trackUpload} onChange={(url) => setStep(i, { mediaUrl: url })} label={t("ed.stepPhoto")} />
                       </div>
                     </div>
                     <div>
@@ -494,10 +514,10 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
                         {t("ed.stepVideo")}
                       </p>
                       <div className="mt-1.5">
-                        <VideoUploader value={s.videoUrl} poster={s.mediaUrl} onChange={(url) => setStep(i, { videoUrl: url })} label={t("ed.stepVideo")} />
+                        <VideoUploader value={s.videoUrl} poster={s.mediaUrl} onBusy={trackUpload} onChange={(url) => setStep(i, { videoUrl: url })} label={t("ed.stepVideo")} />
                       </div>
                     </div>
-                    <p className="text-sm text-amber-600 sm:col-span-2">{t("ed.stepVideoHint", { mb: MAX_VIDEO_BYTES / 1024 / 1024 })}</p>
+                    <p className="text-sm text-amber-600 sm:col-span-2">{t("ed.stepVideoHint", { mb: maxMegabytes("video") })}</p>
                   </div>
 
                   <div className="mt-4 grid grid-cols-2 gap-3 sm:max-w-md">
@@ -549,13 +569,13 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
                   <div className="mt-4 flex flex-wrap gap-1 border-t border-amber-200 pt-3">
                     <Button type="button" size="sm" variant="ghost" disabled={i === 0} onClick={() => set("steps", move(v.steps, i, -1))}>{t("ed.moveStepUp")}</Button>
                     <Button type="button" size="sm" variant="ghost" disabled={i === v.steps.length - 1} onClick={() => set("steps", move(v.steps, i, 1))}>{t("ed.moveStepDown")}</Button>
-                    <Button type="button" size="sm" variant="ghost" disabled={v.steps.length === 1} onClick={() => set("steps", v.steps.filter((_, n) => n !== i))}>{t("common.delete")}</Button>
+                    <Button type="button" size="sm" variant="ghost" disabled={v.steps.length === 1} onClick={() => removeStep(i)}>{t("common.delete")}</Button>
                   </div>
                 </fieldset>
               );
             })}
           </div>
-          <Button type="button" variant="outline" size="sm" onClick={() => set("steps", [...v.steps, { ...BLANK_STEP }])}>
+          <Button type="button" variant="outline" size="sm" onClick={() => set("steps", [...v.steps, blankStep()])}>
             <Plus className="h-4 w-4" aria-hidden="true" />
             {t("ed.addStep")}
           </Button>
@@ -624,11 +644,12 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
         <div className="sticky bottom-0 z-10 space-y-2 rounded-t-2xl border-t border-amber-200 bg-amber-50/95 px-1 py-4 backdrop-blur">
           {error && <p role="alert" className="text-sm font-medium text-red-700">{error}</p>}
           {notice && <p role="status" className="text-sm font-medium text-sage-700">{notice}</p>}
+          {uploads > 0 && <p role="status" className="text-sm font-medium text-amber-700">{t("ed.waitUploads")}</p>}
           <div className="flex flex-wrap gap-3">
-            <Button type="button" variant="outline" size="lg" loading={pending} onClick={() => submit(false)}>
+            <Button type="button" variant="outline" size="lg" loading={pending} disabled={uploads > 0} onClick={() => submit(false)}>
               {v.status === "published" ? t("ed.toDraft") : t("ed.saveDraft")}
             </Button>
-            <Button type="button" size="lg" loading={pending} onClick={() => submit(true)}>
+            <Button type="button" size="lg" loading={pending} disabled={uploads > 0} onClick={() => submit(true)}>
               {v.status === "published" ? t("common.save") : t("ed.publish")}
             </Button>
           </div>

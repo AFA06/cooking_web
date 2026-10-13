@@ -1,6 +1,7 @@
 import "server-only";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import { db, schema } from "@/db";
+import { hasPurchased } from "@/server/access";
 import type { CurrentUser } from "@/server/auth";
 
 export interface RecipeSecrets {
@@ -23,14 +24,6 @@ export async function getRecipeSecrets(recipeId: string, creatorId: string, user
   if (!notes) return { exists: false, notes: null, asOwner: false };
 
   const asOwner = !!user && (user.role === "admin" || ownCreatorId === creatorId);
-  let bought = false;
-  if (user && !asOwner) {
-    const [purchase] = await db
-      .select({ id: schema.purchases.id })
-      .from(schema.purchases)
-      .where(and(eq(schema.purchases.userId, user.id), eq(schema.purchases.recipeId, recipeId), eq(schema.purchases.status, "paid")))
-      .limit(1);
-    bought = !!purchase;
-  }
+  const bought = !!user && !asOwner && (await hasPurchased(user.id, recipeId));
   return { exists: true, notes: asOwner || bought ? notes : null, asOwner };
 }

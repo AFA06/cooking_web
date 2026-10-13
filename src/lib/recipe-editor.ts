@@ -26,6 +26,8 @@ export function toEditorInitial({ recipe: r, ingredients, steps }: RecipeForEdit
     status: r.status,
     ingredients: ingredients.map((i) => ({ name: i.name, quantity: i.quantity, unit: i.unit })),
     steps: steps.map((s) => ({
+      id: s.id,
+      key: s.id,
       title: s.title,
       instruction: s.instruction,
       isFree: s.isFree,

@@ -53,7 +53,8 @@ function recipeJsonLd(recipe: Recipe, locale: Locale, t: TFunction) {
       aggregateRating: { "@type": "AggregateRating", ratingValue: recipe.rating.average.toFixed(1), ratingCount: recipe.rating.count },
     }),
     recipeIngredient: recipe.ingredients.map((i) => `${i.quantity} ${i.unit} ${i.name}`),
-    recipeInstructions: recipe.steps.map((s) => ({ "@type": "HowToStep", name: s.title, text: s.instruction })),
+    // Only what the page shows to everyone: a premium recipe's locked steps stay out of the markup.
+    recipeInstructions: recipe.steps.filter((s) => !recipe.isPremium || s.isFree).map((s) => ({ "@type": "HowToStep", name: s.title, text: s.instruction })),
   };
 }
 

@@ -605,7 +605,8 @@
     "stepAccess": "Bu qadamni kim o‘qiy oladi",
     "stepFree": "Bepul",
     "stepPremium": "Premium",
-    "stepsAccessNote": "Qaysi qadamlar hamma uchun bepul ekanini o‘zingiz tanlaysiz. {total} tadan {free} tasi bepul, qolganlari retseptni sotib olgach ochiladi."
+    "stepsAccessNote": "Qaysi qadamlar hamma uchun bepul ekanini o‘zingiz tanlaysiz. {total} tadan {free} tasi bepul, qolganlari retseptni sotib olgach ochiladi.",
+    "waitUploads": "Saqlashdan oldin yuklash tugashini kuting."
   },
   "email": {
     "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",
@@ -657,7 +658,12 @@
     "videoUrl": "Video havolasi YouTube, Vimeo yoki https:// bilan boshlanadigan .mp4 fayl bo‘lishi kerak",
     "videoBig": "Video juda katta ({mb} MB gacha)",
     "videoType": "Faqat video fayli yuklanadi (MP4, MOV, WebM).",
-    "videoLimit": "Yuklangan videolar chegarasiga yetdingiz."
+    "videoLimit": "Yuklangan videolar chegarasiga yetdingiz.",
+    "storageOff": "Fayl yuklash hali sozlanmagan.",
+    "mediaInvalid": "Qadamlardan biridagi rasm yoki videoni ishlatib bo‘lmaydi. Uni qayta yuklang.",
+    "uploadMissing": "Fayl yetib kelmadi. Qayta urinib ko‘ring.",
+    "photoBigMb": "Rasm juda katta ({mb} MB gacha)",
+    "photoFormat": "Faqat JPEG, PNG yoki WebP rasm yuklanadi."
   },
   "error": {
     "retry": "Qayta urinish",
@@ -1121,6 +1127,8 @@
     "useLink": "Havolani qo‘llash",
     "video": "Video yuklash",
     "videoLink": "Yoki video havolasini kiriting",
-    "videoFail": "Videoni yuklab bo‘lmadi. Qayta urinib ko‘ring."
+    "videoFail": "Videoni yuklab bo‘lmadi. Qayta urinib ko‘ring.",
+    "retry": "Qayta urinish",
+    "checking": "Fayl tekshirilmoqda…"
   }
 }
