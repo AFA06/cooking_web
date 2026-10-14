@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { and, asc, count, desc, eq, inArray, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 import { cleanSocialLinks } from "@/lib/social";
@@ -114,9 +115,15 @@ function selectRecipes() {
     .innerJoin(schema.creators, eq(schema.recipes.creatorId, schema.creators.id));
 }
 
-export async function listPublishedRecipes(): Promise<Recipe[]> {
-  return hydrate(await selectRecipes().where(published).orderBy(desc(schema.recipes.publishedAt)));
-}
+/**
+ * The public catalogue is the same for every visitor and is read on almost every page, so it is kept for a
+ * minute and dropped at once when a recipe is saved, published or hidden (tag "recipes").
+ */
+export const listPublishedRecipes = unstable_cache(
+  async (): Promise<Recipe[]> => hydrate(await selectRecipes().where(published).orderBy(desc(schema.recipes.publishedAt))),
+  ["published-recipes"],
+  { revalidate: 60, tags: ["recipes"] },
+);
 
 export async function getFeaturedRecipes(limit = 6): Promise<Recipe[]> {
   return hydrate(

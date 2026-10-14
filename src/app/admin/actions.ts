@@ -1,7 +1,7 @@
 "use server";
 
 import { and, eq, ne } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
@@ -28,6 +28,7 @@ const uuid = z.string().uuid();
 function refreshPublic() {
   revalidatePath("/admin", "layout");
   revalidatePath("/recipes");
+  revalidateTag("recipes", { expire: 0 });
   revalidatePath("/creators");
   revalidatePath("/");
 }

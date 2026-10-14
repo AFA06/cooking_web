@@ -1,7 +1,7 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
@@ -66,6 +66,7 @@ export async function saveRecipe(
 
   revalidatePath("/dashboard");
   revalidatePath("/recipes");
+  revalidateTag("recipes", { expire: 0 });
   revalidatePath(`/recipes/${result.slug}`);
   return { id: result.id, stepIds: result.stepIds };
 }
@@ -79,6 +80,7 @@ export async function setRecipeStatus(recipeId: string, status: "draft" | "publi
     .where(and(eq(schema.recipes.id, recipeId), eq(schema.recipes.creatorId, ctx.creator.id)));
   revalidatePath("/dashboard");
   revalidatePath("/recipes");
+  revalidateTag("recipes", { expire: 0 });
 }
 
 const creatorProfileSchema = z.object({
