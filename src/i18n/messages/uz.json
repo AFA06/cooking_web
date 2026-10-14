@@ -259,6 +259,7 @@
     "err": {
       "email": "To‘g‘ri email kiriting",
       "exists": "Bu email bilan hisob allaqachon mavjud. Tizimga kirib ko‘ring.",
+      "locked": "Juda ko‘p noto‘g‘ri urinish: hisob himoya uchun vaqtincha bloklandi. Iltimos, {time} kuting va qayta urinib ko‘ring.",
       "name": "Ismingizni kiriting",
       "pwEnter": "Parolingizni kiriting",
       "pwShort": "Parol kamida 8 ta belgidan iborat bo‘lishi kerak",
@@ -334,28 +335,52 @@
     "save": "Saqlash"
   },
   "cook": {
+    "addFive": "+5 daq.",
+    "addMinute": "+1 daq.",
+    "alertedOther": "{title}: vaqt tugadi",
     "allStepsDone": {
       "other": "{title} — barcha {total} qadam bajarildi. Yoqimli ishtaha!"
     },
     "backToRecipe": "Retseptga qaytish",
+    "celebrate": "Barakalla!",
     "createAccount": "Hisob yarating",
     "createAccountNote": "— pishirgan taomlaringiz tarixi saqlanadi va retseptlarni baholay olasiz.",
+    "current": "Hozir",
+    "done": "Bajarildi",
     "exit": "Chiqish",
     "finish": "Tugatish",
     "freeRecipes": "Bepul retseptlarni ko‘rish",
+    "goThere": "Bosqichga o‘tish",
     "howDidItGo": "Qanday chiqdi?",
+    "ingredientsNow": "Shu bosqichda kerak",
+    "jumpTo": "{n}-bosqichga o‘tish: {title}",
+    "lastStage": "Oxirgi bosqich",
     "metaTitle": "Pishirish: {title}",
+    "nextUp": "Keyingisi: {title}",
     "otherRecipes": "Boshqa retseptlar",
+    "overview": "Barcha bosqichlar",
     "premiumLocked": "Premium retseptlar uchun qadam-baqadam rejim pullik versiyaga kiradi. To‘lov tizimi hozircha ulanmagan, shuning uchun bu retseptni ochib bo‘lmaydi.",
     "progress": "Pishirish jarayoni",
     "rateInvite": "Baho bering, natija rasmini qo‘shing — boshqa oshpazlarga yordam beradi.",
     "ready": "Tayyor!",
     "saving": "Pishirish natijasi saqlanmoqda…",
     "scaledNote": "Miqdorlar {servings} kishiga hisoblangan. Matndagi sonlar va taymer asl retsept ({base} kishilik) bo‘yicha — idish kattaligiga qarab vaqtni moslang.",
+    "screenOn": "Ekran o‘chmaydi",
+    "stage": "{n}-bosqich",
+    "stageOf": "Bosqich {n} / {total}",
     "stepOf": "Qadam {n} / {total}",
+    "swipeHint": "Suring yoki ← → tugmalaridan foydalaning",
     "temperature": "Harorat: {temp}°C",
+    "textLarger": "Matnni kattalashtirish",
+    "textNormal": "Oddiy matn",
+    "textSize": "Matn o‘lchami",
     "thanks": "Rahmat! Bahoyingiz saqlandi va ijodkor sahifasida ko‘rinadi.",
+    "timeUp": "Vaqt tugadi!",
+    "timeUpNote": "Taomning holatini tekshiring.",
+    "timerFor": "Bosqich taymeri",
+    "timerRunning": "Taymer ishlayapti",
     "tip": "Maslahat: {tip}",
+    "tipTitle": "Maslahat",
     "youCooked": "Siz buni pishirdingiz."
   },
   "cookbook": {
@@ -436,7 +461,7 @@
     "paymentSoon": "To‘lov tez orada ulanadi",
     "paymentSoonNote": "Hozircha saqlab qo‘ying — to‘lov ochilganda kutubxonangizda bo‘ladi.",
     "premiumIntro": {
-      "other": "Masalliqlar va dastlabki {count} qadam bepul."
+      "other": "Masalliqlar va {count} ta qadam bepul."
     },
     "premiumRecipe": "Premium retsept",
     "premiumStep": "Premium qadam",
@@ -453,6 +478,10 @@
     "readyTitle": "Oshxonada boshlashga tayyormisiz?",
     "reviews": "Pishirganlar fikri",
     "reviewsNote": "Bu yerda faqat retseptni oxirigacha pishirgan odamlar yozadi: natijasi, bahosi va maslahati.",
+    "secretsFor": "Faqat xaridorlar uchun",
+    "secretsLocked": "{name}ning yashirin maslahatlari to‘liq qo‘llanma bilan ochiladi.",
+    "secretsOwner": "Siz buni muallif sifatida ko‘ryapsiz",
+    "secretsTitle": "Oshpaz sirlari",
     "servingsHint": "Necha kishiga pishirasiz? Miqdorlar shunga qarab o‘zgaradi.",
     "servingsYield": {
       "other": "{count} porsiya"
@@ -464,7 +493,10 @@
     "tip": "Oshpaz maslahati",
     "totalTime": "Umumiy vaqt",
     "updateRating": "Bahoyingizni yangilang",
-    "withTimer": "Taymer bilan · {time}"
+    "video": "Video",
+    "videoTitle": "{title} — video",
+    "withTimer": "Taymer bilan · {time}",
+    "premiumIntroNone": "Masalliqlar bepul; qadamlar to‘liq qo‘llanmada."
   },
   "dialog": {
     "createSave": "Yaratish va saqlash",
@@ -492,9 +524,18 @@
     "calories": "Kaloriya (kkal)",
     "carbs": "Uglevod (g)",
     "category": "Toifa",
+    "check": {
+      "nutrition": "Ozuqaviy qiymat (ixtiyoriy)",
+      "secrets": "Yashirin ma’lumotlar (premium)",
+      "title": "Sarlavha va tavsif",
+      "freeStep": "Kamida bitta bepul qadam"
+    },
+    "checkTitle": "Tayyorlik",
     "cookMin": "Pishirish (daq.)",
     "cover": "Muqova rasmi havolasi",
+    "coverHint": "Eng muhim rasm: kartochkada va retsept sahifasida ko‘rinadi.",
     "coverNote": "Rasm yuklash hozircha mavjud emas. O‘zingizga tegishli yoki foydalanish huquqingiz bor rasm havolasini kiriting.",
+    "coverPhoto": "Muqova rasmi",
     "deleteIng": "Masalliqni o‘chirish",
     "description": "Tavsif",
     "down": "Pastga",
@@ -503,28 +544,44 @@
     "editTitle": "Tahrirlash: {title}",
     "fat": "Yog‘ (g)",
     "gallery": "Qo‘shimcha rasmlar (ixtiyoriy)",
+    "galleryHint2": "Taom jarayoni va natijasini ko‘rsating.",
     "galleryNote": "Har bir qatorga bitta rasm havolasi, ko‘pi bilan 5 ta. Retsept sahifasida muqovadan keyin galereyada ko‘rinadi.",
     "ingName": "{n}-masalliq nomi",
     "ingredients": "Masalliqlar",
     "instruction": "Ko‘rsatma",
+    "moveStepDown": "Qadamni pastga",
+    "moveStepUp": "Qadamni yuqoriga",
     "namePh": "Nomi",
     "newRecipe": "Yangi retsept",
     "nutrition": "Ozuqaviy qiymati — 1 kishi uchun (ixtiyoriy)",
     "nutritionNote": "Butun taomning qiymati porsiyalar soniga bo‘lingani, ya’ni bir kishi yeydigan miqdor. To‘ldirilsa, retsept kartochkasida va sahifasida ko‘rinadi.",
+    "optional": "Ixtiyoriy",
     "premium": "Premium retsept",
     "premiumNote": "To‘lov tizimi hozircha ulanmagan, shuning uchun o‘quvchilar premium retseptlarni ocha olmaydi.",
     "prepMin": "Tayyorlash (daq.)",
+    "preview": "Ko‘rinishi",
     "price": "Narxi (so‘m)",
     "protein": "Oqsil (g)",
     "publish": "Nashr etish",
     "published": "Nashr etildi.",
     "qtyPh": "Miqdori",
+    "ready": "Nashr etishga tayyor",
     "saveDraft": "Qoralamani saqlash",
+    "sec": {
+      "media": "Rasm va video",
+      "pricing": "Narx va nashr"
+    },
+    "secrets": "Yashirin ma’lumotlar (faqat xaridorlar uchun)",
+    "secretsHint": "Hech kim aytmaydigan sirlar: ustalik nozikliklari, almashtirish usullari, xatolardan saqlanish. Faqat sotib olganlar ko‘radi.",
+    "secretsPh": "Masalan: Yog‘ni 180° gacha qizdiring, aks holda xamir yopishadi…",
     "servings": "Porsiya",
     "stepImage": "Rasm havolasi (ixtiyoriy)",
     "stepIngs": "Ishlatiladigan masalliq raqamlari",
+    "stepIngsNone": "Avval masalliqlarni qo‘shing",
     "stepIngsPh": "masalan: 1, 3",
+    "stepIngsPick": "Bu qadamda ishlatiladigan masalliqlar",
     "stepN": "Qadam {n}",
+    "stepPhoto": "Qadam rasmi (ixtiyoriy)",
     "steps": "Qadamlar",
     "tags": "Teglar (vergul bilan)",
     "tagsPlaceholder": "O‘zbek, Guruch, Qo‘y go‘shti",
@@ -533,8 +590,33 @@
     "tipOptional": "Maslahat (ixtiyoriy)",
     "title": "Sarlavha",
     "toDraft": "Qoralamaga qaytarish",
+    "type": "Retsept turi",
+    "typeFreeNote": "Hamma ochiq ko‘radi va pishiradi — auditoriya o‘sishi uchun yaxshi.",
+    "typePremiumNote": "Masalliqlar va dastlabki qadamlar bepul, to‘liq qo‘llanma va sirlar — pullik.",
     "unitPh": "Birlik",
-    "up": "Yuqoriga"
+    "untitled": "Retsept nomi",
+    "up": "Yuqoriga",
+    "video": "Video (ixtiyoriy)",
+    "videoBad": "Bu havola qo‘llab-quvvatlanmaydi",
+    "videoHint": "YouTube yoki Vimeo havolasi, yoki .mp4 fayl havolasi. Video retsept sahifasida ko‘rsatiladi.",
+    "videoOk": "Video tanildi",
+    "stepVideo": "Qadam videosi (ixtiyoriy)",
+    "stepVideoHint": "Bu qadam qanday bajarilishini qisqa videoda ko‘rsating, {mb} MB gacha. Ikkalasini ham qo‘shsangiz, rasm va video ketma-ket, alohida ko‘rsatiladi.",
+    "stepAccess": "Bu qadamni kim o‘qiy oladi",
+    "stepFree": "Bepul",
+    "stepPremium": "Premium",
+    "stepsAccessNote": "Qaysi qadamlar hamma uchun bepul ekanini o‘zingiz tanlaysiz. {total} tadan {free} tasi bepul, qolganlari retseptni sotib olgach ochiladi.",
+    "waitUploads": "Saqlashdan oldin yuklash tugashini kuting.",
+    "ingUnitsHint": "Miqdor — raqam (1, 1.5, 1/2) yoki so‘z (yarim, chorak, bir yarim). Birlik: g, kg, ml, l, osh qoshiq, choy qoshiq, stakan, chomich, hovuch, chimdim, ta… O‘zbekcha, ruscha, qozoqcha yoki inglizcha yozsa bo‘ladi. “Ta’bga ko‘ra” uchun birlikni bo‘sh qoldiring."
+  },
+  "email": {
+    "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",
+    "label": {
+      "email_change": "Emailni tasdiqlash kodi",
+      "password_reset": "Parolni tiklash kodi",
+      "phone_change": "Telefonni tasdiqlash kodi",
+      "signup": "Tasdiqlash kodi"
+    }
   },
   "email": {
     "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",
@@ -567,6 +649,7 @@
     "noCreator": "Ijodkor tanlanmagan.",
     "nutritionAll": "Ozuqaviy qiymatning to‘rttasini ham to‘ldiring yoki hammasini bo‘sh qoldiring",
     "photoBig": "Rasm juda katta",
+    "photoType": "Faqat rasm fayli yuklanadi (JPEG).",
     "premiumPrice": "Premium retsept uchun narx kerak",
     "rateCookFirst": "Baholash uchun avval shu retseptni oxirigacha pishiring.",
     "rateSignIn": "Baholash uchun tizimga kiring.",
@@ -580,7 +663,17 @@
     "stepMin": "Kamida bitta qadam qo‘shing",
     "stepTitle": "Har bir qadamning sarlavhasi bo‘lishi kerak",
     "titleLong": "Sarlavha juda uzun",
-    "titleShort": "Sarlavha juda qisqa"
+    "titleShort": "Sarlavha juda qisqa",
+    "uploadLimit": "Yuklangan rasmlar chegarasiga yetdingiz.",
+    "videoUrl": "Video havolasi YouTube, Vimeo yoki https:// bilan boshlanadigan .mp4 fayl bo‘lishi kerak",
+    "videoBig": "Video juda katta ({mb} MB gacha)",
+    "videoType": "Faqat video fayli yuklanadi (MP4, MOV, WebM).",
+    "videoLimit": "Yuklangan videolar chegarasiga yetdingiz.",
+    "storageOff": "Fayl yuklash hali sozlanmagan.",
+    "mediaInvalid": "Qadamlardan biridagi rasm yoki videoni ishlatib bo‘lmaydi. Uni qayta yuklang.",
+    "uploadMissing": "Fayl yetib kelmadi. Qayta urinib ko‘ring.",
+    "photoBigMb": "Rasm juda katta ({mb} MB gacha)",
+    "photoFormat": "Faqat JPEG, PNG yoki WebP rasm yuklanadi."
   },
   "error": {
     "retry": "Qayta urinish",
@@ -750,6 +843,7 @@
     "g": "g",
     "kcal": "kkal",
     "perPerson": "1 kishi uchun",
+    "totalFor": "{count} porsiya uchun jami",
     "protein": "Oqsil"
   },
   "profile": {
@@ -931,7 +1025,16 @@
       "other": "{count} ta mahsulot olish kerak"
     },
     "updateTo": "Ro‘yxatni {count} kishilikka yangilash",
-    "yesClear": "Ha, tozalash"
+    "yesClear": "Ha, tozalash",
+    "pickHint": "Faqat kerakli retsept mahsulotlarini ko‘rish uchun retseptni bosing. Bir nechtasini tanlasangiz, mahsulotlar jamlanadi.",
+    "showingPicked": "{total} ta retseptdan {count} tasi ko‘rsatilmoqda",
+    "allShown": "Barcha retseptlar ko‘rsatilmoqda",
+    "showAll": "Hammasini ko‘rsatish",
+    "pickRecipe": "{title} mahsulotlarini ko‘rsatish",
+    "openRecipe": "{title} retseptini ochish",
+    "clearPicked": "Tanlangan retseptlarni olib tashlash",
+    "confirmClearPicked": "Tanlangan retseptlar ro‘yxatdan olib tashlansinmi?",
+    "yesRemove": "Ha, olib tashlash"
   },
   "site": {
     "tagline": "Sevimli ijodkorlaringizdan qadam-baqadam retseptlar"
@@ -954,6 +1057,64 @@
     "newest": "Yangilari",
     "quickest": "Eng tez tayyor bo‘ladigan"
   },
+  "studio": {
+    "allRecipes": "Barcha retseptlar →",
+    "avgOrder": "O‘rtacha chek",
+    "backToSite": "Saytga qaytish",
+    "buyers": "Xaridorlar",
+    "commission": "Platforma komissiyasi: {pct}%",
+    "empty": "Hali retseptlar yo‘q",
+    "emptyText": "Birinchi retseptingizni yarating — rasm, video va qadamlar bilan.",
+    "eyebrow": "Ijodkor studiyasi",
+    "getStarted": "Boshlash uchun",
+    "gross": "Umumiy tushum",
+    "hasVideo": "Video bor",
+    "hello": "Salom, {name}",
+    "latest": "So‘nggi retseptlar",
+    "lead": "Retseptlaringizni yarating, rasm va video qo‘shing va natijalarni kuzating.",
+    "nav": {
+      "group": "Studiya",
+      "profile": "Profil",
+      "reviews": "Fikrlar",
+      "sales": "Sotuvlar",
+      "sections": "Studiya bo‘limlari"
+    },
+    "net": "Sizning ulushingiz",
+    "noCover": "Muqova yo‘q",
+    "noSales": "Hali sotuvlar yo‘q",
+    "noSalesText": "Premium retsept nashr eting — xaridlar shu yerda ko‘rinadi. To‘lov tizimi ulangach, sotuvlar boshlanadi.",
+    "orders": "Xaridlar soni",
+    "overviewTitle": "Studiya",
+    "price": "Narxi",
+    "recentBuyers": "Oxirgi xaridorlar",
+    "recipes": {
+      "desc": "Barcha retseptlaringiz: tahrirlash, nashr etish va natijalar.",
+      "search": "Retseptlaringiz bo‘yicha qidirish"
+    },
+    "revenueOverTime": "Daromad dinamikasi",
+    "reviews": {
+      "desc": "Retseptlaringizni pishirganlarning baholari va rasmlari."
+    },
+    "sales": {
+      "desc": "Premium retseptlaringiz nechta sotilgani, kim sotib olgani va qancha ishlaganingiz.",
+      "paymentsNote": "To‘lov tizimi hozircha ulanmagan: sotuvlar shu tizim ulangach hisoblanadi.",
+      "premiumHint": "Maslahat: premium retseptga yashirin sirlar qo‘shing — xaridorlar aynan shuni qadrlaydi.",
+      "title": "Sotuvlar va daromad"
+    },
+    "salesByRecipe": "Retseptlar bo‘yicha sotuvlar",
+    "sold": "Sotilgan",
+    "stats": {
+      "desc": "So‘nggi {range} ichida retseptlaringiz qanday ishladi.",
+      "sales": "Sotuvlar"
+    },
+    "todo": {
+      "profile": "Profilingizni to‘ldiring: ism, tanishtiruv va rasm",
+      "publish": "Retseptni nashr eting",
+      "recipe": "Birinchi retseptni yarating",
+      "socials": "Ijtimoiy tarmoqlarni ulang",
+      "video": "Retseptga video qo‘shing"
+    }
+  },
   "time": {
     "daysAgo": "{count} kun oldin",
     "hours": "{count} soat",
@@ -974,5 +1135,20 @@
   },
   "unit": {
     "som": "so‘m"
+  },
+  "up": {
+    "add": "Rasm qo‘shish",
+    "drop": "yoki shu yerga tashlang",
+    "max": "Ko‘pi bilan {max} ta",
+    "orLink": "Yoki rasm havolasini kiriting",
+    "remove": "Olib tashlash",
+    "replace": "Almashtirish",
+    "upload": "Rasm yuklash",
+    "useLink": "Havolani qo‘llash",
+    "video": "Video yuklash",
+    "videoLink": "Yoki video havolasini kiriting",
+    "videoFail": "Videoni yuklab bo‘lmadi. Qayta urinib ko‘ring.",
+    "retry": "Qayta urinish",
+    "checking": "Fayl tekshirilmoqda…"
   }
 }

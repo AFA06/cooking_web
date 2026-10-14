@@ -1,6 +1,7 @@
 import {
   boolean,
   check,
+  customType,
   index,
   integer,
   jsonb,
@@ -21,6 +22,8 @@ export const recipeCategoryEnum = pgEnum("recipe_category", ["soup", "main", "sa
 export const recipeStatusEnum = pgEnum("recipe_status", ["draft", "published"]);
 export const sessionStatusEnum = pgEnum("cooking_session_status", ["in_progress", "completed", "abandoned"]);
 export const purchaseStatusEnum = pgEnum("purchase_status", ["pending", "paid", "failed", "refunded"]);
+export const mediaKindEnum = pgEnum("media_kind", ["image", "video"]);
+export const mediaStatusEnum = pgEnum("media_status", ["pending", "ready"]);
 
 export const users = pgTable(
   "users",
@@ -143,6 +146,10 @@ export const recipes = pgTable(
     priceAmount: integer("price_amount"),
     priceCurrency: text("price_currency"),
     tags: text("tags").array().notNull().default([]),
+    /** A YouTube or Vimeo link, or a direct video file, shown on the recipe page. */
+    videoUrl: text("video_url"),
+    /** Hidden tips that only buyers (and the creator) can read; kept out of the public recipe object. */
+    secretNotes: text("secret_notes"),
     status: recipeStatusEnum("status").notNull().default("draft"),
     isFeatured: boolean("is_featured").notNull().default(false),
     publishedAt: timestamp("published_at", { withTimezone: true }),
@@ -150,6 +157,55 @@ export const recipes = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("recipes_slug_idx").on(t.slug), index("recipes_creator_idx").on(t.creatorId)],
+);
+
+/**
+ * Photos uploaded by creators, stored as resized JPEG (base64) and served from /api/media/:id.
+ * Each upload gets its own id, so responses can be cached for good.
+ */
+export const mediaUploads = pgTable(
+  "media_uploads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: uuid("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    mime: text("mime").notNull(),
+    data: text("data").notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("media_uploads_owner_idx").on(t.ownerId)],
+);
+
+const bytea = customType<{ data: Buffer; driverData: string | Uint8Array }>({
+  dataType: () => "bytea",
+  toDriver: (value) => `\\x${value.toString("hex")}`,
+  fromDriver: (value) => (typeof value === "string" ? Buffer.from(value.replace(/^\\x/, ""), "hex") : Buffer.from(value)),
+});
+
+/**
+ * Video clips uploaded by creators, served from /api/video/:id. A clip arrives in parts and is only
+ * shown once every part is in (`ready`).
+ */
+export const videoUploads = pgTable(
+  "video_uploads",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: uuid("owner_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    mime: text("mime").notNull().default("video/mp4"),
+    size: integer("size").notNull(),
+    ready: boolean("ready").notNull().default(false),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("video_uploads_owner_idx").on(t.ownerId)],
+);
+
+export const videoParts = pgTable(
+  "video_parts",
+  {
+    uploadId: uuid("upload_id").notNull().references(() => videoUploads.id, { onDelete: "cascade" }),
+    part: integer("part").notNull(),
+    data: bytea("data").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.uploadId, t.part] })],
 );
 
 export const recipeIngredients = pgTable(
@@ -175,12 +231,46 @@ export const recipeSteps = pgTable(
     title: text("title").notNull(),
     instruction: text("instruction").notNull(),
     mediaUrl: text("media_url"),
+    videoUrl: text("video_url"),
+    /** On a premium recipe: the creator lets everyone read this step before buying. Ignored on free recipes. */
+    isFree: boolean("is_free").notNull().default(false),
     timerSeconds: integer("timer_seconds"),
     temperatureCelsius: integer("temperature_celsius"),
     tip: text("tip"),
     ingredientPositions: integer("ingredient_positions").array().notNull().default([]),
   },
   (t) => [index("recipe_steps_recipe_idx").on(t.recipeId)],
+);
+
+/**
+ * A photo or clip kept in file storage (see server/storage). Steps point at it as /api/files/:id;
+ * the storage key never leaves the server. `pending` until the upload has been checked.
+ * It belongs to exactly one step once the recipe is saved; before that, only to whoever uploaded it.
+ * Deleting a user, recipe or step only unlinks the row, so the stored file can still be found and removed.
+ */
+export const mediaAssets = pgTable(
+  "media_assets",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    ownerId: uuid("owner_id").references(() => users.id, { onDelete: "set null" }),
+    recipeId: uuid("recipe_id").references(() => recipes.id, { onDelete: "set null" }),
+    stepId: uuid("step_id").references(() => recipeSteps.id, { onDelete: "set null" }),
+    kind: mediaKindEnum("kind").notNull(),
+    objectKey: text("object_key").notNull(),
+    contentType: text("content_type").notNull(),
+    size: integer("size").notNull(),
+    status: mediaStatusEnum("status").notNull().default("pending"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("media_assets_key_idx").on(t.objectKey),
+    // A step has at most one photo and one clip.
+    uniqueIndex("media_assets_step_kind_idx").on(t.stepId, t.kind),
+    index("media_assets_owner_idx").on(t.ownerId),
+    index("media_assets_recipe_idx").on(t.recipeId),
+    check("media_assets_size_check", sql`${t.size} > 0`),
+  ],
 );
 
 export const savedRecipes = pgTable(

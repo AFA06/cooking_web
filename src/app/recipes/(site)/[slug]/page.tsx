@@ -8,6 +8,8 @@ import { getCurrentUser } from "@/server/auth";
 import { getSavedRecipeIds } from "@/server/user-data";
 import { getRecipeRating, getRecipeReviews, getReviewEligibility } from "@/server/reviews";
 import { getShoppingServings } from "@/server/shopping";
+import { getCreatorForUser } from "@/server/creator";
+import { getRecipeSecrets } from "@/server/secrets";
 import { RecipeDetail } from "@/components/recipe/RecipeDetail";
 
 interface Props {
@@ -64,16 +66,18 @@ export default async function RecipePage({ params, searchParams }: Props) {
   after(() =>
     trackEvent({ name: "recipe_view", userId: user?.id, recipeId: recipe.id, creatorId: recipe.creator.id, source: src }),
   );
-  const [byCreator, savedList, reviews, rating, eligibility, shoppingServings] = await Promise.all([
+  const [byCreator, savedList, reviews, rating, eligibility, shoppingServings, ownCreator] = await Promise.all([
     getRecipesByCreator(recipe.creator.slug),
     user ? getSavedRecipeIds(user.id) : [],
     getRecipeReviews(recipe.id),
     getRecipeRating(recipe.id),
     user ? getReviewEligibility(user.id, recipe.id) : null,
     user ? getShoppingServings(user.id, recipe.id) : null,
+    user ? getCreatorForUser(user.id) : null,
   ]);
+  const secrets = recipe.isPremium ? await getRecipeSecrets(recipe.id, recipe.creator.id, user, ownCreator?.id ?? null) : null;
   const savedIds = new Set(savedList);
   const moreRecipes = byCreator.filter((r) => r.id !== recipe.id).slice(0, 4);
 
-  return <RecipeDetail recipe={recipe} isLoggedIn={!!user} isSaved={savedIds.has(recipe.id)} moreRecipes={moreRecipes} savedIds={savedIds} reviews={reviews} rating={rating} eligibility={eligibility} shoppingServings={shoppingServings} />;
+  return <RecipeDetail recipe={recipe} isLoggedIn={!!user} isSaved={savedIds.has(recipe.id)} moreRecipes={moreRecipes} savedIds={savedIds} reviews={reviews} rating={rating} eligibility={eligibility} shoppingServings={shoppingServings} secrets={secrets} />;
 }

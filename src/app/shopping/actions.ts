@@ -6,7 +6,7 @@ import { z } from "zod";
 import { db, schema } from "@/db";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { clampServings, parseQuantity, scaleQuantity } from "@/lib/scaling";
-import { getT } from "@/i18n/server";
+import { getLocale, getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { getRecipeById } from "@/server/recipes";
 
@@ -26,6 +26,7 @@ export async function addToShoppingList(recipeId: string, servings: number): Pro
   const recipe = uuid.safeParse(recipeId).success ? await getRecipeById(recipeId) : undefined;
   if (!recipe || recipe.ingredients.length === 0) return { error: t("err.recipeNotFound") };
 
+  const locale = await getLocale();
   const chosen = clampServings(servings, recipe.servings);
   const factor = chosen / recipe.servings;
   const ofRecipe = and(eq(items.userId, user.id), eq(items.recipeId, recipe.id));
@@ -44,7 +45,7 @@ export async function addToShoppingList(recipeId: string, servings: number): Pro
           recipeId: recipe.id,
           position: ingredient.order,
           name: ingredient.name,
-          quantity: scaleQuantity(ingredient.quantity, ingredient.unit, factor),
+          quantity: scaleQuantity(ingredient.quantity, ingredient.unit, factor, locale),
           amount: amount === null ? null : amount * factor,
           unit: ingredient.unit,
         };
@@ -83,14 +84,21 @@ export async function setShoppingChecked(ids: string[], checked: boolean): Promi
   return { ok: true };
 }
 
-/** Removes what has been bought, or everything. Recipes left with nothing to buy leave the list too. */
-export async function clearShoppingList(scope: "bought" | "all"): Promise<Result> {
+/**
+ * Removes what has been bought, or everything, on the whole list or only for the given recipes.
+ * Recipes left with nothing to buy leave the list too.
+ */
+export async function clearShoppingList(scope: "bought" | "all", recipeIds?: string[]): Promise<Result> {
   const t = await getT();
   const user = await getCurrentUser();
   if (!user) return { error: t(SIGN_IN) };
+  const only = recipeIds === undefined ? undefined : z.array(uuid).min(1).max(100).safeParse(recipeIds);
+  if (only && !only.success) return { error: t("err.badRequest") };
 
-  const own = eq(items.userId, user.id);
-  await db.delete(items).where(scope === "bought" ? and(own, eq(items.checked, true)) : own);
+  const conditions = [eq(items.userId, user.id)];
+  if (only?.success) conditions.push(inArray(items.recipeId, only.data));
+  if (scope === "bought") conditions.push(eq(items.checked, true));
+  await db.delete(items).where(and(...conditions));
   await db.delete(listed).where(
     and(
       eq(listed.userId, user.id),

@@ -1,13 +1,15 @@
 "use server";
 
 import { and, eq, ne } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { getT } from "@/i18n/server";
 import { getCurrentUser, type CurrentUser } from "@/server/auth";
+import { listRecipeMedia, removeAssets } from "@/server/media";
 import { persistRecipe } from "@/server/recipe-write";
+import { getStorage } from "@/server/storage";
 import { recipeInputSchema, slugify, type RecipeInput } from "@/lib/recipe-schema";
 
 export interface FormState {
@@ -26,6 +28,7 @@ const uuid = z.string().uuid();
 function refreshPublic() {
   revalidatePath("/admin", "layout");
   revalidatePath("/recipes");
+  revalidateTag("recipes", { expire: 0 });
   revalidatePath("/creators");
   revalidatePath("/");
 }
@@ -201,7 +204,11 @@ export async function setRecipeStatusAsAdmin(recipeId: string, status: "draft" |
 export async function deleteRecipe(recipeId: string): Promise<void> {
   await requireAdmin();
   if (!uuid.safeParse(recipeId).success) return;
+  // The recipe's uploaded files go with it: found first, removed from storage once the recipe is gone.
+  const media = await listRecipeMedia(recipeId);
   await db.delete(schema.recipes).where(eq(schema.recipes.id, recipeId));
+  const storage = getStorage();
+  if (storage) await removeAssets(storage, media);
   refreshPublic();
   redirect("/admin/recipes");
 }
@@ -212,17 +219,17 @@ export async function adminSaveRecipe(
   recipeId: string | null,
   input: RecipeInput,
   publish: boolean,
-): Promise<{ error: string } | { id: string }> {
+): Promise<{ error: string } | { id: string; stepIds: string[] }> {
   const t = await getT();
-  await requireAdmin();
+  const admin = await requireAdmin();
   const parsed = recipeInputSchema.safeParse(input);
   if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
   if (recipeId && !uuid.safeParse(recipeId).success) return { error: t("adm.err.badRecipe") };
   if (!recipeId && !uuid.safeParse(creatorId).success) return { error: t("err.noCreator") };
 
-  const result = await persistRecipe({ recipeId, creatorId, ownerOnly: false, data: parsed.data, publish });
-  if ("error" in result) return result;
+  const result = await persistRecipe({ recipeId, creatorId, ownerOnly: false, data: parsed.data, publish, actor: admin });
+  if ("error" in result) return { error: t(result.error) };
   refreshPublic();
   revalidatePath(`/recipes/${result.slug}`);
-  return { id: result.id };
+  return { id: result.id, stepIds: result.stepIds };
 }

@@ -6,6 +6,8 @@ import { z } from "zod";
 import { db, schema } from "@/db";
 import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
+import { WINDOW, allow } from "@/server/rate-limit";
+import { keyedHash } from "@/server/security";
 import { getReviewEligibility } from "@/server/reviews";
 
 const uuid = z.string().uuid();
@@ -52,6 +54,7 @@ export async function submitReview(input: ReviewInput): Promise<{ ok: true } | {
   const t = await getT();
   const user = await getCurrentUser();
   if (!user) return { error: t("err.rateSignIn") };
+  if (!(await allow("review", keyedHash("user", user.id), 20, WINDOW.hour))) return { error: t("auth.a.tooMany") };
   const parsed = reviewSchema.safeParse(input);
   if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
   const { recipeId, rating, comment, photo } = parsed.data;

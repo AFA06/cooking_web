@@ -4,7 +4,7 @@ import * as React from "react";
 import Link from "next/link";
 import { Check, Minus, Plus } from "lucide-react";
 import { Button, type ButtonProps } from "@/components/ui/Button";
-import { useT } from "@/i18n/client";
+import { useLocale, useT } from "@/i18n/client";
 import { formatMinutes } from "@/lib/format";
 import { MAX_SERVINGS, MIN_SERVINGS, clampServings, scaleQuantity, scaleTimes } from "@/lib/scaling";
 import { cn } from "@/lib/utils";
@@ -74,6 +74,7 @@ export function ServingsStepper() {
 
 /** Ingredient list that follows the chosen servings; rows can be ticked off while gathering. */
 export function ScaledIngredients({ ingredients }: { ingredients: RecipeIngredient[] }) {
+  const locale = useLocale();
   const { factor } = useServings();
   const [checked, setChecked] = React.useState<Set<string>>(() => new Set());
   const toggle = (id: string) =>
@@ -103,7 +104,7 @@ export function ScaledIngredients({ ingredients }: { ingredients: RecipeIngredie
               </span>
               <span className={cn("flex-1 transition-colors", done ? "text-amber-500 line-through" : "text-amber-950")}>{i.name}</span>
               <span className={cn("whitespace-nowrap font-semibold tabular-nums transition-colors", done ? "text-amber-500" : "text-amber-950")}>
-                {scaleQuantity(i.quantity, i.unit, factor)} <span className="font-normal text-amber-600">{i.unit}</span>
+                {scaleQuantity(i.quantity, i.unit, factor, locale)} <span className="font-normal text-amber-600">{i.unit}</span>
               </span>
             </label>
           </li>
@@ -115,6 +116,7 @@ export function ScaledIngredients({ ingredients }: { ingredients: RecipeIngredie
 
 /** Compact scaled amounts for the ingredients one step uses. */
 export function StepIngredients({ ingredients }: { ingredients: RecipeIngredient[] }) {
+  const locale = useLocale();
   const t = useT();
   const { factor } = useServings();
   if (ingredients.length === 0) return null;
@@ -123,7 +125,7 @@ export function StepIngredients({ ingredients }: { ingredients: RecipeIngredient
       {ingredients.map((i) => (
         <li key={i.id} className="rounded-full bg-sage-50 px-3 py-1.5 text-sm text-sage-900">
           <span className="font-semibold tabular-nums">
-            {scaleQuantity(i.quantity, i.unit, factor)} {i.unit}
+            {scaleQuantity(i.quantity, i.unit, factor, locale)} {i.unit}
           </span>{" "}
           {i.name.toLowerCase()}
         </li>

@@ -186,3 +186,88 @@ button:disabled {
   transform-origin: var(--radix-dropdown-menu-content-transform-origin);
   animation: menu-pop 0.16s ease-out;
 }
+
+/* Guided cooking: stages slide in the direction you are travelling. */
+@keyframes stage-next {
+  from {
+    opacity: 0;
+    transform: translateX(48px);
+  }
+}
+@keyframes stage-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-48px);
+  }
+}
+.stage-next {
+  animation: stage-next 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+.stage-prev {
+  animation: stage-prev 0.42s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+/* The big step number scales in as a stage begins. */
+@keyframes stage-number {
+  from {
+    opacity: 0;
+    transform: scale(0.6) translateY(10px);
+  }
+}
+.stage-number {
+  animation: stage-number 0.55s cubic-bezier(0.2, 0.9, 0.3, 1.2) both;
+}
+
+/* A finished timer breathes so it can be seen from across the kitchen. */
+@keyframes timer-alarm {
+  0%,
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(200, 109, 81, 0));
+  }
+  50% {
+    transform: scale(1.035);
+    filter: drop-shadow(0 0 22px rgba(200, 109, 81, 0.75));
+  }
+}
+.timer-alarm {
+  animation: timer-alarm 1s ease-in-out infinite;
+}
+
+@keyframes confetti-fall {
+  from {
+    opacity: 1;
+    transform: translate3d(0, -12vh, 0) rotate(0deg);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(var(--drift, 0px), 100vh, 0) rotate(540deg);
+  }
+}
+.confetti {
+  animation: confetti-fall var(--fall, 3.5s) ease-in both;
+}
+
+@keyframes draw-check {
+  from {
+    stroke-dashoffset: 40;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+.draw-check {
+  stroke-dasharray: 40;
+  animation: draw-check 0.6s 0.25s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-next,
+  .stage-prev,
+  .stage-number,
+  .timer-alarm,
+  .confetti,
+  .draw-check {
+    animation: none;
+  }
+}

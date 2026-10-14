@@ -1,6 +1,8 @@
+import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { NutritionFacts } from "@/components/recipe/NutritionFacts";
+import { StepMedia } from "@/components/recipe/StepMedia";
 import { ChefHat, Clock, Flame, Lock, Thermometer, Users } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
@@ -11,6 +13,8 @@ import { CookLink, ScaledIngredients, ScaledTime, ServingsProvider, ServingsStep
 import { ShareButton } from "@/components/recipe/ShareButton";
 import { getLocale, getT } from "@/i18n/server";
 import { LOCALE_INFO, type Locale, type TFunction } from "@/i18n/core";
+import { parseVideoUrl } from "@/lib/video";
+import type { RecipeSecrets } from "@/server/secrets";
 import { DIFFICULTY_KEY, formatMinutes, formatPrice, toIsoDuration } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
@@ -49,7 +53,8 @@ function recipeJsonLd(recipe: Recipe, locale: Locale, t: TFunction) {
       aggregateRating: { "@type": "AggregateRating", ratingValue: recipe.rating.average.toFixed(1), ratingCount: recipe.rating.count },
     }),
     recipeIngredient: recipe.ingredients.map((i) => `${i.quantity} ${i.unit} ${i.name}`),
-    recipeInstructions: recipe.steps.map((s) => ({ "@type": "HowToStep", name: s.title, text: s.instruction })),
+    // Only what the page shows to everyone: a premium recipe's locked steps stay out of the markup.
+    recipeInstructions: recipe.steps.filter((s) => !recipe.isPremium || s.isFree).map((s) => ({ "@type": "HowToStep", name: s.title, text: s.instruction })),
   };
 }
 
@@ -121,17 +126,22 @@ interface Props {
   eligibility: ReviewEligibility | null;
   /** Servings this recipe is on the visitor's shopping list for, if it is. */
   shoppingServings: number | null;
+  /** Insider notes of a premium recipe; null for free recipes. */
+  secrets: RecipeSecrets | null;
 }
 
-export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds, reviews, rating, eligibility, shoppingServings }: Props) {
+export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds, reviews, rating, eligibility, shoppingServings, secrets }: Props) {
   const [t, locale] = await Promise.all([getT(), getLocale()]);
   const { creator } = recipe;
   const times = { prepMinutes: recipe.prepTimeMinutes, cookMinutes: recipe.cookTimeMinutes };
   const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency, t) : null;
-  const previewCount = recipe.isPremium ? Math.min(PLATFORM_CONFIG.premium.freePreviewSteps, recipe.steps.length) : recipe.steps.length;
-  const openSteps = recipe.steps.slice(0, previewCount);
-  const lockedSteps = recipe.steps.slice(previewCount);
+  // On a premium recipe the creator marks each step free or premium; a free recipe shows everything.
+  const isOpen = (step: Recipe["steps"][number]) => !recipe.isPremium || step.isFree;
+  const openCount = recipe.steps.filter(isOpen).length;
+  const lockedCount = recipe.steps.length - openCount;
+  const firstLocked = recipe.steps.findIndex((step) => !isOpen(step));
   const ingredientsById = new Map(recipe.ingredients.map((i) => [i.id, i]));
+  const video = recipe.videoUrl ? parseVideoUrl(recipe.videoUrl) : null;
 
   return (
     <ServingsProvider base={recipe.servings}>
@@ -219,7 +229,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                 {recipe.isPremium ? (
                   <div className="rounded-2xl bg-amber-100 p-5">
                     <p className="font-medium text-amber-950">
-                      {t("detail.premiumIntro", { count: previewCount })}
+                      {openCount > 0 ? t("detail.premiumIntro", { count: openCount }) : t("detail.premiumIntroNone")}
                       {price && <> {t("detail.fullGuide")} <span className="font-serif text-xl font-semibold text-amber-700">{price}</span>.</>}
                     </p>
                     <Button asChild size="lg" className="mt-4 w-full sm:w-auto">
@@ -238,8 +248,29 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
           </div>
         </Container>
 
+        {video && (
+          <Container size="xl" className="mt-14 lg:mt-20">
+            <h2 className="text-[1.9rem] font-medium leading-tight text-amber-950 sm:text-[2.4rem]">{t("detail.video")}</h2>
+            <div className="mt-5 aspect-video max-w-5xl overflow-hidden rounded-[1.75rem] bg-ink">
+              {video.kind === "file" ? (
+                <video src={video.src} controls preload="metadata" playsInline className="h-full w-full" />
+              ) : (
+                <iframe
+                  src={video.embedUrl}
+                  title={t("detail.videoTitle", { title: recipe.title })}
+                  loading="lazy"
+                  allow="accelerometer; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                  className="h-full w-full"
+                />
+              )}
+            </div>
+          </Container>
+        )}
+
         <Container size="xl" className="mt-16 grid items-start gap-12 lg:mt-24 lg:grid-cols-[23rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[26rem_minmax(0,1fr)] xl:gap-20">
-          <section aria-labelledby="ingredients-heading" className="rounded-[1.75rem] bg-sage-50 p-6 sm:p-8 lg:sticky lg:top-24">
+          <section aria-labelledby="ingredients-heading" className="rounded-[1.75rem] bg-sage-50 p-6 sm:p-8">
             <div className="flex items-baseline justify-between gap-4">
               <h2 id="ingredients-heading" className="text-3xl font-medium text-amber-950">{t("detail.ingredients")}</h2>
               <p className="text-sm text-sage-600">{t("detail.ingredientsCount", { count: recipe.ingredients.length })}</p>
@@ -261,43 +292,37 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
             </div>
 
             <ol>
-              {openSteps.map((step) => (
-                <li key={step.id} className="grid gap-x-6 gap-y-4 border-b border-amber-200 py-10 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
-                  <p className="font-serif text-6xl font-medium leading-none text-clay-400 tabular-nums sm:text-7xl" aria-hidden="true">
-                    {String(step.order).padStart(2, "0")}
-                  </p>
-                  <div className="min-w-0 space-y-4">
-                    <StepFacts step={step} t={t} />
-                    <h3 className="text-2xl font-medium leading-snug text-amber-950 sm:text-[1.75rem]">
-                      <span className="sr-only">{t("detail.stepLabel", { n: step.order })} </span>
-                      {step.title}
-                    </h3>
-                    <p className="max-w-2xl text-lg leading-relaxed text-amber-900">{step.instruction}</p>
-                    <StepIngredients ingredients={(step.ingredientIds ?? []).map((id) => ingredientsById.get(id)).filter((i) => i !== undefined)} />
-                    {step.mediaUrl && (
-                      <div className="relative aspect-[16/9] max-w-2xl overflow-hidden rounded-2xl bg-amber-100">
-                        <Image src={step.mediaUrl} alt={step.title} fill sizes="(max-width: 1024px) 100vw, 45vw" className="object-cover" />
-                      </div>
+              {recipe.steps.map((step, index) =>
+                isOpen(step) ? (
+                  <li key={step.id} className="grid gap-x-6 gap-y-4 border-b border-amber-200 py-10 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
+                    <p className="font-serif text-6xl font-medium leading-none text-clay-400 tabular-nums sm:text-7xl" aria-hidden="true">
+                      {String(step.order).padStart(2, "0")}
+                    </p>
+                    <div className="min-w-0 space-y-4">
+                      <StepFacts step={step} t={t} />
+                      <h3 className="text-2xl font-medium leading-snug text-amber-950 sm:text-[1.75rem]">
+                        <span className="sr-only">{t("detail.stepLabel", { n: step.order })} </span>
+                        {step.title}
+                      </h3>
+                      <p className="max-w-2xl text-lg leading-relaxed text-amber-900">{step.instruction}</p>
+                      <StepIngredients ingredients={(step.ingredientIds ?? []).map((id) => ingredientsById.get(id)).filter((i) => i !== undefined)} />
+                      <StepMedia step={step} sizes="(max-width: 1024px) 100vw, 45vw" className="max-w-2xl rounded-2xl" />
+                      {step.tip && (
+                        <p className="max-w-2xl rounded-2xl bg-clay-100/60 px-5 py-4 text-amber-950">
+                          <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{t("detail.tip")}</span>
+                          {step.tip}
+                        </p>
+                      )}
+                    </div>
+                  </li>
+                ) : (
+                  <Fragment key={step.id}>
+                    {index === firstLocked && (
+                      <li className="list-none py-10">
+                        <UnlockCard recipe={recipe} lockedCount={lockedCount} price={price} t={t} />
+                      </li>
                     )}
-                    {step.tip && (
-                      <p className="max-w-2xl rounded-2xl bg-clay-100/60 px-5 py-4 text-amber-950">
-                        <span className="mb-1 block text-xs font-semibold uppercase tracking-[0.14em] text-amber-700">{t("detail.tip")}</span>
-                        {step.tip}
-                      </p>
-                    )}
-                  </div>
-                </li>
-              ))}
-            </ol>
-
-            {lockedSteps.length > 0 && (
-              <>
-                <div className="py-10">
-                  <UnlockCard recipe={recipe} lockedCount={lockedSteps.length} price={price} t={t} />
-                </div>
-                <ol start={previewCount + 1} aria-label={t("detail.premiumSteps")}>
-                  {lockedSteps.map((step) => (
-                    <li key={step.id} className="grid items-center gap-x-6 border-t border-amber-200 py-6 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
+                    <li className="grid items-center gap-x-6 border-t border-amber-200 py-6 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
                       <p className="font-serif text-4xl font-medium leading-none text-amber-300 tabular-nums sm:text-5xl" aria-hidden="true">
                         {String(step.order).padStart(2, "0")}
                       </p>
@@ -309,9 +334,24 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                         <Lock className="h-5 w-5 shrink-0 text-amber-400" aria-label={t("detail.premiumStep")} />
                       </div>
                     </li>
-                  ))}
-                </ol>
-              </>
+                  </Fragment>
+                ),
+              )}
+            </ol>
+
+            {secrets?.exists && (
+              <section aria-labelledby="secrets-heading" className="mt-12 rounded-[1.75rem] border-2 border-dashed border-amber-700/60 bg-clay-100/50 p-7 sm:p-9">
+                <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
+                  <Lock className="h-4 w-4" aria-hidden="true" />
+                  {secrets.notes ? (secrets.asOwner ? t("detail.secretsOwner") : t("detail.secretsFor")) : t("detail.secretsFor")}
+                </p>
+                <h3 id="secrets-heading" className="mt-3 font-serif text-3xl font-medium text-amber-950">{t("detail.secretsTitle")}</h3>
+                {secrets.notes ? (
+                  <p className="mt-4 whitespace-pre-line text-xl leading-relaxed text-amber-950">{secrets.notes}</p>
+                ) : (
+                  <p className="mt-3 text-lg text-amber-900">{t("detail.secretsLocked", { name: creator.name })}</p>
+                )}
+              </section>
             )}
 
             {!recipe.isPremium && (

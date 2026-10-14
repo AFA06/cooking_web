@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/Button";
 import { LegalConsent } from "@/components/legal/LegalConsent";
 import { PasswordField, authInputClass } from "@/components/auth/PasswordField";
+import { PhoneField } from "@/components/auth/PhoneField";
 import { useT } from "@/i18n/client";
 import type { AuthState } from "@/app/auth/actions";
 
@@ -19,6 +20,9 @@ export function AuthForm({ mode, action, next, notice }: Props) {
   const t = useT();
   const [state, formAction, pending] = React.useActionState(action, {});
   const isSignup = mode === "signup";
+  // Controlled, because React clears an uncontrolled form after a failed submit and people would retype everything.
+  const [name, setName] = React.useState("");
+  const [phone, setPhone] = React.useState("");
   const suffix = next ? `?next=${encodeURIComponent(next)}` : "";
 
   return (
@@ -26,17 +30,22 @@ export function AuthForm({ mode, action, next, notice }: Props) {
       <input type="hidden" name="next" value={next} />
       {notice && <p role="status" className="rounded-xl bg-sage-500/15 px-4 py-3 text-sm font-medium text-sage-700">{notice}</p>}
       {isSignup && (
+        // Bot trap: invisible to people and to screen readers, tempting to scripts.
+        <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden">
+          <label>
+            Contact
+            <input type="text" name="hp_contact" tabIndex={-1} autoComplete="off" defaultValue="" />
+          </label>
+        </div>
+      )}
+      {isSignup && (
         <div>
           <label htmlFor="name" className="text-sm font-medium text-amber-950">{t("auth.name")}</label>
-          <input id="name" name="name" type="text" autoComplete="name" required maxLength={80} className={authInputClass} />
+          <input id="name" name="name" type="text" autoComplete="name" required maxLength={80} value={name} onChange={(e) => setName(e.target.value)} className={authInputClass} />
         </div>
       )}
       {isSignup ? (
-        <div>
-          <label htmlFor="phone" className="text-sm font-medium text-amber-950">{t("settings.phone")}</label>
-          <input id="phone" name="phone" type="tel" inputMode="tel" autoComplete="tel" required placeholder="+998 90 123 45 67" className={authInputClass} />
-          <p className="mt-1.5 text-sm text-amber-600">{t("auth.phoneHint")}</p>
-        </div>
+        <PhoneField id="phone" name="phone" label={t("settings.phone")} hint={t("auth.phoneHint")} value={phone} onChange={setPhone} />
       ) : (
         <div>
           <label htmlFor="identifier" className="text-sm font-medium text-amber-950">{t("auth.identifier")}</label>

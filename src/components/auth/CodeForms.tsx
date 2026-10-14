@@ -9,7 +9,8 @@ import type { AuthState } from "@/app/auth/actions";
 
 type Action = (state: AuthState, formData: FormData) => Promise<AuthState>;
 
-function CodeField() {
+/** Six digits only; the form is sent as soon as the last one is typed or pasted. */
+function CodeField({ autoSubmit = false }: { autoSubmit?: boolean }) {
   const t = useT();
   return (
     <div>
@@ -25,6 +26,11 @@ function CodeField() {
         required
         autoFocus
         placeholder="••••••"
+        onChange={(e) => {
+          const input = e.currentTarget;
+          input.value = input.value.replace(/\D/g, "").slice(0, CODE_LENGTH);
+          if (autoSubmit && input.value.length === CODE_LENGTH) input.form?.requestSubmit();
+        }}
         className={`${authInputClass} text-center font-mono text-2xl tracking-[0.5em]`}
       />
     </div>
@@ -87,7 +93,7 @@ export function VerifyCodeForm({ action, challengeId, next }: { action: Action; 
     <form action={formAction} className="mt-8 space-y-5">
       <input type="hidden" name="challengeId" value={challengeId} />
       <input type="hidden" name="next" value={next} />
-      <CodeField />
+      <CodeField autoSubmit />
       {state.error && <p role="alert" className="text-sm font-medium text-red-700">{state.error}</p>}
       <Button type="submit" size="xl" className="w-full rounded-full" loading={pending}>{t("auth.confirm")}</Button>
     </form>

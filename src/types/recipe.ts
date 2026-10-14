@@ -15,8 +15,12 @@ export interface RecipeStep {
   order: number;
   title: string;
   instruction: string;
+  /** On a premium recipe, whether this step is open to everyone; the creator decides step by step. */
+  isFree: boolean;
   mediaUrl?: string;
   mediaType?: "image" | "video";
+  /** A clip showing this step: an upload or a link, see lib/video. Shown next to the step photo, never as its cover. */
+  videoUrl?: string;
   timerSeconds?: number;
   temperatureCelsius?: number;
   tip?: string;
@@ -69,6 +73,8 @@ export interface Recipe {
   ingredients: RecipeIngredient[];
   steps: RecipeStep[];
   media: RecipeMedia[];
+  /** Link to a YouTube/Vimeo page or a direct video file. */
+  videoUrl?: string;
   tags: string[];
   publishedAt: string;
   /** Completed guided-cooking sessions. */

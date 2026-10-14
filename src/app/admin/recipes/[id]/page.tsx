@@ -67,7 +67,7 @@ export default async function AdminRecipePage({ params }: { params: Promise<{ id
 
       <div className="grid gap-6 xl:grid-cols-[1fr_20rem]">
         <Panel title={t("adm.recipeContent")}>
-          <RecipeEditor initial={toEditorInitial(data)} save={adminSaveRecipe.bind(null, null)} basePath="/admin/recipes" />
+          <RecipeEditor initial={toEditorInitial(data)} save={adminSaveRecipe.bind(null, null)} basePath="/admin/recipes" sidebar={false} />
         </Panel>
         <div className="min-w-0">
           <Panel title={t("adm.danger")}>

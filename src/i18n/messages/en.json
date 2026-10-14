@@ -259,6 +259,7 @@
     "err": {
       "email": "Enter a valid email",
       "exists": "An account with this email already exists. Try signing in.",
+      "locked": "Too many wrong attempts: your account is temporarily locked for protection. Please wait {time} and try again.",
       "name": "Enter your name",
       "pwEnter": "Enter your password",
       "pwShort": "The password must be at least 8 characters",
@@ -335,29 +336,53 @@
     "save": "Save"
   },
   "cook": {
+    "addFive": "+5 min",
+    "addMinute": "+1 min",
+    "alertedOther": "{title}: time's up",
     "allStepsDone": {
       "one": "{title} — all {total} step done. Enjoy your meal!",
       "other": "{title} — all {total} steps done. Enjoy your meal!"
     },
     "backToRecipe": "Back to the recipe",
+    "celebrate": "Well done!",
     "createAccount": "Create an account",
     "createAccountNote": "— your cooking history is kept and you can rate recipes.",
+    "current": "Now",
+    "done": "Done",
     "exit": "Exit",
     "finish": "Finish",
     "freeRecipes": "Browse free recipes",
+    "goThere": "Go to that stage",
     "howDidItGo": "How did it turn out?",
+    "ingredientsNow": "You need now",
+    "jumpTo": "Go to stage {n}: {title}",
+    "lastStage": "Last stage",
     "metaTitle": "Cooking: {title}",
+    "nextUp": "Up next: {title}",
     "otherRecipes": "Other recipes",
+    "overview": "All stages",
     "premiumLocked": "Step-by-step mode for premium recipes is part of the paid version. Payments aren't connected yet, so this recipe can't be unlocked.",
     "progress": "Cooking progress",
     "rateInvite": "Leave a rating and add a photo of the result — it helps other cooks.",
     "ready": "Done!",
     "saving": "Saving your result…",
     "scaledNote": "Amounts are calculated for {servings} servings. Numbers in the text and the timer follow the original recipe ({base} servings) — adjust the time to your pot size.",
+    "screenOn": "Screen stays on",
+    "stage": "Stage {n}",
+    "stageOf": "Stage {n} of {total}",
     "stepOf": "Step {n} / {total}",
+    "swipeHint": "Swipe or use the ← → keys",
     "temperature": "Temperature: {temp}°C",
+    "textLarger": "Larger text",
+    "textNormal": "Normal text",
+    "textSize": "Text size",
     "thanks": "Thank you! Your rating is saved and will show on the creator's page.",
+    "timeUp": "Time's up!",
+    "timeUpNote": "Check how the dish is doing.",
+    "timerFor": "Stage timer",
+    "timerRunning": "Timer running",
     "tip": "Tip: {tip}",
+    "tipTitle": "Tip",
     "youCooked": "You cooked this."
   },
   "cookbook": {
@@ -440,8 +465,8 @@
     "paymentSoon": "Payments are coming soon",
     "paymentSoonNote": "Save it for now — it will be in your library once payments open.",
     "premiumIntro": {
-      "one": "Ingredients and the first {count} step are free.",
-      "other": "Ingredients and the first {count} steps are free."
+      "one": "Ingredients and {count} step are free.",
+      "other": "Ingredients and {count} steps are free."
     },
     "premiumRecipe": "Premium recipe",
     "premiumStep": "Premium step",
@@ -459,6 +484,10 @@
     "readyTitle": "Ready to start in the kitchen?",
     "reviews": "What cooks say",
     "reviewsNote": "Only people who cooked the recipe all the way through write here: their result, rating and advice.",
+    "secretsFor": "For buyers only",
+    "secretsLocked": "{name}'s insider tips unlock with the full guide.",
+    "secretsOwner": "You see this as the author",
+    "secretsTitle": "The chef's secrets",
     "servingsHint": "How many are you cooking for? Amounts adjust automatically.",
     "servingsYield": {
       "one": "{count} serving",
@@ -472,7 +501,10 @@
     "tip": "Chef's tip",
     "totalTime": "Total time",
     "updateRating": "Update your rating",
-    "withTimer": "With timer · {time}"
+    "video": "Video",
+    "videoTitle": "{title} — video",
+    "withTimer": "With timer · {time}",
+    "premiumIntroNone": "Ingredients are free; the steps are in the full guide."
   },
   "dialog": {
     "createSave": "Create and save",
@@ -500,9 +532,18 @@
     "calories": "Calories (kcal)",
     "carbs": "Carbs (g)",
     "category": "Category",
+    "check": {
+      "nutrition": "Nutrition (optional)",
+      "secrets": "Insider secrets (premium)",
+      "title": "Title and description",
+      "freeStep": "At least one free step"
+    },
+    "checkTitle": "Readiness",
     "cookMin": "Cooking (min)",
     "cover": "Cover image link",
+    "coverHint": "The most important photo: shown on the card and the recipe page.",
     "coverNote": "Photo upload isn't available yet. Enter a link to an image you own or have the right to use.",
+    "coverPhoto": "Cover photo",
     "deleteIng": "Delete ingredient",
     "description": "Description",
     "down": "Move down",
@@ -511,28 +552,44 @@
     "editTitle": "Editing: {title}",
     "fat": "Fat (g)",
     "gallery": "Extra photos (optional)",
+    "galleryHint2": "Show the process and the result.",
     "galleryNote": "One image link per line, up to 5. They appear in the gallery after the cover on the recipe page.",
     "ingName": "Ingredient {n} name",
     "ingredients": "Ingredients",
     "instruction": "Instruction",
+    "moveStepDown": "Move step down",
+    "moveStepUp": "Move step up",
     "namePh": "Name",
     "newRecipe": "New recipe",
     "nutrition": "Nutrition — per serving (optional)",
     "nutritionNote": "The whole dish divided by the number of servings — what one person eats. If filled in, it shows on the recipe card and page.",
+    "optional": "Optional",
     "premium": "Premium recipe",
     "premiumNote": "Payments aren't connected yet, so readers can't unlock premium recipes.",
     "prepMin": "Prep (min)",
+    "preview": "Preview",
     "price": "Price (UZS)",
     "protein": "Protein (g)",
     "publish": "Publish",
     "published": "Published.",
     "qtyPh": "Amount",
+    "ready": "Ready to publish",
     "saveDraft": "Save draft",
+    "sec": {
+      "media": "Photos and video",
+      "pricing": "Pricing and publishing"
+    },
+    "secrets": "Insider secrets (buyers only)",
+    "secretsHint": "The things nobody tells you: little techniques, substitutions, how to avoid mistakes. Only people who bought the recipe see this.",
+    "secretsPh": "For example: heat the oil to 180°, otherwise the dough sticks…",
     "servings": "Servings",
     "stepImage": "Image link (optional)",
     "stepIngs": "Numbers of the ingredients used",
+    "stepIngsNone": "Add ingredients first",
     "stepIngsPh": "e.g. 1, 3",
+    "stepIngsPick": "Ingredients used in this step",
     "stepN": "Step {n}",
+    "stepPhoto": "Step photo (optional)",
     "steps": "Steps",
     "tags": "Tags (comma-separated)",
     "tagsPlaceholder": "Uzbek, Rice, Lamb",
@@ -541,8 +598,33 @@
     "tipOptional": "Tip (optional)",
     "title": "Title",
     "toDraft": "Back to draft",
+    "type": "Recipe type",
+    "typeFreeNote": "Open to everyone — great for growing your audience.",
+    "typePremiumNote": "Ingredients and the first steps are free; the full guide and secrets are paid.",
     "unitPh": "Unit",
-    "up": "Move up"
+    "untitled": "Recipe title",
+    "up": "Move up",
+    "video": "Video (optional)",
+    "videoBad": "This link isn't supported",
+    "videoHint": "A YouTube or Vimeo link, or a link to an .mp4 file. The video is shown on the recipe page.",
+    "videoOk": "Video recognised",
+    "stepVideo": "Step video (optional)",
+    "stepVideoHint": "Show how this step is done in a short clip, up to {mb} MB. If you add both, the photo and the video are shown one under the other.",
+    "stepAccess": "Who can read this step",
+    "stepFree": "Free",
+    "stepPremium": "Premium",
+    "stepsAccessNote": "You choose which steps readers see for free. {free} of {total} are free; the rest unlock after they buy the recipe.",
+    "waitUploads": "Wait for the uploads to finish before saving.",
+    "ingUnitsHint": "Quantity: a number (1, 1.5, 1/2) or a word (half, quarter, one and a half). Unit: g, kg, ml, l, tbsp, tsp, cup, ladle, handful, pinch, pcs… You can write in English, Russian, Kazakh or Uzbek. Leave the unit empty for “to taste”."
+  },
+  "email": {
+    "body": "{label}: {code}\n\nThe code is valid for {minutes} minutes. Do not share it with anyone.\nIf you did not make this request, ignore this email.",
+    "label": {
+      "email_change": "Email confirmation code",
+      "password_reset": "Password reset code",
+      "phone_change": "Phone confirmation code",
+      "signup": "Confirmation code"
+    }
   },
   "email": {
     "body": "{label}: {code}\n\nThe code is valid for {minutes} minutes. Do not share it with anyone.\nIf you did not make this request, ignore this email.",
@@ -575,6 +657,7 @@
     "noCreator": "No creator selected.",
     "nutritionAll": "Fill in all four nutrition values or leave them all empty",
     "photoBig": "The photo is too large",
+    "photoType": "Only image files (JPEG) can be uploaded.",
     "premiumPrice": "A premium recipe needs a price",
     "rateCookFirst": "To rate, first cook this recipe all the way through.",
     "rateSignIn": "Sign in to rate.",
@@ -588,7 +671,17 @@
     "stepMin": "Add at least one step",
     "stepTitle": "Every step needs a title",
     "titleLong": "The title is too long",
-    "titleShort": "The title is too short"
+    "titleShort": "The title is too short",
+    "uploadLimit": "You've reached the limit of uploaded photos.",
+    "videoUrl": "The video link must be a YouTube or Vimeo link, or an .mp4 file over https://",
+    "videoBig": "The video is too large (up to {mb} MB)",
+    "videoType": "Only video files (MP4, MOV, WebM) can be uploaded.",
+    "videoLimit": "You've reached the limit of uploaded videos.",
+    "storageOff": "File uploads are not set up yet.",
+    "mediaInvalid": "A photo or video on one of the steps can't be used. Upload it again.",
+    "uploadMissing": "The file didn't arrive. Try again.",
+    "photoBigMb": "The photo is too large (up to {mb} MB)",
+    "photoFormat": "Only JPEG, PNG or WebP photos can be uploaded."
   },
   "error": {
     "retry": "Try again",
@@ -758,6 +851,7 @@
     "g": "g",
     "kcal": "kcal",
     "perPerson": "Per serving",
+    "totalFor": "Total for {count} servings",
     "protein": "Protein"
   },
   "profile": {
@@ -945,7 +1039,16 @@
       "other": "{count} items to buy"
     },
     "updateTo": "Update the list to {count} servings",
-    "yesClear": "Yes, clear it"
+    "yesClear": "Yes, clear it",
+    "pickHint": "Tap a recipe to see only the products for it. Tap several to combine them.",
+    "showingPicked": "Showing {count} of {total} recipes",
+    "allShown": "Showing all recipes",
+    "showAll": "Show all",
+    "pickRecipe": "Show the products for {title}",
+    "openRecipe": "Open {title}",
+    "clearPicked": "Remove the selected recipes",
+    "confirmClearPicked": "Remove the selected recipes from the list?",
+    "yesRemove": "Yes, remove"
   },
   "site": {
     "tagline": "Step-by-step recipes from the creators you love"
@@ -968,6 +1071,64 @@
     "newest": "Newest",
     "quickest": "Quickest to make"
   },
+  "studio": {
+    "allRecipes": "All recipes →",
+    "avgOrder": "Average order",
+    "backToSite": "Back to the site",
+    "buyers": "Buyers",
+    "commission": "Platform commission: {pct}%",
+    "empty": "No recipes yet",
+    "emptyText": "Create your first recipe — with photos, a video and steps.",
+    "eyebrow": "Creator studio",
+    "getStarted": "Get started",
+    "gross": "Gross revenue",
+    "hasVideo": "Has video",
+    "hello": "Hello, {name}",
+    "latest": "Latest recipes",
+    "lead": "Create recipes, add photos and videos, and follow how they perform.",
+    "nav": {
+      "group": "Studio",
+      "profile": "Profile",
+      "reviews": "Reviews",
+      "sales": "Sales",
+      "sections": "Studio sections"
+    },
+    "net": "Your share",
+    "noCover": "No cover",
+    "noSales": "No sales yet",
+    "noSalesText": "Publish a premium recipe — purchases will show up here. Sales start once the payment system is connected.",
+    "orders": "Purchases",
+    "overviewTitle": "Studio",
+    "price": "Price",
+    "recentBuyers": "Recent buyers",
+    "recipes": {
+      "desc": "All your recipes: edit, publish and see how they do.",
+      "search": "Search your recipes"
+    },
+    "revenueOverTime": "Revenue over time",
+    "reviews": {
+      "desc": "Ratings and photos from people who cooked your recipes."
+    },
+    "sales": {
+      "desc": "How many times your premium recipes sold, who bought them and what you earned.",
+      "paymentsNote": "The payment system isn't connected yet: sales are counted once it is.",
+      "premiumHint": "Tip: add insider secrets to a premium recipe — that's what buyers value most.",
+      "title": "Sales and earnings"
+    },
+    "salesByRecipe": "Sales by recipe",
+    "sold": "Sold",
+    "stats": {
+      "desc": "How your recipes performed over the last {range}.",
+      "sales": "Sales"
+    },
+    "todo": {
+      "profile": "Complete your profile: name, intro and photo",
+      "publish": "Publish a recipe",
+      "recipe": "Create your first recipe",
+      "socials": "Connect your social networks",
+      "video": "Add a video to a recipe"
+    }
+  },
   "time": {
     "daysAgo": "{count} d ago",
     "hours": "{count} h",
@@ -988,5 +1149,20 @@
   },
   "unit": {
     "som": "UZS"
+  },
+  "up": {
+    "add": "Add a photo",
+    "drop": "or drop it here",
+    "max": "Up to {max}",
+    "orLink": "Or enter an image link",
+    "remove": "Remove",
+    "replace": "Replace",
+    "upload": "Upload a photo",
+    "useLink": "Use link",
+    "video": "Upload a video",
+    "videoLink": "Or paste a video link",
+    "videoFail": "The video couldn't be uploaded. Try again.",
+    "retry": "Try again",
+    "checking": "Checking the file…"
   }
 }

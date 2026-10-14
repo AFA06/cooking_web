@@ -1,7 +1,7 @@
 "use server";
 
 import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
@@ -48,7 +48,7 @@ export async function saveRecipe(
   recipeId: string | null,
   input: RecipeInput,
   publish: boolean,
-): Promise<{ error: string } | { id: string }> {
+): Promise<{ error: string } | { id: string; stepIds: string[] }> {
   const t = await getT();
   const ctx = await getCurrentCreator();
   if (!ctx) return { error: t("err.needCreator") };
@@ -60,13 +60,15 @@ export async function saveRecipe(
     ownerOnly: true,
     data: parsed.data,
     publish,
+    actor: ctx.user,
   });
   if ("error" in result) return { error: t(result.error) };
 
   revalidatePath("/dashboard");
   revalidatePath("/recipes");
+  revalidateTag("recipes", { expire: 0 });
   revalidatePath(`/recipes/${result.slug}`);
-  return { id: result.id };
+  return { id: result.id, stepIds: result.stepIds };
 }
 
 export async function setRecipeStatus(recipeId: string, status: "draft" | "published"): Promise<void> {
@@ -78,6 +80,7 @@ export async function setRecipeStatus(recipeId: string, status: "draft" | "publi
     .where(and(eq(schema.recipes.id, recipeId), eq(schema.recipes.creatorId, ctx.creator.id)));
   revalidatePath("/dashboard");
   revalidatePath("/recipes");
+  revalidateTag("recipes", { expire: 0 });
 }
 
 const creatorProfileSchema = z.object({

@@ -13,9 +13,13 @@
     "make-admin": "tsx scripts/make-admin.ts",
     "set-password": "tsx scripts/set-password.ts",
     "create-user": "tsx scripts/create-user.ts",
-    "test-recipes": "tsx scripts/test-recipes.ts"
+    "test-recipes": "tsx scripts/test-recipes.ts",
+    "test:media": "tsx --conditions=react-server scripts/test-media.ts",
+    "test:units": "tsx scripts/test-units.ts"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1150.0",
+    "@aws-sdk/s3-request-presigner": "^3.1150.0",
     "@neondatabase/serverless": "^1.2.0",
     "@radix-ui/react-dialog": "^1.2.0",
     "@radix-ui/react-dropdown-menu": "^2.1.25",

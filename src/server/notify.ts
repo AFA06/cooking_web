@@ -9,10 +9,51 @@ export class DeliveryUnavailable extends Error {}
 const BRAND = PLATFORM_CONFIG.name;
 const SMS_DAILY_LIMIT = Number(process.env.SMS_DAILY_LIMIT ?? 1000);
 
+const ESKIZ_API = "https://notify.eskiz.uz/api";
+const ESKIZ_TIMEOUT_MS = 8000;
+
+/** Eskiz logins last 30 days; the token is kept per server instance and renewed on demand. */
+let eskizToken: string | null = null;
+
+async function eskizLogin(): Promise<string> {
+  const email = process.env.ESKIZ_EMAIL;
+  const password = process.env.ESKIZ_PASSWORD;
+  if (!email || !password) throw new DeliveryUnavailable("ESKIZ_EMAIL / ESKIZ_PASSWORD are not set");
+  const res = await fetch(`${ESKIZ_API}/auth/login`, {
+    method: "POST",
+    body: new URLSearchParams({ email, password }),
+    signal: AbortSignal.timeout(ESKIZ_TIMEOUT_MS),
+  });
+  const token = res.ok ? ((await res.json()) as { data?: { token?: string } }).data?.token : undefined;
+  if (!token) throw new DeliveryUnavailable(`Eskiz login failed (${res.status})`);
+  return (eskizToken = token);
+}
+
+async function sendViaEskiz(to: string, text: string): Promise<void> {
+  const body = () =>
+    new URLSearchParams({
+      mobile_phone: to.replace(/^\+/, ""),
+      message: text,
+      from: process.env.ESKIZ_FROM || "4546",
+    });
+  const post = async (token: string) =>
+    fetch(`${ESKIZ_API}/message/sms/send`, {
+      method: "POST",
+      headers: { Authorization: `Bearer ${token}` },
+      body: body(),
+      signal: AbortSignal.timeout(ESKIZ_TIMEOUT_MS),
+    });
+
+  let res = await post(eskizToken ?? (await eskizLogin()));
+  if (res.status === 401) res = await post(await eskizLogin()); // expired token: log in once more
+  // Only the status goes into the error: the message holds a one-time code and the number is personal data.
+  if (!res.ok) throw new DeliveryUnavailable(`Eskiz send failed (${res.status})`);
+}
+
 /**
- * SMS delivery. No provider is connected yet: set SMS_PROVIDER once one is chosen and add its case below.
- * Without one, codes are printed to the server console in development only. In production the send
- * fails closed, so a code can never end up in a production log.
+ * SMS delivery through the provider named in SMS_PROVIDER. Without one, codes are printed to the server
+ * console in development only. In production the send fails closed, so a code can never end up in a
+ * production log.
  */
 export async function sendSms(to: string, text: string): Promise<void> {
   // Cost guard: a bot hammering signup must not be able to drain the SMS balance.
@@ -25,8 +66,8 @@ export async function sendSms(to: string, text: string): Promise<void> {
     return;
   }
   switch (provider) {
-    // case "eskiz": return sendViaEskiz(to, text);
-    // case "playmobile": return sendViaPlaymobile(to, text);
+    case "eskiz":
+      return sendViaEskiz(to, text);
     default:
       throw new DeliveryUnavailable(`Unknown SMS_PROVIDER "${provider}"`);
   }

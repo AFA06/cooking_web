@@ -13,7 +13,7 @@ import { getT } from "@/i18n/server";
 import { createSession, destroyAllSessions, destroySession } from "@/server/auth";
 import { TTL_MINUTES, createChallenge, getOpenChallenge, resendChallenge, verifyChallenge } from "@/server/challenges";
 import { DeliveryUnavailable, deliverCode, sendAccountExistsNotice } from "@/server/notify";
-import { WINDOW, allow, clear, peek, record } from "@/server/rate-limit";
+import { WINDOW, allow, clear, lockedForMinutes, record } from "@/server/rate-limit";
 import { clientKey, keyedHash, safeEqual } from "@/server/security";
 
 export interface AuthState {
@@ -66,6 +66,16 @@ async function isBoundToThisBrowser(expected: string | undefined): Promise<boole
 // Compared against when the account is unknown, so response time does not reveal whether it exists.
 const DUMMY_HASH = "$2b$12$C6UzMDM.H6dfI/f/IKcEeO5bQ7O8ZIOTbN0vJj5X9i1x4zV5g3a2K";
 
+/** Wrong passwords allowed per account (and in total per address) before the lock, and how long it lasts. */
+const MAX_FAILURES = 4;
+const MAX_FAILURES_PER_ADDRESS = 15;
+const LOCK_WINDOW = WINDOW.hour;
+
+/** Signups allowed from one address, and from everywhere together, so bots cannot flood the database or the SMS balance. */
+const SIGNUPS_PER_ADDRESS_HOUR = 5;
+const SIGNUPS_PER_ADDRESS_DAY = 15;
+const SIGNUPS_ANYWHERE_PER_10_MIN = 60;
+
 /* ───────────── Sign-in ───────────── */
 
 export async function login(_: AuthState, formData: FormData): Promise<AuthState> {
@@ -75,13 +85,16 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
   const password = text(formData, "password", 200);
   if (!ident || !password) return wrong;
 
+  // Failures are counted per account and per address, for known and unknown accounts alike, so a
+  // lock tells an attacker nothing about which accounts exist. While locked the password is not
+  // even checked, and further attempts do not extend the lock.
   const ip = await clientKey();
   const idKey = keyedHash("ident", ident.value);
-  // Failures are counted per caller and per account, for known and unknown accounts alike,
-  // so a lockout tells an attacker nothing about which accounts exist.
-  if ((await peek("login-fail", ip, WINDOW.quarterHour)) >= 30 || (await peek("login-fail", idKey, WINDOW.quarterHour)) >= 8) {
-    return { error: t("acct.err.locked") };
-  }
+  const minutes = Math.max(
+    await lockedForMinutes("login-fail", idKey, MAX_FAILURES, LOCK_WINDOW),
+    await lockedForMinutes("login-fail-ip", ip, MAX_FAILURES_PER_ADDRESS, LOCK_WINDOW),
+  );
+  if (minutes > 0) return { error: t("auth.err.locked", { time: t("time.min", { count: minutes }) }) };
 
   const [user] = await db
     .select()
@@ -90,7 +103,7 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
     .limit(1);
   const ok = await bcrypt.compare(password, user?.passwordHash ?? DUMMY_HASH);
   if (!user || !ok) {
-    await Promise.all([record("login-fail", ip), record("login-fail", idKey)]);
+    await Promise.all([record("login-fail", idKey), record("login-fail-ip", ip)]);
     return wrong;
   }
 
@@ -114,6 +127,9 @@ const signupSchema = z.object({
 
 export async function startSignup(_: AuthState, formData: FormData): Promise<AuthState> {
   const t = await getT();
+  // A field real people never see: scripts that fill every input give themselves away. Answered
+  // exactly like a rate limit, so the bot learns nothing.
+  if (text(formData, "hp_contact") !== "") return { error: t(TOO_MANY) };
   const parsed = signupSchema.safeParse({ name: formData.get("name"), phone: formData.get("phone"), password: formData.get("password") });
   if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
   const phone = normalizeUzPhone(parsed.data.phone);
@@ -123,7 +139,12 @@ export async function startSignup(_: AuthState, formData: FormData): Promise<Aut
 
   const ip = await clientKey();
   const phoneKey = keyedHash("dest", phone);
-  if (!(await allow("signup-ip", ip, 10, WINDOW.hour)) || !(await allow("send-dest", phoneKey, 6, WINDOW.hour))) return { error: t(TOO_MANY) };
+  const withinLimits =
+    (await allow("signup-ip-hour", ip, SIGNUPS_PER_ADDRESS_HOUR, WINDOW.hour)) &&
+    (await allow("signup-ip-day", ip, SIGNUPS_PER_ADDRESS_DAY, WINDOW.day)) &&
+    (await allow("signup-all", "all", SIGNUPS_ANYWHERE_PER_10_MIN, 10 * WINDOW.minute)) &&
+    (await allow("send-dest", phoneKey, 6, WINDOW.hour));
+  if (!withinLimits) return { error: t(TOO_MANY) };
 
   const [existing] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.phone, phone)).limit(1);
   // Hash even when the number is taken, so both paths cost the same time.

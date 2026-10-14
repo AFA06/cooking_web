@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { notFound, redirect } from "next/navigation";
 import { z } from "zod";
-import { Container } from "@/components/ui/Container";
 import { RecipeEditor } from "@/components/dashboard/RecipeEditor";
 import { toEditorInitial } from "@/lib/recipe-editor";
 import { getT } from "@/i18n/server";
@@ -22,9 +21,9 @@ export default async function EditRecipePage({ params }: { params: Promise<{ id:
   if (!data) notFound();
 
   return (
-    <Container size="md" className="py-12">
+    <div className="mx-auto max-w-6xl">
       <h1 className="mb-8 text-3xl font-medium text-amber-950 break-words sm:text-4xl">{t("ed.editTitle", { title: data.recipe.title })}</h1>
       <RecipeEditor initial={toEditorInitial(data)} save={saveRecipe} basePath="/dashboard/recipes" />
-    </Container>
+    </div>
   );
 }
