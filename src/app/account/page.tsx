@@ -16,6 +16,7 @@ import { formatDate } from "@/lib/format";
 import { formatPhone } from "@/lib/profile";
 import { listMyOrders } from "@/server/orders";
 import { formatPrice } from "@/lib/format";
+import { toListItem } from "@/lib/recipe-list";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getT())("nav.myKitchen"), robots: { index: false } };
@@ -85,7 +86,7 @@ export default async function AccountPage() {
           ) : (
             <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {saved.map((r) => (
-                <RecipeCard key={r.id} recipe={r} isLoggedIn saved />
+                <RecipeCard key={r.id} recipe={toListItem(r)} isLoggedIn saved />
               ))}
             </div>
           )}

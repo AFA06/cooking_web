@@ -1,5 +1,5 @@
 import type { RecipeCategory } from "@/lib/categories";
-import type { Recipe } from "@/types/recipe";
+import type { RecipeListItem } from "@/types/recipe";
 
 /** Filter values are language-neutral keys; their labels come from the dictionary (filter.*, difficulty.*). */
 export const ALL = "all";
@@ -24,7 +24,7 @@ export interface RecipeFilters {
 
 export const EMPTY_FILTERS: RecipeFilters = { query: "", difficulty: ALL, price: ALL, time: ALL, categories: [] };
 
-export function filterRecipes(recipes: Recipe[], f: RecipeFilters): Recipe[] {
+export function filterRecipes(recipes: RecipeListItem[], f: RecipeFilters): RecipeListItem[] {
   const q = f.query.trim().toLowerCase();
   const maxMinutes = TIME_FILTERS.find((t) => t.key === f.time)?.max ?? null;
   return recipes.filter((r) => {
@@ -57,8 +57,8 @@ export const SORTS = [
 
 export type SortKey = (typeof SORTS)[number]["key"];
 
-export function sortRecipes(recipes: Recipe[], sort: SortKey): Recipe[] {
-  const total = (r: Recipe) => r.prepTimeMinutes + r.cookTimeMinutes;
+export function sortRecipes(recipes: RecipeListItem[], sort: SortKey): RecipeListItem[] {
+  const total = (r: RecipeListItem) => r.prepTimeMinutes + r.cookTimeMinutes;
   const sorted = [...recipes];
   if (sort === "quickest") sorted.sort((a, b) => total(a) - total(b));
   else if (sort === "mostCooked") sorted.sort((a, b) => b.cookedCount - a.cookedCount);

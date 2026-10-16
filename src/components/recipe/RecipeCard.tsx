@@ -9,10 +9,10 @@ import { useT } from "@/i18n/client";
 import { DIFFICULTY_KEY, formatMinutes, formatNumber } from "@/lib/format";
 import { PriceTag } from "@/components/recipe/PriceTag";
 import { cn } from "@/lib/utils";
-import type { Recipe } from "@/types/recipe";
+import type { RecipeListItem } from "@/types/recipe";
 
 interface Props {
-  recipe: Recipe;
+  recipe: RecipeListItem;
   isLoggedIn?: boolean;
   saved?: boolean;
   /** Portrait crops read better in multi-column grids; landscape in wide slots. */

@@ -9,6 +9,7 @@ import { getT } from "@/i18n/server";
 import { DIFFICULTY_KEY, formatMinutes } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import type { Recipe } from "@/types/recipe";
+import { toListItem } from "@/lib/recipe-list";
 
 const totalMinutes = (r: Recipe) => r.prepTimeMinutes + r.cookTimeMinutes;
 
@@ -125,7 +126,7 @@ export async function LatestRecipes({ recipes, isLoggedIn, savedIds }: { recipes
       <SectionHeading id="latest-heading" title={t("home.latest")} note={t("home.latestNote")} href={PLATFORM_CONFIG.urls.recipes} linkLabel={t("home.allRecipes")} />
       <div className="grid grid-cols-1 gap-x-7 gap-y-11 sm:grid-cols-2 lg:grid-cols-3">
         {recipes.map((r) => (
-          <RecipeCard key={r.id} recipe={r} isLoggedIn={isLoggedIn} saved={savedIds.has(r.id)} shape="landscape" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 32vw" />
+          <RecipeCard key={r.id} recipe={toListItem(r)} isLoggedIn={isLoggedIn} saved={savedIds.has(r.id)} shape="landscape" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 32vw" />
         ))}
       </div>
       <Link href={PLATFORM_CONFIG.urls.recipes} className="mt-8 inline-flex items-center gap-1.5 font-medium text-amber-950 sm:hidden">

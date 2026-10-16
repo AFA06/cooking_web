@@ -26,6 +26,7 @@ import { ReviewForm } from "@/components/reviews/ReviewForm";
 import { RatingOverview, ResultPhotos, ReviewList } from "@/components/reviews/ReviewList";
 import type { RatingSummary, Review, ReviewEligibility } from "@/server/reviews";
 import type { Recipe, RecipeStep } from "@/types/recipe";
+import { toListItem } from "@/lib/recipe-list";
 
 function recipeJsonLd(recipe: Recipe, locale: Locale, t: TFunction) {
   return {
@@ -425,7 +426,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
             </div>
             <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
               {moreRecipes.map((r) => (
-                <RecipeCard key={r.id} recipe={r} isLoggedIn={isLoggedIn} saved={savedIds.has(r.id)} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw" />
+                <RecipeCard key={r.id} recipe={toListItem(r)} isLoggedIn={isLoggedIn} saved={savedIds.has(r.id)} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw" />
               ))}
             </div>
           </Container>

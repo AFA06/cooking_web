@@ -12,6 +12,7 @@ import { getT } from "@/i18n/server";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { getCurrentUser } from "@/server/auth";
 import { getCookbook } from "@/server/cookbooks";
+import { toListItem } from "@/lib/recipe-list";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getT())("cookbook.title"), robots: { index: false } };
@@ -49,7 +50,7 @@ export default async function CookbookPage({ params }: { params: Promise<{ id: s
         ) : (
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3">
             {cookbook.recipes.map((recipe) => (
-              <RecipeCard key={recipe.id} recipe={recipe} isLoggedIn saved />
+              <RecipeCard key={recipe.id} recipe={toListItem(recipe)} isLoggedIn saved />
             ))}
           </div>
         )}

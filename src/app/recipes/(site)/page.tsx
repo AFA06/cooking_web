@@ -6,6 +6,7 @@ import { ALL, DIFFICULTIES, PRICE_FILTERS, TIME_FILTERS } from "@/lib/filters";
 import { getCurrentUser } from "@/server/auth";
 import { listPublishedRecipes } from "@/server/recipes";
 import { getSavedRecipeIds } from "@/server/user-data";
+import { toListItem } from "@/lib/recipe-list";
 
 export const dynamic = "force-dynamic";
 
@@ -31,7 +32,7 @@ export default async function RecipesPage({ searchParams }: { searchParams: Prom
 
   return (
     <RecipesBrowser
-      recipes={recipes}
+      recipes={recipes.map(toListItem)}
       isLoggedIn={!!user}
       savedIds={savedIds}
       initialFilters={{

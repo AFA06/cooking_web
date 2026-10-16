@@ -14,6 +14,7 @@ import { getCreatorForUser } from "@/server/creator";
 import { getCreatorBySlug, getRecipesByCreator } from "@/server/recipes";
 import { getCreatorReviews, getCreatorSummary } from "@/server/reviews";
 import { getSavedRecipeIds } from "@/server/user-data";
+import { toListItem } from "@/lib/recipe-list";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -106,7 +107,7 @@ export default async function CreatorPage({ params }: Props) {
         ) : (
           <div className="grid grid-cols-1 gap-x-6 gap-y-12 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 xl:gap-x-8">
             {recipes.map((r, i) => (
-              <RecipeCard key={r.id} recipe={r} isLoggedIn={!!user} saved={savedIds.has(r.id)} priority={i < 4} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw" />
+              <RecipeCard key={r.id} recipe={toListItem(r)} isLoggedIn={!!user} saved={savedIds.has(r.id)} priority={i < 4} sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, (max-width: 1280px) 33vw, 25vw" />
             ))}
           </div>
         )}

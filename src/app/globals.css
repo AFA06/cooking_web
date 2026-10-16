@@ -271,3 +271,27 @@ button:disabled {
     animation: none;
   }
 }
+
+/* Top loading bar for page changes (components/layout/NavProgress). It waits a moment before showing,
+   so quick navigations don't flash it, then creeps towards the end until the page arrives. */
+.nav-progress-run {
+  width: 0;
+  opacity: 0;
+  animation: nav-progress-run 8s cubic-bezier(0.1, 0.7, 0.2, 1) 80ms forwards;
+}
+.nav-progress-done {
+  width: 100%;
+  animation: nav-progress-done 300ms ease-out forwards;
+}
+@keyframes nav-progress-run {
+  0% { width: 0; opacity: 1; }
+  15% { width: 45%; opacity: 1; }
+  100% { width: 92%; opacity: 1; }
+}
+@keyframes nav-progress-done {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .nav-progress-run { animation: none; width: 60%; opacity: 1; }
+}

@@ -12,7 +12,7 @@ import { CATEGORY_LABEL, RECIPE_CATEGORIES, type RecipeCategory } from "@/lib/ca
 import { ALL, DIFFICULTIES, EMPTY_FILTERS, PRICE_FILTERS, SORTS, TIME_FILTERS, filterRecipes, sortRecipes, type RecipeFilters, type SortKey } from "@/lib/filters";
 import { RECIPE_GRID_CLASSES, useGridColumns } from "@/lib/use-grid-columns";
 import { cn } from "@/lib/utils";
-import type { Recipe } from "@/types/recipe";
+import type { RecipeListItem } from "@/types/recipe";
 
 /** Rows shown at first and added by each "Yana retseptlar" press. */
 const ROWS_PER_PAGE = 4;
@@ -56,7 +56,7 @@ function CategoryChip({ label, count, checked, onClick, all }: { label: string; 
 }
 
 interface Props {
-  recipes: Recipe[];
+  recipes: RecipeListItem[];
   initialFilters: RecipeFilters;
   isLoggedIn: boolean;
   savedIds: string[];

@@ -87,6 +87,18 @@ export interface Recipe {
   rating: { average: number; count: number };
 }
 
+/**
+ * What recipe lists and cards get in the browser: no steps, photos or quantities. Steps must never ride along,
+ * because a premium recipe's locked steps would then be readable in the page source. `steps?: never` makes
+ * passing a full Recipe a type error, so every list goes through `toListItem`.
+ */
+export type RecipeListItem = Omit<Recipe, "steps" | "media" | "ingredients"> & {
+  /** Names only, for the search box. */
+  ingredients: Pick<RecipeIngredient, "name">[];
+  steps?: never;
+  media?: never;
+};
+
 export interface RecipeCardProps {
   recipe: Recipe;
   variant?: "default" | "featured" | "compact";

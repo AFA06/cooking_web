@@ -4,6 +4,7 @@ import { LOCALE_INFO } from "@/i18n/core";
 import { I18nProvider } from "@/i18n/client";
 import { getLocale, getMessages, getT } from "@/i18n/server";
 import { SITE_URL } from "@/lib/site-url";
+import { NavProgress } from "@/components/layout/NavProgress";
 import "./globals.css";
 
 const onest = Onest({
@@ -69,6 +70,7 @@ export default async function RootLayout({
         >
           {t("nav.skip")}
         </a>
+        <NavProgress />
         <I18nProvider locale={locale} messages={getMessages(locale)}>
           {children}
         </I18nProvider>
