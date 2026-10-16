@@ -103,3 +103,8 @@ export async function deliverCode(channel: "sms" | "email", to: string, code: st
 export async function sendAccountExistsNotice(phone: string, t: TFunction) {
   await sendSms(phone, t("sms.exists", { brand: BRAND }));
 }
+
+/** The email version of the notice, for sign-ups confirmed by email. */
+export async function sendAccountExistsEmail(email: string, t: TFunction) {
+  await sendEmail(email, `${BRAND}: ${t("email.existsSubject")}`, t("email.existsBody", { brand: BRAND }));
+}

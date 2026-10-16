@@ -8,11 +8,12 @@ import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { z } from "zod";
 import { db, schema } from "@/db";
-import { checkPassword, normalizeUzPhone, parseIdentifier } from "@/lib/auth-rules";
+import { checkPassword, normalizeEmail, parseIdentifier } from "@/lib/auth-rules";
+import { isUzbekPhone, parseInternational } from "@/lib/phone";
 import { getT } from "@/i18n/server";
 import { createSession, destroyAllSessions, destroySession } from "@/server/auth";
 import { TTL_MINUTES, createChallenge, getOpenChallenge, resendChallenge, verifyChallenge } from "@/server/challenges";
-import { DeliveryUnavailable, deliverCode, sendAccountExistsNotice } from "@/server/notify";
+import { DeliveryUnavailable, deliverCode, sendAccountExistsEmail, sendAccountExistsNotice } from "@/server/notify";
 import { WINDOW, allow, clear, lockedForMinutes, record } from "@/server/rate-limit";
 import { clientKey, keyedHash, safeEqual } from "@/server/security";
 
@@ -122,11 +123,13 @@ export async function logout() {
   redirect("/");
 }
 
-/* ───────────── Sign-up, verified by SMS ───────────── */
+/* ───────────── Sign-up: SMS code for Uzbek numbers, email code for the rest ───────────── */
 
 const signupSchema = z.object({
-  name: z.string().trim().min(2, "auth.err.name").max(80),
+  firstName: z.string().trim().min(1, "auth.err.firstName").max(40),
+  lastName: z.string().trim().min(1, "auth.err.lastName").max(40),
   phone: z.string().max(40),
+  email: z.string().trim().max(254),
   password: z.string().max(200),
 });
 
@@ -135,43 +138,60 @@ export async function startSignup(_: AuthState, formData: FormData): Promise<Aut
   // A field real people never see: scripts that fill every input give themselves away. Answered
   // exactly like a rate limit, so the bot learns nothing.
   if (text(formData, "hp_contact") !== "") return { error: t(TOO_MANY) };
-  const parsed = signupSchema.safeParse({ name: formData.get("name"), phone: formData.get("phone"), password: formData.get("password") });
+  const parsed = signupSchema.safeParse({
+    firstName: formData.get("firstName") ?? "",
+    lastName: formData.get("lastName") ?? "",
+    phone: formData.get("phone") ?? "",
+    email: formData.get("email") ?? "",
+    password: formData.get("password") ?? "",
+  });
   if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
-  const phone = normalizeUzPhone(parsed.data.phone);
-  if (!phone) return { error: t("acct.err.phone") };
+  const intl = parseInternational(parsed.data.phone);
+  if (!intl) return { error: t("acct.err.phone") };
+  const phone = intl.phone;
+  const bySms = isUzbekPhone(phone);
+  const email = parsed.data.email ? normalizeEmail(parsed.data.email) : null;
+  if (parsed.data.email && !email) return { error: t("auth.err.email") };
+  // Codes only go by SMS to Uzbek numbers; everyone else confirms with a code sent to their email.
+  if (!bySms && !email) return { error: t("auth.err.emailNeeded") };
   const weak = checkPassword(parsed.data.password, phone);
   if (weak) return { error: t(weak) };
+  const name = `${parsed.data.firstName} ${parsed.data.lastName}`;
 
+  const channel = bySms ? "sms" : "email";
+  const destination = bySms ? phone : email!;
   const ip = await clientKey();
-  const phoneKey = keyedHash("dest", phone);
+  const destKey = keyedHash("dest", destination);
   const withinLimits =
     (await allow("signup-ip-hour", ip, SIGNUPS_PER_ADDRESS_HOUR, WINDOW.hour)) &&
     (await allow("signup-ip-day", ip, SIGNUPS_PER_ADDRESS_DAY, WINDOW.day)) &&
     (await allow("signup-all", "all", SIGNUPS_ANYWHERE_PER_10_MIN, 10 * WINDOW.minute)) &&
-    (await allow("send-dest", phoneKey, 6, WINDOW.hour));
+    (await allow("send-dest", destKey, 6, WINDOW.hour));
   if (!withinLimits) return { error: t(TOO_MANY) };
 
-  const [existing] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.phone, phone)).limit(1);
-  // Hash even when the number is taken, so both paths cost the same time.
+  const [phoneTaken] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.phone, phone)).limit(1);
+  const [emailTaken] = !bySms ? await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.email, email!)).limit(1) : [];
+  // Hash even when the account exists, so both paths cost the same time.
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
 
   let challengeId: string;
   try {
-    if (existing) {
+    if (phoneTaken || emailTaken) {
       // Same screens and same answer as a real signup, so the form cannot be used to probe who has an account.
-      // The number's owner is told by SMS instead.
-      ({ id: challengeId } = await createChallenge({ purpose: "signup", channel: "sms", destination: phone, inert: true }));
-      await sendAccountExistsNotice(phone, t);
+      // The owner of the number or address is told instead.
+      ({ id: challengeId } = await createChallenge({ purpose: "signup", channel, destination, inert: true }));
+      if (bySms) await sendAccountExistsNotice(phone, t);
+      else await sendAccountExistsEmail(email!, t);
     } else {
       const created = await createChallenge({
         purpose: "signup",
-        channel: "sms",
-        destination: phone,
-        payload: { name: parsed.data.name, passwordHash, bind: await bindToBrowser() },
+        channel,
+        destination,
+        payload: { name, passwordHash, phone, ...(email ? { email } : {}), bind: await bindToBrowser() },
       });
       challengeId = created.id;
       try {
-        await deliverCode("sms", phone, created.code, "signup", TTL_MINUTES.sms, t);
+        await deliverCode(channel, destination, created.code, "signup", TTL_MINUTES[channel], t);
       } catch (e) {
         await db.delete(schema.authChallenges).where(eq(schema.authChallenges.id, created.id));
         throw e;
@@ -192,15 +212,33 @@ export async function verifySignup(_: AuthState, formData: FormData): Promise<Au
   if (!row || row.payload?.inert === "1" || !row.payload?.passwordHash || !row.destination) return { error: t(BAD_CODE) };
   if (!(await isBoundToThisBrowser(row.payload.bind))) return { error: t("auth.a.wrongBrowser") };
 
+  const byEmail = row.channel === "email";
+  // Older SMS challenges carried the phone only as the destination.
+  const phone = row.payload.phone ?? row.destination;
+  let email: string | null = row.payload.email ?? null;
+  if (email && !byEmail) {
+    // An optional address someone else already uses is simply left off; it can be added later in settings.
+    const [taken] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.email, email)).limit(1);
+    if (taken) email = null;
+  }
+
   let userId: string;
   try {
     const [user] = await db
       .insert(schema.users)
-      .values({ name: row.payload.name ?? "", phone: row.destination, phoneVerifiedAt: new Date(), passwordHash: row.payload.passwordHash })
+      .values({
+        name: row.payload.name ?? "",
+        phone,
+        // Only what the code proved is marked as verified: the phone by SMS, or the email by an email code.
+        phoneVerifiedAt: byEmail ? null : new Date(),
+        email,
+        emailVerifiedAt: byEmail ? new Date() : null,
+        passwordHash: row.payload.passwordHash,
+      })
       .returning({ id: schema.users.id });
     userId = user.id;
   } catch {
-    // Someone else completed a signup for this number first.
+    // Someone else completed a signup for this number or address first.
     return { error: t("auth.a.phoneExists") };
   }
   await createSession(userId);
@@ -218,10 +256,10 @@ export async function resendSignupCode(_: AuthState, formData: FormData): Promis
   if (open.payload?.inert === "1") return { ok: t("auth.a.codeSent") };
   if (!(await allow("send-dest", keyedHash("dest", open.destination), 6, WINDOW.hour))) return { error: t(TOO_MANY) };
 
-  const next = await resendChallenge(id, "signup", "sms");
+  const next = await resendChallenge(id, "signup", open.channel);
   if (!next) return { error: t("auth.a.waitRetry") };
   try {
-    await deliverCode("sms", open.destination, next.code, "signup", TTL_MINUTES.sms, t);
+    await deliverCode(open.channel, open.destination, next.code, "signup", TTL_MINUTES[open.channel], t);
   } catch (e) {
     console.error("signup resend failed:", e instanceof Error ? e.message : "unknown");
     return { error: t(UNAVAILABLE) };

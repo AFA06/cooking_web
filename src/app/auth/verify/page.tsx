@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { AuthScreen } from "@/components/auth/AuthScreen";
 import { ResendButton, VerifyCodeForm } from "@/components/auth/CodeForms";
 import { SiteShell } from "@/components/layout/SiteShell";
-import { maskPhone } from "@/lib/auth-rules";
+import { maskEmail, maskPhone } from "@/lib/auth-rules";
 import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { cooldownLeft, getOpenChallenge } from "@/server/challenges";
@@ -26,7 +26,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
       <AuthScreen
         eyebrow={t("auth.verifyEyebrow")}
         title={<>{t("auth.verifyLead")} <em className="text-clay-400">{t("auth.verifyEm")}</em></>}
-        note={challenge?.destination ? t("auth.codeSentTo", { phone: maskPhone(challenge.destination) }) : t("auth.codeExpired")}
+        note={
+          !challenge?.destination
+            ? t("auth.codeExpired")
+            : challenge.channel === "email"
+              ? t("auth.codeSentToEmail", { email: maskEmail(challenge.destination) })
+              : t("auth.codeSentTo", { phone: maskPhone(challenge.destination) })
+        }
       >
         {challenge ? (
           <>
@@ -34,7 +40,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
             <div className="mt-6 flex flex-col gap-3">
               <ResendButton action={resendSignupCode} challengeId={challenge.id} label={t("auth.resendCode")} secondsLeft={cooldownLeft(challenge)} />
               <Link href="/auth/signup" className="text-sm font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
-                {t("auth.changeNumber")}
+                {challenge.channel === "email" ? t("auth.changeDetails") : t("auth.changeNumber")}
               </Link>
             </div>
           </>

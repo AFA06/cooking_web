@@ -1,4 +1,5 @@
 /** Rules shared by the sign-in forms and the server. Nothing here touches secrets, so it is safe in the browser. */
+import { parseInternational } from "@/lib/phone";
 
 /** Uzbek mobile numbers only: +998 followed by nine digits. Returns +998XXXXXXXXX or null. */
 export function normalizeUzPhone(input: string): string | null {
@@ -11,7 +12,8 @@ export function normalizeUzPhone(input: string): string | null {
 
 export function maskPhone(phone: string): string {
   const m = /^\+998(\d{2})\d{3}(\d{2})(\d{2})$/.exec(phone);
-  return m ? `+998 ${m[1]} *** ${m[2]} ${m[3]}` : "***";
+  if (m) return `+998 ${m[1]} *** ${m[2]} ${m[3]}`;
+  return /^\+\d{8,15}$/.test(phone) ? `${phone.slice(0, phone.length - 6)}***${phone.slice(-2)}` : "***";
 }
 
 export function maskEmail(email: string): string {
@@ -33,8 +35,8 @@ export function parseIdentifier(input: string): Identifier | null {
     const email = normalizeEmail(raw);
     return email ? { kind: "email", value: email } : null;
   }
-  const phone = normalizeUzPhone(raw);
-  return phone ? { kind: "phone", value: phone } : null;
+  const parsed = parseInternational(raw);
+  return parsed ? { kind: "phone", value: parsed.phone } : null;
 }
 
 const COMMON_PASSWORDS = new Set([
