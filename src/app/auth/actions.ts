@@ -146,6 +146,7 @@ export async function startSignup(_: AuthState, formData: FormData): Promise<Aut
     password: formData.get("password") ?? "",
   });
   if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
+  if (formData.get("terms") !== "yes") return { error: t("auth.err.terms") };
   const intl = parseInternational(parsed.data.phone);
   if (!intl) return { error: t("acct.err.phone") };
   const phone = intl.phone;

@@ -385,6 +385,7 @@
       "name": "Enter your name",
       "pwEnter": "Enter your password",
       "pwShort": "The password must be at least 8 characters",
+      "terms": "Please accept the terms to continue.",
       "wrong": "Incorrect email or password."
     },
     "firstName": "First name",
@@ -938,15 +939,17 @@
     "termsLabel": "Terms"
   },
   "legal": {
+    "agree": {
+      "after": ".",
+      "before": "I have read and agree to the",
+      "privacy": "Privacy policy",
+      "terms": "Terms of use"
+    },
     "and": "and",
-    "consentAfter": ".",
-    "consentBefore": "By continuing, you agree to the",
     "contents": "Contents",
     "document": "Document",
     "draftNote": "This is sample text for the document; it will be replaced with the final legal text before publication.",
-    "privacyLink": "Privacy policy",
     "questions": "Have questions?",
-    "termsLink": "Terms of use",
     "updated": "Last updated: {date}"
   },
   "meta": {

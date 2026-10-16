@@ -385,6 +385,7 @@
       "name": "Ismingizni kiriting",
       "pwEnter": "Parolingizni kiriting",
       "pwShort": "Parol kamida 8 ta belgidan iborat bo‘lishi kerak",
+      "terms": "Davom etish uchun shartlarga rozilik bildiring.",
       "wrong": "Email yoki parol noto‘g‘ri."
     },
     "firstName": "Ism",
@@ -930,15 +931,17 @@
     "termsLabel": "Shartlar"
   },
   "legal": {
+    "agree": {
+      "after": "ni o‘qidim va roziman.",
+      "before": "Men",
+      "privacy": "Maxfiylik siyosati",
+      "terms": "Foydalanish shartlari"
+    },
     "and": "va",
-    "consentAfter": "ga rozilik bildirasiz.",
-    "consentBefore": "Davom etish orqali",
     "contents": "Mundarija",
     "document": "Hujjat",
     "draftNote": "Bu hujjatning namunaviy matni; yakuniy yuridik matn e’lon qilinishidan oldin almashtiriladi.",
-    "privacyLink": "Maxfiylik siyosati",
     "questions": "Savollaringiz bormi?",
-    "termsLink": "Foydalanish shartlari",
     "updated": "Oxirgi yangilanish: {date}"
   },
   "meta": {
