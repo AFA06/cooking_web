@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowDown, ArrowRight, Timer } from "lucide-react";
+import { ArrowDown, ArrowRight, Clock, Timer } from "lucide-react";
 import { Container } from "@/components/ui/Container";
-import { CreatorProfileForm } from "@/components/dashboard/CreatorProfileForm";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { getT } from "@/i18n/server";
 import type { TFunction } from "@/i18n/core";
@@ -12,6 +11,9 @@ import { formatClock } from "@/lib/format";
 import { getCurrentUser } from "@/server/auth";
 import { getCreatorForUser } from "@/server/creator";
 import { getFeaturedRecipes, listPublishedRecipes } from "@/server/recipes";
+import { getMyApplication } from "@/server/applications";
+import { ApplicationForm } from "@/components/creator/ApplicationForm";
+import { formatPhone } from "@/lib/profile";
 import type { Recipe } from "@/types/recipe";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -35,7 +37,6 @@ const STEPS = (t: TFunction) => [
 ];
 
 const primaryCta = "inline-flex h-14 items-center justify-center gap-2.5 rounded-full bg-clay-400 px-6 text-base sm:px-8 sm:text-lg font-semibold text-amber-50 transition-colors duration-200 hover:bg-amber-950";
-const quietCta = "inline-flex h-14 items-center justify-center rounded-full border border-amber-950/25 px-8 text-lg font-semibold text-amber-950 transition-colors duration-200 hover:border-amber-950";
 
 /** A real recipe shown the way cooks will see it: one step at a time. */
 function StepDeck({ recipe, t }: { recipe: Recipe; t: TFunction }) {
@@ -86,6 +87,10 @@ function StepDeck({ recipe, t }: { recipe: Recipe; t: TFunction }) {
 export default async function JoinPage() {
   const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   if (user && (await getCreatorForUser(user.id))) redirect("/dashboard");
+  const application = user ? await getMyApplication(user.id) : null;
+  const pending = application?.status === "pending";
+  // Visitors without an account first sign up quickly, then come straight back to the form.
+  const applyHref = user ? "#ariza" : `/auth/signup?next=${encodeURIComponent("/creators/join#ariza")}`;
 
   const [featured] = await getFeaturedRecipes(1);
   const sample = featured ?? (await listPublishedRecipes())[0];
@@ -104,23 +109,19 @@ export default async function JoinPage() {
               <p className="mt-7 max-w-xl text-lg leading-relaxed text-amber-900">
                 {t("join.heroText")}
               </p>
-              <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-                {user ? (
-                  <a href="#boshlash" className={primaryCta}>
-                    {t("join.createProfile")}
-                    <ArrowDown className="h-5 w-5" aria-hidden="true" />
+              <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
+                {pending ? (
+                  <a href="#ariza" className={primaryCta}>
+                    <Clock className="h-5 w-5" aria-hidden="true" />
+                    {t("apply.pendingShort")}
                   </a>
                 ) : (
-                  <>
-                    <Link href="/auth/signup?next=/creators/join" className={primaryCta}>
-                      {t("join.signupCta")}
-                      <ArrowRight className="h-5 w-5" aria-hidden="true" />
-                    </Link>
-                    <Link href="/auth/login?next=/creators/join" className={quietCta}>
-                      {t("join.haveAccount")}
-                    </Link>
-                  </>
+                  <Link href={applyHref} className={primaryCta}>
+                    {t("apply.cta")}
+                    {user ? <ArrowDown className="h-5 w-5" aria-hidden="true" /> : <ArrowRight className="h-5 w-5" aria-hidden="true" />}
+                  </Link>
                 )}
+                {!user && <p className="max-w-xs text-sm text-amber-600">{t("apply.signupFirst")}</p>}
               </div>
             </header>
             {sample && sample.steps.length > 0 && <StepDeck recipe={sample} t={t} />}
@@ -164,26 +165,36 @@ export default async function JoinPage() {
         </Container>
       </section>
 
-      <section id="boshlash" className="scroll-mt-16 pb-20 lg:pb-28">
+      <section id="ariza" className="scroll-mt-20 pb-20 lg:pb-28">
         <Container size="xl">
-          <div className="theme-light grid gap-10 rounded-[2rem] bg-amber-50 p-7 text-amber-950 sm:p-12 lg:grid-cols-2 lg:gap-20 lg:p-16">
+          <div className="theme-light grid gap-10 rounded-[2rem] bg-amber-50 p-7 text-amber-950 sm:p-12 lg:grid-cols-[2fr_3fr] lg:gap-16 lg:p-16">
             <div>
-              <h2 className="font-serif text-4xl font-medium leading-tight sm:text-5xl">{t("join.openKitchen")}</h2>
-              <p className="mt-5 max-w-md leading-relaxed text-amber-900">
-                {t("join.premiumNote")}
-              </p>
+              <h2 className="font-serif text-4xl font-medium leading-tight sm:text-5xl">{t("apply.title")}</h2>
+              <p className="mt-5 max-w-md leading-relaxed text-amber-900">{t("apply.intro")}</p>
+              <p className="mt-4 max-w-md text-sm leading-relaxed text-amber-700">{t("join.premiumNote")}</p>
             </div>
-            {user ? (
-              <CreatorProfileForm defaultName={user.name} />
-            ) : (
-              <div className="flex flex-col justify-center gap-3">
-                <Link href="/auth/signup?next=/creators/join" className="inline-flex h-14 items-center justify-center gap-2.5 rounded-full bg-amber-950 px-6 text-base sm:px-8 sm:text-lg font-semibold text-amber-50 transition-colors duration-200 hover:bg-amber-700">
-                  {t("join.signupCta")}
+            {!user ? (
+              <div className="flex flex-col justify-center gap-4">
+                <p className="leading-relaxed text-amber-900">{t("apply.signupFirst")}</p>
+                <Link href={applyHref} className="inline-flex h-14 items-center justify-center gap-2.5 rounded-full bg-amber-950 px-6 text-base font-semibold text-amber-50 transition-colors duration-200 hover:bg-amber-700 sm:px-8 sm:text-lg">
+                  {t("apply.signupCta")}
                   <ArrowRight className="h-5 w-5" aria-hidden="true" />
                 </Link>
-                <Link href="/auth/login?next=/creators/join" className="inline-flex h-14 items-center justify-center rounded-full border border-amber-300 px-8 text-lg font-semibold transition-colors duration-200 hover:border-amber-950">
-                  {t("join.haveAccount")}
-                </Link>
+              </div>
+            ) : pending ? (
+              <div role="status" className="flex flex-col justify-center gap-3 rounded-2xl bg-amber-100 p-6">
+                <p className="flex items-center gap-2 font-serif text-2xl font-medium"><Clock className="h-6 w-6 text-clay-400" aria-hidden="true" />{t("apply.pendingTitle")}</p>
+                <p className="leading-relaxed text-amber-900">{t("apply.pendingText", { phone: formatPhone(application.phone) })}</p>
+              </div>
+            ) : (
+              <div className="space-y-5">
+                {application?.status === "rejected" && (
+                  <p role="status" className="rounded-2xl bg-clay-100 px-5 py-4 text-amber-950">
+                    {t("apply.rejected")}
+                    {application.adminNote && <span className="mt-1 block text-sm text-amber-800">{application.adminNote}</span>}
+                  </p>
+                )}
+                <ApplicationForm defaultName={user.name} defaultPhone={user.phone ? formatPhone(user.phone) : ""} />
               </div>
             )}
           </div>

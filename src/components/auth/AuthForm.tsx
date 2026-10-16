@@ -26,7 +26,7 @@ export function AuthForm({ mode, action, next, notice }: Props) {
   const suffix = next ? `?next=${encodeURIComponent(next)}` : "";
 
   return (
-    <form action={formAction} className="mt-8 space-y-5">
+    <form action={formAction} className="mt-6 space-y-5">
       <input type="hidden" name="next" value={next} />
       {notice && <p role="status" className="rounded-xl bg-sage-500/15 px-4 py-3 text-sm font-medium text-sage-700">{notice}</p>}
       {isSignup && (
@@ -76,12 +76,6 @@ export function AuthForm({ mode, action, next, notice }: Props) {
       <Button type="submit" size="xl" className="w-full rounded-full" loading={pending}>
         {isSignup ? t("auth.sendCode") : t("nav.login")}
       </Button>
-      <p className="text-sm text-amber-900">
-        {isSignup ? `${t("auth.haveAccount")} ` : `${t("auth.newHere")} `}
-        <Link href={`${isSignup ? "/auth/login" : "/auth/signup"}${suffix}`} className="font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
-          {isSignup ? t("nav.login") : t("auth.createAccount")}
-        </Link>
-      </p>
     </form>
   );
 }

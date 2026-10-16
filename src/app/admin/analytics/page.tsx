@@ -30,10 +30,12 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
   const funnelMax = Math.max(...funnel.map((f) => f.value), 1);
 
   const charts = [
+    { metric: "active", label: t("adm.dailyActive") },
     { metric: "views", label: t("dash.col.views") },
     { metric: "signups", label: t("adm.chart.signups") },
     { metric: "cooks", label: t("adm.tile.cooksStarted") },
     { metric: "completions", label: t("adm.chart.cooksDone") },
+    { metric: "saves", label: t("dash.col.saves") },
   ] as const;
 
   return (
@@ -68,7 +70,7 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
         {charts.map((c) => (
-          <Panel key={c.metric} title={c.label} description={t("adm.chartTotal", { total: formatNumber(p.total(c.metric)), prev: formatNumber(p.previousTotal(c.metric)) })}>
+          <Panel key={c.metric} title={c.label} description={c.metric === "active" ? t("adm.dailyActiveNote") : t("adm.chartTotal", { total: formatNumber(p.total(c.metric)), prev: formatNumber(p.previousTotal(c.metric)) })}>
             <TimeSeriesChart data={p.points(c.metric)} label={c.label} height={220} />
           </Panel>
         ))}

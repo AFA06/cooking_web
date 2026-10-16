@@ -38,6 +38,7 @@
     "pwUpdated": "Password updated. Sessions on other devices were signed out."
   },
   "adm": {
+    "access": "Access",
     "act": {
       "cook_done": "Finished cooking",
       "cook_start": "Started cooking",
@@ -45,6 +46,7 @@
     },
     "activity": "Activity",
     "activityNote": "Recent actions",
+    "activityRange": "Activity · {range}",
     "addFirstCreator": "Add the first creator.",
     "addFirstRecipe": "Add the first recipe on this creator's behalf.",
     "addRecipe": "Add a recipe",
@@ -53,6 +55,22 @@
     "allTimeShort": "all time",
     "amount": "Amount",
     "analysis": "Analysis",
+    "block": "Block",
+    "blockNote": "A blocked person can't sign in and all their sessions end at once. Nothing is deleted.",
+    "blocked": "Blocked",
+    "blockedNote": "This account is blocked. Unblock it to let them sign in again.",
+    "blockedSince": "Blocked since {date}",
+    "blogger": {
+      "copy": "Copy as message",
+      "created": "{name} has been added",
+      "desc": "Creates the creator's sign-in account and public profile in one step. You hand over the sign-in details yourself.",
+      "handover": "Hello {name}! Your Damda studio sign-in:\nLogin: {login}\nTemporary password: {password}\nYou'll choose your own password the first time you sign in.",
+      "login": "Login",
+      "open": "Open creator page",
+      "password": "Temporary password",
+      "phone": "Phone (used to sign in)",
+      "submit": "Add creator"
+    },
     "buyer": "Buyer",
     "cannotDeleteSelf": "You can't delete your own account here.",
     "changeFilter": "Try changing your search or filter.",
@@ -75,11 +93,15 @@
     "createCreator": "Create creator",
     "createCreatorFirst": "Create a creator before adding a recipe.",
     "createCreatorLink": "Create a creator",
+    "creatorBlocked": "This creator's account is blocked: they can't sign in to the studio.",
     "creatorProfile": "Creator profile: {name}",
     "creatorRank": "Creator ranking",
     "creatorRecipesNote": "Published and draft recipes by this creator",
+    "creatorSales": "Creator sales",
     "creatorsCount": "{count} creators",
     "creatorsDesc": "Bloggers, their details and results.",
+    "dailyActive": "Daily active users",
+    "dailyActiveNote": "People who used the site signed in, per day.",
     "dailyTable": "Daily data table",
     "dailyViews": "Daily views",
     "dailyViewsNote": "Visits to recipe pages, last {range}",
@@ -105,7 +127,8 @@
       "emailTaken": "This email belongs to another account.",
       "slugEmpty": "The address can't be empty.",
       "slugFormat": "The address may contain only Latin letters, digits and hyphens",
-      "slugTaken": "This address is taken. Choose another one."
+      "slugTaken": "This address is taken. Choose another one.",
+      "telegram": "Telegram username must be 5–32 letters, digits or underscores."
     },
     "f": {
       "avatarHint": "An image link starting with https://. Optional.",
@@ -114,7 +137,9 @@
       "foundingHint": "No commission during the founding period",
       "slug": "Page address",
       "slugHint": "Public link: /creators/address. If changed, old links stop working.",
-      "slugOptional": "If left empty, it's made from the name. /creators/address"
+      "slugOptional": "If left empty, it's made from the name. /creators/address",
+      "telegram": "Telegram username",
+      "telegramHint": "Buyers of premium recipes are sent to this name (t.me/name). Only an admin can change it."
     },
     "feature": "Feature",
     "featured": "Featured",
@@ -132,7 +157,20 @@
     "hide": "Hide",
     "lastRange": "Last {range}",
     "lastSeen": "Last seen",
+    "login": {
+      "badPhone": "That phone number isn't valid.",
+      "create": "Create account",
+      "done": "Login: {login} · Temporary password: {password}",
+      "linked": "An account is linked. Issue a new temporary password.",
+      "once": "The password is shown once. Send it to the author privately: they choose their own at first sign-in.",
+      "phoneHint": "The author signs in with this number.",
+      "phoneTaken": "An account with this number already exists.",
+      "reset": "Issue new password",
+      "title": "Sign-in details",
+      "unlinked": "No account yet. Create one from a phone number."
+    },
     "manage": "Management",
+    "manageAccount": "Manage account",
     "menu": "Admin menu",
     "metaDefault": "Admin panel",
     "moreStats": "Detailed statistics →",
@@ -146,6 +184,7 @@
     "new": "New",
     "newCreator": "New creator",
     "newCreatorDesc": "The profile is created without a linked user account. You add the recipes as admin.",
+    "newToday": "+{count} today",
     "noActivity": "No activity yet",
     "noActivityText": "When the user saves or cooks a recipe, it shows up here.",
     "noCreators": "No creators yet",
@@ -158,6 +197,7 @@
     "noViews": "No views in this period yet.",
     "noVisits": "No visits in this period yet.",
     "notLinked": "Not linked to an account",
+    "ofUsers": "{pct}% of all users",
     "openSite": "Open the site",
     "overviewDesc": "Platform status — last {range}.",
     "pageOf": "Page {page} of {pages} · {total} total",
@@ -166,6 +206,7 @@
     "paidHint": "paid purchases",
     "paidPurchases": "Paid purchases",
     "paymentsNotConnected": "Payments aren't connected yet.",
+    "people": "People",
     "pickCreator": "Choose a creator",
     "pickCreatorDesc": "First choose which creator the recipe will be published under.",
     "platformTotal": "Platform totals",
@@ -204,6 +245,7 @@
     "role": "Role",
     "roleHint": "An admin can manage all data.",
     "roleHintSelf": "You can't remove your own admin rights.",
+    "salesNote": "{paid} confirmed, {pending} waiting for payment. For now creators keep the full amount.",
     "same": "No change",
     "saveChanges": "Save changes",
     "saved": "Saved.",
@@ -217,12 +259,17 @@
     "sourcesNote": "By the ?src= tag in the link",
     "statsDesc": "Activity, conversion and results for the last {range}.",
     "tile": {
+      "active30": "Active in 30 days",
+      "active7": "Active in 7 days",
+      "activeToday": "Active today",
       "completionRate": "Completion rate",
       "cooksStarted": "Cooking started",
+      "registered": "Registered users",
       "signups": "New users"
     },
     "topViewed": "Most viewed recipes",
     "type": "Type",
+    "unblock": "Unblock",
     "unfeature": "Remove from featured",
     "unpriced": "no price",
     "updated": "Updated: {when}",
@@ -231,9 +278,76 @@
     "vsPrev": "vs the previous period",
     "welcome": "Welcome, {name}"
   },
+  "apply": {
+    "about": "A few words about you",
+    "aboutPlaceholder": "What do you cook, and who follows you?",
+    "adm": {
+      "account": "Account: {name}",
+      "approve": "Approve and open studio",
+      "approveHint": "They keep their own account: a creator profile is made and the creator panel opens for them.",
+      "approvedOk": "Request approved. Check the Telegram username and fix it if needed: buyers are sent there.",
+      "desc": "Check the audience, talk to the person, then approve or decline.",
+      "empty": {
+        "approved": "No approved requests yet.",
+        "pending": "No new requests.",
+        "rejected": "No declined requests."
+      },
+      "nav": "Requests",
+      "note": "Note",
+      "notePlaceholder": "Optional: a short note the applicant will see",
+      "reject": "Decline",
+      "rejectConfirm": "Confirm decline",
+      "rejectedOk": "Request declined.",
+      "review": "Review",
+      "status": {
+        "approved": "Approved",
+        "pending": "New",
+        "rejected": "Declined"
+      },
+      "title": "Creator requests",
+      "waiting": {
+        "one": "{count} new creator request is waiting",
+        "other": "{count} new creator requests are waiting"
+      }
+    },
+    "audience": "Followers (roughly)",
+    "audiencePick": "Choose one",
+    "cta": "Apply to become a creator",
+    "err": {
+      "about": "Write a sentence or two about yourself.",
+      "aboutLong": "That's too long (600 characters max).",
+      "already": "You're already a creator.",
+      "audience": "Choose your follower count.",
+      "instagram": "That Instagram isn't valid. Enter @username or a link.",
+      "name": "Enter your full name.",
+      "oneLink": "Enter your Instagram or Telegram.",
+      "pending": "You already have a request being reviewed.",
+      "telegram": "That Telegram isn't valid. Enter @username or a link."
+    },
+    "fullName": "Full name",
+    "intro": "We'll look at your audience on Instagram or Telegram and get in touch. If it's a fit, we'll open your studio.",
+    "linksHint": "Give at least one: that's where we'll look at your audience.",
+    "pendingShort": "Your request is being reviewed",
+    "pendingText": "The team will review it and contact you at {phone}. Once approved, “Creator panel” appears in your menu.",
+    "pendingTitle": "We've got your request",
+    "phone": "Phone to reach you",
+    "rejected": "Your last request wasn't approved this time. You can update the details and send it again.",
+    "signupCta": "Sign up and apply",
+    "signupFirst": "First sign up in a minute, then fill in a short request.",
+    "size": {
+      "100k+": "Over 100,000",
+      "10k-50k": "10,000 – 50,000",
+      "1k-10k": "1,000 – 10,000",
+      "50k-100k": "50,000 – 100,000",
+      "lt1k": "Under 1,000"
+    },
+    "submit": "Send request",
+    "title": "Become a creator"
+  },
   "auth": {
     "a": {
       "badCode": "The code is wrong or has expired.",
+      "blocked": "This account is blocked. If you have questions, contact the Damda team.",
       "codeExpiredRestart": "The code has expired. Start again.",
       "codeSent": "Code sent.",
       "genericSent": "If the account exists, a code was sent.",
@@ -283,6 +397,9 @@
     "password": "Password",
     "phoneHint": "We'll send a confirmation code to your number by SMS.",
     "pick": "Today's pick",
+    "reasonApply": "Create an account or sign in first, then send your creator request.",
+    "reasonCook": "To start cooking, create an account in a minute or sign in. You'll go straight to cooking afterwards.",
+    "reasonRecipe": "Create an account or sign in to continue.",
     "resendCode": "Resend the code",
     "resetDone": "Password updated. Sign in with the new password.",
     "resetEm": "new password.",
@@ -298,6 +415,7 @@
     "signupNote": "Save recipes and keep track of the dishes you've cooked.",
     "signupNoteSms": "Sign up with your phone number: save recipes and keep track of the dishes you've cooked.",
     "smsInstead": "Can't reach my email — send an SMS",
+    "switchLabel": "Sign in or create an account",
     "verifyEm": "code.",
     "verifyEyebrow": "Verification",
     "verifyLead": "Enter the",
@@ -361,7 +479,7 @@
     "nextUp": "Up next: {title}",
     "otherRecipes": "Other recipes",
     "overview": "All stages",
-    "premiumLocked": "Step-by-step mode for premium recipes is part of the paid version. Payments aren't connected yet, so this recipe can't be unlocked.",
+    "premiumLocked": "Step-by-step mode for premium recipes opens after you buy the recipe. Buy it through Telegram on its page.",
     "progress": "Cooking progress",
     "rateInvite": "Leave a rating and add a photo of the result — it helps other cooks.",
     "ready": "Done!",
@@ -463,11 +581,12 @@
     "noRatings": "No ratings yet. Only people who cooked this recipe all the way through can rate it.",
     "originalServings": "Original servings",
     "paymentSoon": "Payments are coming soon",
-    "paymentSoonNote": "Save it for now — it will be in your library once payments open.",
+    "paymentSoonNote": "Buying opens once the author connects Telegram.",
     "premiumIntro": {
       "one": "Ingredients and {count} step are free.",
       "other": "Ingredients and {count} steps are free."
     },
+    "premiumIntroNone": "Ingredients are free; the steps are in the full guide.",
     "premiumRecipe": "Premium recipe",
     "premiumStep": "Premium step",
     "premiumSteps": "Premium steps",
@@ -503,8 +622,7 @@
     "updateRating": "Update your rating",
     "video": "Video",
     "videoTitle": "{title} — video",
-    "withTimer": "With timer · {time}",
-    "premiumIntroNone": "Ingredients are free; the steps are in the full guide."
+    "withTimer": "With timer · {time}"
   },
   "dialog": {
     "createSave": "Create and save",
@@ -533,10 +651,10 @@
     "carbs": "Carbs (g)",
     "category": "Category",
     "check": {
+      "freeStep": "At least one free step",
       "nutrition": "Nutrition (optional)",
       "secrets": "Insider secrets (premium)",
-      "title": "Title and description",
-      "freeStep": "At least one free step"
+      "title": "Title and description"
     },
     "checkTitle": "Readiness",
     "cookMin": "Cooking (min)",
@@ -555,6 +673,7 @@
     "galleryHint2": "Show the process and the result.",
     "galleryNote": "One image link per line, up to 5. They appear in the gallery after the cover on the recipe page.",
     "ingName": "Ingredient {n} name",
+    "ingUnitsHint": "Quantity: a number (1, 1.5, 1/2) or a word (half, quarter, one and a half). Unit: g, kg, ml, l, tbsp, tsp, cup, ladle, handful, pinch, pcs… You can write in English, Russian, Kazakh or Uzbek. Leave the unit empty for “to taste”.",
     "ingredients": "Ingredients",
     "instruction": "Instruction",
     "moveStepDown": "Move step down",
@@ -583,6 +702,8 @@
     "secretsHint": "The things nobody tells you: little techniques, substitutions, how to avoid mistakes. Only people who bought the recipe see this.",
     "secretsPh": "For example: heat the oil to 180°, otherwise the dough sticks…",
     "servings": "Servings",
+    "stepAccess": "Who can read this step",
+    "stepFree": "Free",
     "stepImage": "Image link (optional)",
     "stepIngs": "Numbers of the ingredients used",
     "stepIngsNone": "Add ingredients first",
@@ -590,7 +711,11 @@
     "stepIngsPick": "Ingredients used in this step",
     "stepN": "Step {n}",
     "stepPhoto": "Step photo (optional)",
+    "stepPremium": "Premium",
+    "stepVideo": "Step video (optional)",
+    "stepVideoHint": "Show how this step is done in a short clip, up to {mb} MB. If you add both, the photo and the video are shown one under the other.",
     "steps": "Steps",
+    "stepsAccessNote": "You choose which steps readers see for free. {free} of {total} are free; the rest unlock after they buy the recipe.",
     "tags": "Tags (comma-separated)",
     "tagsPlaceholder": "Uzbek, Rice, Lamb",
     "temp": "Temperature (°C)",
@@ -608,23 +733,7 @@
     "videoBad": "This link isn't supported",
     "videoHint": "A YouTube or Vimeo link, or a link to an .mp4 file. The video is shown on the recipe page.",
     "videoOk": "Video recognised",
-    "stepVideo": "Step video (optional)",
-    "stepVideoHint": "Show how this step is done in a short clip, up to {mb} MB. If you add both, the photo and the video are shown one under the other.",
-    "stepAccess": "Who can read this step",
-    "stepFree": "Free",
-    "stepPremium": "Premium",
-    "stepsAccessNote": "You choose which steps readers see for free. {free} of {total} are free; the rest unlock after they buy the recipe.",
-    "waitUploads": "Wait for the uploads to finish before saving.",
-    "ingUnitsHint": "Quantity: a number (1, 1.5, 1/2) or a word (half, quarter, one and a half). Unit: g, kg, ml, l, tbsp, tsp, cup, ladle, handful, pinch, pcs… You can write in English, Russian, Kazakh or Uzbek. Leave the unit empty for “to taste”."
-  },
-  "email": {
-    "body": "{label}: {code}\n\nThe code is valid for {minutes} minutes. Do not share it with anyone.\nIf you did not make this request, ignore this email.",
-    "label": {
-      "email_change": "Email confirmation code",
-      "password_reset": "Password reset code",
-      "phone_change": "Phone confirmation code",
-      "signup": "Confirmation code"
-    }
+    "waitUploads": "Wait for the uploads to finish before saving."
   },
   "email": {
     "body": "{label}: {code}\n\nThe code is valid for {minutes} minutes. Do not share it with anyone.\nIf you did not make this request, ignore this email.",
@@ -651,12 +760,15 @@
     "ingQty": "Every ingredient needs an amount",
     "maxBooks": "You can create at most {max} books.",
     "maxGallery": "At most 5 extra photos",
+    "mediaInvalid": "A photo or video on one of the steps can't be used. Upload it again.",
     "nameDisplay": "Enter a display name",
     "nameShort": "The name is too short",
     "needCreator": "You need a creator profile to publish recipes.",
     "noCreator": "No creator selected.",
     "nutritionAll": "Fill in all four nutrition values or leave them all empty",
     "photoBig": "The photo is too large",
+    "photoBigMb": "The photo is too large (up to {mb} MB)",
+    "photoFormat": "Only JPEG, PNG or WebP photos can be uploaded.",
     "photoType": "Only image files (JPEG) can be uploaded.",
     "premiumPrice": "A premium recipe needs a price",
     "rateCookFirst": "To rate, first cook this recipe all the way through.",
@@ -670,18 +782,15 @@
     "stepInstr": "Every step needs an instruction",
     "stepMin": "Add at least one step",
     "stepTitle": "Every step needs a title",
+    "storageOff": "File uploads are not set up yet.",
     "titleLong": "The title is too long",
     "titleShort": "The title is too short",
     "uploadLimit": "You've reached the limit of uploaded photos.",
-    "videoUrl": "The video link must be a YouTube or Vimeo link, or an .mp4 file over https://",
-    "videoBig": "The video is too large (up to {mb} MB)",
-    "videoType": "Only video files (MP4, MOV, WebM) can be uploaded.",
-    "videoLimit": "You've reached the limit of uploaded videos.",
-    "storageOff": "File uploads are not set up yet.",
-    "mediaInvalid": "A photo or video on one of the steps can't be used. Upload it again.",
     "uploadMissing": "The file didn't arrive. Try again.",
-    "photoBigMb": "The photo is too large (up to {mb} MB)",
-    "photoFormat": "Only JPEG, PNG or WebP photos can be uploaded."
+    "videoBig": "The video is too large (up to {mb} MB)",
+    "videoLimit": "You've reached the limit of uploaded videos.",
+    "videoType": "Only video files (MP4, MOV, WebM) can be uploaded.",
+    "videoUrl": "The video link must be a YouTube or Vimeo link, or an .mp4 file over https://"
   },
   "error": {
     "retry": "Try again",
@@ -756,6 +865,7 @@
     "whyTitle": "Even when your hands are busy, the next step is right in front of you."
   },
   "join": {
+    "byInvite": "Studio access is by invitation from the Damda team.",
     "createProfile": "Create a profile",
     "deckNote": "The card on the right is the first step of a real recipe. Yours will open the same way.",
     "deckStep": "Step {n}",
@@ -766,12 +876,13 @@
     "heroText": "Publish your recipes step by step — with ingredients, timers and tips — share one link with your audience and offer premium recipes.",
     "howEm": "just like a recipe.",
     "howLead": "Three steps,",
+    "inviteText": "The Damda team adds creators and sends their sign-in details. If you've been invited, sign in with your phone number and the password you received.",
     "openKitchen": "Open the door to your kitchen.",
-    "premiumNote": "You can publish premium recipes now, but readers won't be able to buy them until payments are connected.",
+    "premiumNote": "Premium recipes are sold through Telegram: the buyer messages you, pays to your card, and you keep the full price.",
     "signupCta": "Create an account to get started",
     "step1": {
-      "text": "A name and a short intro are enough. You can add your social networks later.",
-      "title": "Create a profile"
+      "text": "Sign up and send a short request. The team looks at your audience, gets in touch and opens your studio.",
+      "title": "Send a request"
     },
     "step2": {
       "text": "Ingredients, each step, a timer and a tip where needed. Free or premium — your choice.",
@@ -781,12 +892,13 @@
       "text": "People cook from the steps on screen, without rewinding a video.",
       "title": "Share the link"
     },
+    "studioSignIn": "Sign in to the studio",
     "term1": {
       "text": "The first {count} creators join as founding partners.",
       "title": "Founding creators"
     },
     "term2": {
-      "text": "No platform commission is taken during the founding period.",
+      "text": "For now the platform takes no commission: you keep the full price of every sale.",
       "title": "Platform commission"
     },
     "term3": {
@@ -851,8 +963,70 @@
     "g": "g",
     "kcal": "kcal",
     "perPerson": "Per serving",
-    "totalFor": "Total for {count} servings",
-    "protein": "Protein"
+    "protein": "Protein",
+    "totalFor": "Total for {count} servings"
+  },
+  "order": {
+    "buy": "Buy via Telegram",
+    "cancel": "Cancel order",
+    "closed": "This order is closed. You can start a new one from the recipe page.",
+    "dialog": {
+      "hint": "You pay {name} directly by card. Damda never asks for card details.",
+      "note": "This exact text will be typed in Telegram. You press send yourself.",
+      "open": "Open Telegram",
+      "share": "Include my name and phone so {name} can find my order",
+      "title": "Message to {name}"
+    },
+    "err": {
+      "notFound": "Recipe not found.",
+      "own": "This is your own recipe.",
+      "owned": "You already own this recipe.",
+      "promoExpired": "This promo code has expired.",
+      "promoInvalid": "That promo code doesn't exist.",
+      "promoNotForRecipe": "This code is for other recipes.",
+      "promoUsedUp": "This promo code has run out.",
+      "reason": "Write a short reason.",
+      "signIn": "Please sign in first.",
+      "stale": "This order has already changed. Refresh the page.",
+      "tooMany": "You have too many open orders. Finish or cancel one first.",
+      "unavailable": "This recipe can't be bought right now."
+    },
+    "expires": "Open until {date}",
+    "free": {
+      "get": "Get it free",
+      "note": "With code {code} this recipe is free for you, a gift from {name}. No payment or Telegram needed.",
+      "price": "Free",
+      "title": "Free recipe"
+    },
+    "myOrders": "My orders",
+    "notReady": "This recipe can't be bought yet: the author hasn't connected Telegram.",
+    "openChat": "Open chat again",
+    "paidText": "{name} confirmed your payment. The full recipe is yours.",
+    "promo": {
+      "apply": "Apply",
+      "have": "Have a promo code?",
+      "label": "Promo code",
+      "remove": "Remove"
+    },
+    "safety": "Check before paying: the card holder's name should match {name}. Damda never asks you to pay anywhere else.",
+    "signInToBuy": "Sign in to buy",
+    "startCooking": "Start cooking",
+    "status": {
+      "paid": "Access granted",
+      "pending": "Waiting for payment"
+    },
+    "step": {
+      "confirm": "{name} confirms and unlocks the recipe",
+      "pay": "Pay the card {name} sends you",
+      "payNote": "Then send the receipt in the chat.",
+      "sent": "Message sent to {name}"
+    }
+  },
+  "price": {
+    "leftDays": "{d}d {h}h left",
+    "leftHours": "{h}h {m}m left",
+    "now": "Now:",
+    "was": "Was:"
   },
   "profile": {
     "add": "Add",
@@ -871,6 +1045,81 @@
     "saved": "Profile saved.",
     "socials": "Social networks",
     "socialsNote": "Added accounts appear on your public profile, under the introduction."
+  },
+  "promo": {
+    "allRecipes": "All my premium recipes",
+    "appliesTo": "Applies to",
+    "chosenRecipes": "Chosen recipes",
+    "code": "Code",
+    "codeHint": "4–20 letters or digits. Leave it empty and we'll make one.",
+    "codePlaceholder": "For example PALOV20",
+    "codes": "My codes",
+    "codesDesc": "See how many times each code was used.",
+    "copy": "Copy",
+    "create": "Create code",
+    "created": "Code {code} created.",
+    "days": "days",
+    "delete": "Delete code {code}",
+    "desc": "Sale prices and promo codes give your followers a reason to buy now.",
+    "draft": "Draft: buyers can't see it yet",
+    "endsOn": "Ends {date}",
+    "err": {
+      "amount": "Enter a valid amount.",
+      "code": "The code must be 4–20 letters or digits.",
+      "duration": "The time limit must be between 1 hour and 90 days.",
+      "kind": "Choose what the code gives.",
+      "maxUses": "Uses must be between 1 and 100,000.",
+      "noPrice": "This recipe has no price.",
+      "percent": "Percent must be 1–99. For 100%, choose Free.",
+      "recipes": "Choose at least one recipe.",
+      "salePrice": "The new price must be lower than the normal price and not below 0.",
+      "taken": "That code is taken. Type another or press Generate."
+    },
+    "eyebrow": "Marketing",
+    "freeHint": "The code unlocks the recipe for free, with no payment. Best to limit how many times it can be used.",
+    "generate": "Generate",
+    "gives": "What it gives",
+    "hours": "hours",
+    "kind": {
+      "amount": "Amount off",
+      "free": "Free",
+      "percent": "Percent off"
+    },
+    "maxUses": "Uses",
+    "maxUsesHint": "Empty: no limit",
+    "newCode": "New promo code",
+    "newCodeDesc": "Give the code to your followers: they enter it in the Buy window.",
+    "newPrice": "New price (so‘m)",
+    "noEnd": "No end date",
+    "noPremium": "You don't have premium recipes yet.",
+    "noPrice": "No price set",
+    "noneYet": "No codes yet.",
+    "pause": "Pause",
+    "recipesCount": {
+      "one": "{count} recipe",
+      "other": "{count} recipes"
+    },
+    "resume": "Resume",
+    "saleFor": "Runs for",
+    "saleForHint": "Empty: until you stop it",
+    "saleOn": "The sale is on.",
+    "salesDesc": "Enter a new price. With a time limit the sale ends by itself; leave it empty to run it until you stop it.",
+    "salesTitle": "Sale prices",
+    "setPriceFirst": "Set a price in the recipe editor first.",
+    "startSale": "Start sale",
+    "status": {
+      "expired": "Expired",
+      "live": "Live",
+      "paused": "Paused",
+      "usedUp": "Used up"
+    },
+    "stopSale": "End sale",
+    "unit": "Unit",
+    "until": "until {date}",
+    "updateSale": "Update sale",
+    "used": "Used {used}/{max}",
+    "validFor": "Valid for",
+    "validForHint": "Empty: no end"
   },
   "pw": {
     "common": "This password is too simple. Choose another one.",
@@ -988,6 +1237,7 @@
     "emailSectionNote": "Optional. A confirmed email receives the password-reset code; SMS stays as the fallback.",
     "emailTitle": "Email",
     "member": "Member since",
+    "mustChange": "Choose your own password to continue. The current one is temporary.",
     "newEmail": "New email",
     "newPhone": "New phone number",
     "newPw": "New password",
@@ -1019,19 +1269,27 @@
   "shopping": {
     "add": "Add to shopping list",
     "allBought": "Everything's bought. Happy cooking!",
+    "allShown": "Showing all recipes",
     "bought": "Bought",
     "boughtCount": "{count} bought",
     "clear": "Clear the list",
     "clearBought": "Remove bought items",
+    "clearPicked": "Remove the selected recipes",
     "cleared": "The list is cleared.",
     "confirmClear": "Clear the whole list?",
+    "confirmClearPicked": "Remove the selected recipes from the list?",
     "empty": "Your list is empty",
     "emptyText": "Open a recipe, choose how many you're cooking for and press “Add to shopping list” under the ingredients. If you add several recipes, identical products are combined into one line.",
     "eyebrow": "Before you go shopping",
     "onList": "On your shopping list · {count} servings",
     "openList": "Open the list",
+    "openRecipe": "Open {title}",
+    "pickHint": "Tap a recipe to see only the products for it. Tap several to combine them.",
+    "pickRecipe": "Show the products for {title}",
     "recipesList": "Recipes on the list",
     "removeRecipe": "Remove the ingredients of {title} from the list",
+    "showAll": "Show all",
+    "showingPicked": "Showing {count} of {total} recipes",
     "title": "Shopping list",
     "toBuy": "To buy",
     "toBuyCount": {
@@ -1040,14 +1298,6 @@
     },
     "updateTo": "Update the list to {count} servings",
     "yesClear": "Yes, clear it",
-    "pickHint": "Tap a recipe to see only the products for it. Tap several to combine them.",
-    "showingPicked": "Showing {count} of {total} recipes",
-    "allShown": "Showing all recipes",
-    "showAll": "Show all",
-    "pickRecipe": "Show the products for {title}",
-    "openRecipe": "Open {title}",
-    "clearPicked": "Remove the selected recipes",
-    "confirmClearPicked": "Remove the selected recipes from the list?",
     "yesRemove": "Yes, remove"
   },
   "site": {
@@ -1084,11 +1334,14 @@
     "gross": "Gross revenue",
     "hasVideo": "Has video",
     "hello": "Hello, {name}",
+    "keepAll": "You keep 100% of every sale",
     "latest": "Latest recipes",
     "lead": "Create recipes, add photos and videos, and follow how they perform.",
     "nav": {
       "group": "Studio",
+      "orders": "Orders",
       "profile": "Profile",
+      "promotions": "Promotions",
       "reviews": "Reviews",
       "sales": "Sales",
       "sections": "Studio sections"
@@ -1097,6 +1350,40 @@
     "noCover": "No cover",
     "noSales": "No sales yet",
     "noSalesText": "Publish a premium recipe — purchases will show up here. Sales start once the payment system is connected.",
+    "ord": {
+      "amount": "Amount",
+      "back": "Go back",
+      "check1": "The money is on my card",
+      "check2": "The amount is {amount} or more",
+      "check3": "The receipt shows {name} or order {code}",
+      "checks": "Payment checks",
+      "code": "Order",
+      "confirmGrant": "Unlock “{recipe}” for {name}?",
+      "confirmYes": "Yes, grant access",
+      "desc": "Buyers message you on Telegram. Check the payment and unlock the recipe here.",
+      "grant": "Grant access",
+      "granted": "Access granted",
+      "logged": "Your name and the time are saved. You can take access back later with a reason.",
+      "noTelegram": "Buyers can't reach you yet: your profile has no Telegram username. Ask an admin to add it.",
+      "noneGranted": "You haven't granted access to anyone yet.",
+      "noneWaiting": "No orders are waiting.",
+      "opened": "Date",
+      "phone": "Phone",
+      "pick": "Choose an order to check the payment and grant access.",
+      "recipe": "Recipe",
+      "reject": "Reject",
+      "revoke": "Take access back",
+      "revokeConfirm": "Take access back",
+      "revokeReason": "Reason",
+      "search": {
+        "button": "Search",
+        "help": "No list of users is shown. You need the exact code or number, and search only looks inside your own orders.",
+        "label": "Find a buyer by order code or full phone number",
+        "none": "No order matches. Only orders for your recipes can be found."
+      },
+      "telegram": "Buyers are sent to @{name}.",
+      "waiting": "Waiting for payment"
+    },
     "orders": "Purchases",
     "overviewTitle": "Studio",
     "price": "Price",
@@ -1111,7 +1398,7 @@
     },
     "sales": {
       "desc": "How many times your premium recipes sold, who bought them and what you earned.",
-      "paymentsNote": "The payment system isn't connected yet: sales are counted once it is.",
+      "paymentsNote": "Payments go to the author's card through a Telegram chat. A sale is counted once it is confirmed in Orders.",
       "premiumHint": "Tip: add insider secrets to a premium recipe — that's what buyers value most.",
       "title": "Sales and earnings"
     },
@@ -1152,17 +1439,17 @@
   },
   "up": {
     "add": "Add a photo",
+    "checking": "Checking the file…",
     "drop": "or drop it here",
     "max": "Up to {max}",
     "orLink": "Or enter an image link",
     "remove": "Remove",
     "replace": "Replace",
+    "retry": "Try again",
     "upload": "Upload a photo",
     "useLink": "Use link",
     "video": "Upload a video",
-    "videoLink": "Or paste a video link",
     "videoFail": "The video couldn't be uploaded. Try again.",
-    "retry": "Try again",
-    "checking": "Checking the file…"
+    "videoLink": "Or paste a video link"
   }
 }

@@ -10,6 +10,11 @@ import { getRecipeRating, getRecipeReviews, getReviewEligibility } from "@/serve
 import { getShoppingServings } from "@/server/shopping";
 import { getCreatorForUser } from "@/server/creator";
 import { getRecipeSecrets } from "@/server/secrets";
+import { hasFullAccess } from "@/server/access";
+import { getCheckoutInfo, getOrderForRecipe } from "@/server/orders";
+import { toOrderView } from "@/server/order-view";
+import { formatPrice } from "@/lib/format";
+import { getLocale } from "@/i18n/server";
 import { RecipeDetail } from "@/components/recipe/RecipeDetail";
 
 interface Props {
@@ -79,5 +84,20 @@ export default async function RecipePage({ params, searchParams }: Props) {
   const savedIds = new Set(savedList);
   const moreRecipes = byCreator.filter((r) => r.id !== recipe.id).slice(0, 4);
 
-  return <RecipeDetail recipe={recipe} isLoggedIn={!!user} isSaved={savedIds.has(recipe.id)} moreRecipes={moreRecipes} savedIds={savedIds} reviews={reviews} rating={rating} eligibility={eligibility} shoppingServings={shoppingServings} secrets={secrets} />;
+  const unlocked = await hasFullAccess(user, recipe, ownCreator?.id ?? null, recipe.creator.id);
+  let checkout = null;
+  if (recipe.isPremium && !unlocked) {
+    const [t, locale] = await Promise.all([getT(), getLocale()]);
+    const [info, order] = await Promise.all([
+      getCheckoutInfo(
+        { title: recipe.title, price: recipe.price, salePrice: recipe.salePrice, saleEndsAt: recipe.saleEndsAt, currency: recipe.currency, stepCount: recipe.steps.length, totalMinutes: recipe.prepTimeMinutes + recipe.cookTimeMinutes, creatorId: recipe.creator.id },
+        user ? { name: user.name, phone: user.phone } : null,
+        (amount, currency) => formatPrice(amount, currency, t),
+      ),
+      user ? getOrderForRecipe(user.id, recipe.id) : null,
+    ]);
+    checkout = { ...info, order: order ? toOrderView(order, t, locale) : null };
+  }
+
+  return <RecipeDetail unlocked={unlocked} checkout={checkout} recipe={recipe} isLoggedIn={!!user} isSaved={savedIds.has(recipe.id)} moreRecipes={moreRecipes} savedIds={savedIds} reviews={reviews} rating={rating} eligibility={eligibility} shoppingServings={shoppingServings} secrets={secrets} />;
 }

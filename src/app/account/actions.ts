@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { checkPassword, normalizeEmail, normalizeUzPhone } from "@/lib/auth-rules";
@@ -177,7 +178,9 @@ export async function changePassword(_: AccountState, formData: FormData): Promi
   const denied = await confirmPassword(user.id, currentPassword);
   if (denied) return denied;
 
-  await db.update(schema.users).set({ passwordHash: await bcrypt.hash(newPassword, 12) }).where(eq(schema.users.id, user.id));
+  await db.update(schema.users).set({ passwordHash: await bcrypt.hash(newPassword, 12), mustChangePassword: false }).where(eq(schema.users.id, user.id));
   await destroyOtherSessions(user.id);
+  // A blogger who just replaced the temporary password from the admin goes straight on to the studio.
+  if (user.mustChangePassword && user.role !== "user") redirect(user.role === "admin" ? "/admin" : "/dashboard");
   return { ok: t("acct.pwUpdated") };
 }

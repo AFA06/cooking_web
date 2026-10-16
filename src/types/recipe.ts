@@ -69,6 +69,10 @@ export interface Recipe {
   nutrition?: RecipeNutrition;
   isPremium: boolean;
   price?: number;
+  /** A lower price for a while; see lib/pricing for when it applies. */
+  salePrice?: number;
+  /** ISO time the sale ends; missing when it runs until the creator stops it. */
+  saleEndsAt?: string;
   currency?: string;
   ingredients: RecipeIngredient[];
   steps: RecipeStep[];

@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, ChartColumn, ExternalLink, LayoutDashboard, Menu, Plus, Star, UserRound, Wallet, X } from "lucide-react";
+import { BadgePercent, BookOpen, ChartColumn, ClipboardCheck, ExternalLink, LayoutDashboard, Menu, Plus, Star, UserRound, Wallet, X } from "lucide-react";
 import { useT } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
@@ -11,6 +11,8 @@ const NAV = [
   { href: "/dashboard", label: "adm.nav.overview", icon: LayoutDashboard, exact: true },
   { href: "/dashboard/recipes", label: "nav.recipes", icon: BookOpen },
   { href: "/dashboard/stats", label: "adm.nav.stats", icon: ChartColumn },
+  { href: "/dashboard/orders", label: "studio.nav.orders", icon: ClipboardCheck },
+  { href: "/dashboard/promotions", label: "studio.nav.promotions", icon: BadgePercent },
   { href: "/dashboard/sales", label: "studio.nav.sales", icon: Wallet },
   { href: "/dashboard/reviews", label: "studio.nav.reviews", icon: Star },
   { href: "/dashboard/profile", label: "studio.nav.profile", icon: UserRound },

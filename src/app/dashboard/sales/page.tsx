@@ -51,7 +51,7 @@ export default async function StudioSalesPage({ searchParams }: { searchParams: 
       <p className="mb-6 rounded-2xl bg-amber-100 px-5 py-3 text-sm text-amber-900">{t("studio.sales.paymentsNote")}</p>
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatTile label={t("studio.net")} value={money(net)} hint={t("studio.commission", { pct: Math.round(rate * 100) })} />
+        <StatTile label={t("studio.net")} value={money(net)} hint={rate === 0 ? t("studio.keepAll") : t("studio.commission", { pct: Math.round(rate * 100) })} />
         <StatTile label={t("studio.gross")} value={money(totals.revenue)} hint={t("adm.allTimeShort")} />
         <StatTile label={t("studio.orders")} value={formatNumber(totals.orders)} current={p.total("sales")} previous={p.previousTotal("sales")} series={p.values("sales")} />
         <StatTile

@@ -11,6 +11,7 @@ export const dynamic = "force-dynamic";
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   if (!user) redirect("/auth/login?next=/dashboard");
+  if (user.mustChangePassword) redirect("/account/settings?newpw=1#sozlama-parol");
   const creator = await getCreatorForUser(user.id);
   if (!creator) redirect("/creators/join");
 

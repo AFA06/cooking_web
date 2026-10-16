@@ -1,15 +1,19 @@
 "use server";
 
+import { randomInt } from "node:crypto";
+import bcrypt from "bcryptjs";
 import { and, eq, ne } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { getT } from "@/i18n/server";
-import { getCurrentUser, type CurrentUser } from "@/server/auth";
+import { destroyOtherSessions, getCurrentUser, type CurrentUser } from "@/server/auth";
 import { listRecipeMedia, removeAssets } from "@/server/media";
 import { persistRecipe } from "@/server/recipe-write";
 import { getStorage } from "@/server/storage";
+import { normalizePhone } from "@/lib/profile";
+import { TELEGRAM_PATTERN, normalizeTelegram } from "@/server/orders";
 import { recipeInputSchema, slugify, type RecipeInput } from "@/lib/recipe-schema";
 
 export interface FormState {
@@ -95,6 +99,11 @@ const creatorSchema = z.object({
     .trim()
     .max(1000)
     .refine((v) => v === "" || /^https?:\/\//i.test(v), "err.imgUrl"),
+  /** Where buyers of this creator's premium recipes are sent. Empty = not selling yet. */
+  telegramUsername: z
+    .string()
+    .transform(normalizeTelegram)
+    .refine((v) => v === "" || TELEGRAM_PATTERN.test(v), "adm.err.telegram"),
   isFoundingCreator: z.boolean(),
   isFeatured: z.boolean(),
 });
@@ -105,6 +114,7 @@ function parseCreator(formData: FormData) {
     slug: formData.get("slug") ?? "",
     bio: formData.get("bio") ?? "",
     avatarUrl: formData.get("avatarUrl") ?? "",
+    telegramUsername: formData.get("telegramUsername") ?? "",
     isFoundingCreator: formData.get("isFoundingCreator") === "on",
     isFeatured: formData.get("isFeatured") === "on",
   });
@@ -119,21 +129,46 @@ async function slugTaken(slug: string, exceptId?: string): Promise<boolean> {
   return !!row;
 }
 
-export async function createCreator(_: FormState, formData: FormData): Promise<FormState> {
+export interface NewBloggerState {
+  error?: string;
+  /** Shown once after the account is made, so the admin can hand it over. */
+  created?: { creatorId: string; name: string; login: string; password: string };
+}
+
+/**
+ * Adds a blogger in one step: their sign-in account (phone + temporary password, role "creator") and their
+ * public profile, linked together. The password is returned once and must be changed at first sign-in.
+ */
+export async function createBlogger(_: NewBloggerState, formData: FormData): Promise<NewBloggerState> {
   const t = await getT();
   await requireAdmin();
   const parsed = parseCreator(formData);
   if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
   const d = parsed.data;
-  const slug = d.slug || slugify(d.name) || "ijodkor";
+  const phone = normalizePhone(String(formData.get("phone") ?? ""));
+  if (!phone) return { error: t("adm.login.badPhone") };
+  const [taken] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.phone, phone)).limit(1);
+  if (taken) return { error: t("adm.login.phoneTaken") };
+  const slug = d.slug || slugify(d.name) || "bloger";
   if (await slugTaken(slug)) return { error: t("adm.err.slugTaken") };
 
-  const [row] = await db
-    .insert(schema.creators)
-    .values({ ...d, slug, bio: d.bio || null, avatarUrl: d.avatarUrl || null })
-    .returning({ id: schema.creators.id });
-  refreshPublic();
-  redirect(`/admin/creators/${row.id}`);
+  const password = temporaryPassword();
+  const [user] = await db
+    .insert(schema.users)
+    .values({ name: d.name, phone, phoneVerifiedAt: new Date(), passwordHash: await bcrypt.hash(password, 12), mustChangePassword: true, role: "creator" })
+    .returning({ id: schema.users.id });
+  try {
+    const [row] = await db
+      .insert(schema.creators)
+      .values({ ...d, slug, userId: user.id, bio: d.bio || null, avatarUrl: d.avatarUrl || null, telegramUsername: d.telegramUsername || null })
+      .returning({ id: schema.creators.id });
+    refreshPublic();
+    return { created: { creatorId: row.id, name: d.name, login: phone, password } };
+  } catch {
+    // No half-made bloggers: without a profile the account is removed again.
+    await db.delete(schema.users).where(eq(schema.users.id, user.id));
+    return { error: t("adm.err.slugTaken") };
+  }
 }
 
 export async function updateCreator(creatorId: string, _: FormState, formData: FormData): Promise<FormState> {
@@ -148,10 +183,52 @@ export async function updateCreator(creatorId: string, _: FormState, formData: F
 
   await db
     .update(schema.creators)
-    .set({ ...d, bio: d.bio || null, avatarUrl: d.avatarUrl || null })
+    .set({ ...d, bio: d.bio || null, avatarUrl: d.avatarUrl || null, telegramUsername: d.telegramUsername || null })
     .where(eq(schema.creators.id, creatorId));
   refreshPublic();
   return { ok: t("adm.saved") };
+}
+
+/** Readable temporary password: no look-alike characters, about 60 bits. */
+function temporaryPassword(): string {
+  const letters = "abcdefghjkmnpqrstuvwxyz";
+  const digits = "23456789";
+  const pick = (set: string, n: number) => Array.from({ length: n }, () => set[randomInt(set.length)]).join("");
+  return `${pick(letters, 4)}-${pick(digits, 4)}-${pick(letters, 4)}`;
+}
+
+/**
+ * Gives a creator a way to sign in. If the profile has no account yet, creates one from the phone number;
+ * if it has, issues a new temporary password. The password is shown once and must be changed at first sign-in.
+ */
+export async function issueCreatorLogin(creatorId: string, _: FormState, formData: FormData): Promise<FormState> {
+  const t = await getT();
+  await requireAdmin();
+  if (!uuid.safeParse(creatorId).success) return { error: t("adm.err.badCreator") };
+  const [creator] = await db.select({ id: schema.creators.id, name: schema.creators.name, userId: schema.creators.userId }).from(schema.creators).where(eq(schema.creators.id, creatorId)).limit(1);
+  if (!creator) return { error: t("adm.err.badCreator") };
+
+  const password = temporaryPassword();
+  const passwordHash = await bcrypt.hash(password, 12);
+
+  if (creator.userId) {
+    const [user] = await db.update(schema.users).set({ passwordHash, mustChangePassword: true }).where(eq(schema.users.id, creator.userId)).returning({ phone: schema.users.phone, email: schema.users.email });
+    await destroyOtherSessions(creator.userId);
+    return { ok: t("adm.login.done", { login: user?.phone ?? user?.email ?? "", password }) };
+  }
+
+  const phone = normalizePhone(String(formData.get("phone") ?? ""));
+  if (!phone) return { error: t("adm.login.badPhone") };
+  const [taken] = await db.select({ id: schema.users.id }).from(schema.users).where(eq(schema.users.phone, phone)).limit(1);
+  if (taken) return { error: t("adm.login.phoneTaken") };
+
+  const [user] = await db
+    .insert(schema.users)
+    .values({ name: creator.name, phone, phoneVerifiedAt: new Date(), passwordHash, mustChangePassword: true, role: "creator" })
+    .returning({ id: schema.users.id });
+  await db.update(schema.creators).set({ userId: user.id }).where(eq(schema.creators.id, creatorId));
+  revalidatePath("/admin", "layout");
+  return { ok: t("adm.login.done", { login: phone, password }) };
 }
 
 export async function setCreatorFlag(creatorId: string, flag: "isFoundingCreator" | "isFeatured", value: boolean): Promise<void> {
@@ -174,6 +251,67 @@ export async function deleteCreator(creatorId: string): Promise<void> {
   }
   refreshPublic();
   redirect("/admin/creators");
+}
+
+/* ───────────── Blocking ───────────── */
+
+/** Blocks or unblocks a person. A block ends every session at once; admins cannot block themselves. */
+export async function setUserBlocked(userId: string, blocked: boolean): Promise<void> {
+  const admin = await requireAdmin();
+  if (!uuid.safeParse(userId).success || userId === admin.id) return;
+  await db.update(schema.users).set({ blockedAt: blocked ? new Date() : null }).where(eq(schema.users.id, userId));
+  if (blocked) await db.delete(schema.sessions).where(eq(schema.sessions.userId, userId));
+  revalidatePath("/admin", "layout");
+}
+
+/* ───────────── Creator requests ───────────── */
+
+/**
+ * Approves a request: the person keeps their own account and gets a creator profile linked to it,
+ * filled from the request (name, Instagram, Telegram). They see the studio the next time they open the site.
+ */
+export async function approveApplication(applicationId: string): Promise<void> {
+  const admin = await requireAdmin();
+  if (!uuid.safeParse(applicationId).success) return;
+  const [app] = await db.select().from(schema.creatorApplications).where(eq(schema.creatorApplications.id, applicationId)).limit(1);
+  if (!app || app.status !== "pending") return;
+
+  const [existing] = await db.select({ id: schema.creators.id }).from(schema.creators).where(eq(schema.creators.userId, app.userId)).limit(1);
+  let creatorId = existing?.id;
+  if (!creatorId) {
+    const base = slugify(app.fullName) || "ijodkor";
+    let slug = base;
+    for (let i = 0; i < 5 && (await slugTaken(slug)); i++) slug = `${base}-${randomInt(1000, 9999)}`;
+    const handle = app.telegram ? normalizeTelegram(app.telegram) : "";
+    const socialLinks: Record<string, string> = {};
+    if (app.instagram) socialLinks.instagram = app.instagram;
+    if (app.telegram) socialLinks.telegram = app.telegram;
+    const [row] = await db
+      .insert(schema.creators)
+      .values({ userId: app.userId, slug, name: app.fullName, socialLinks, telegramUsername: TELEGRAM_PATTERN.test(handle) ? handle : null })
+      .returning({ id: schema.creators.id });
+    creatorId = row.id;
+  }
+  await db.update(schema.users).set({ role: "creator" }).where(and(eq(schema.users.id, app.userId), eq(schema.users.role, "user")));
+  await db
+    .update(schema.creatorApplications)
+    .set({ status: "approved", reviewedBy: admin.id, reviewedAt: new Date() })
+    .where(eq(schema.creatorApplications.id, applicationId));
+  refreshPublic();
+  redirect(`/admin/creators/${creatorId}?approved=1`);
+}
+
+export async function rejectApplication(applicationId: string, _: FormState, formData: FormData): Promise<FormState> {
+  const t = await getT();
+  const admin = await requireAdmin();
+  if (!uuid.safeParse(applicationId).success) return { error: t("adm.err.badUser") };
+  const note = String(formData.get("note") ?? "").trim().slice(0, 300);
+  await db
+    .update(schema.creatorApplications)
+    .set({ status: "rejected", adminNote: note || null, reviewedBy: admin.id, reviewedAt: new Date() })
+    .where(and(eq(schema.creatorApplications.id, applicationId), eq(schema.creatorApplications.status, "pending")));
+  revalidatePath("/admin", "layout");
+  return { ok: t("apply.adm.rejectedOk") };
 }
 
 /* ───────────── Recipes ───────────── */

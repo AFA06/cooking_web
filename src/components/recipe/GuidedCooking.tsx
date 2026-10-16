@@ -73,7 +73,7 @@ function Confetti() {
 
 /* ───────────── the cooking screen ───────────── */
 
-export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe; isLoggedIn: boolean; servings: number }) {
+export function GuidedCooking({ recipe, locked, isLoggedIn, servings }: { recipe: Recipe; /** Premium and not bought: show the paywall instead of cooking. */ locked: boolean; isLoggedIn: boolean; servings: number }) {
   const t = useT();
   const locale = useLocale();
   const factor = servings / recipe.servings;
@@ -127,14 +127,14 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
   const timers = useCookTimers(recipe.steps, alarm);
 
   const ensureSession = React.useCallback(() => {
-    if (!isLoggedIn || recipe.isPremium) return null;
+    if (!isLoggedIn || locked) return null;
     if (!sessionId.current) {
       sessionId.current = startCookingSession(recipe.id)
         .then((r) => r?.sessionId ?? null)
         .catch(() => null);
     }
     return sessionId.current;
-  }, [isLoggedIn, recipe.id, recipe.isPremium]);
+  }, [isLoggedIn, recipe.id, locked]);
 
   React.useEffect(() => {
     ensureSession();
@@ -228,7 +228,7 @@ export function GuidedCooking({ recipe, isLoggedIn, servings }: { recipe: Recipe
   };
 
   /* ───────────── premium recipes are not cookable yet ───────────── */
-  if (recipe.isPremium) {
+  if (locked) {
     return (
       <div className="mx-auto max-w-xl px-5 py-20 text-center">
         <h1 className="font-serif text-4xl text-amber-950">{recipe.title}</h1>

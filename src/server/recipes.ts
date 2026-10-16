@@ -49,6 +49,8 @@ function toRecipe(
         : undefined,
     isPremium: r.isPremium,
     price: r.priceAmount ?? undefined,
+    salePrice: r.salePrice ?? undefined,
+    saleEndsAt: r.saleEndsAt?.toISOString() ?? undefined,
     currency: r.priceCurrency ?? undefined,
     ingredients: ingredients
       .slice()

@@ -2,47 +2,13 @@
 
 import { and, eq } from "drizzle-orm";
 import { revalidatePath, revalidateTag } from "next/cache";
-import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { getT } from "@/i18n/server";
-import { getCurrentUser } from "@/server/auth";
 import { getCurrentCreator } from "@/server/creator";
 import { persistRecipe } from "@/server/recipe-write";
-import { recipeInputSchema, slugify, type RecipeInput } from "@/lib/recipe-schema";
+import { recipeInputSchema, type RecipeInput } from "@/lib/recipe-schema";
 import { cleanSocialLinks } from "@/lib/social";
-
-export interface ActionResult {
-  error?: string;
-}
-
-const profileSchema = z.object({
-  name: z.string().trim().min(2, "err.nameDisplay").max(80),
-  bio: z.string().trim().max(500).optional().default(""),
-});
-
-export async function becomeCreator(_: ActionResult, formData: FormData): Promise<ActionResult> {
-  const t = await getT();
-  const user = await getCurrentUser();
-  if (!user) return { error: t("err.signInFirst") };
-  const parsed = profileSchema.safeParse(Object.fromEntries(formData));
-  if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
-
-  const [existing] = await db.select({ id: schema.creators.id }).from(schema.creators).where(eq(schema.creators.userId, user.id)).limit(1);
-  if (existing) redirect("/dashboard");
-
-  const base = slugify(parsed.data.name) || "creator";
-  let slug = base;
-  for (let i = 0; i < 5; i++) {
-    const [taken] = await db.select({ id: schema.creators.id }).from(schema.creators).where(eq(schema.creators.slug, slug)).limit(1);
-    if (!taken) break;
-    slug = `${base}-${Math.random().toString(36).slice(2, 6)}`;
-  }
-
-  await db.insert(schema.creators).values({ userId: user.id, slug, name: parsed.data.name, bio: parsed.data.bio || null });
-  if (user.role === "user") await db.update(schema.users).set({ role: "creator" }).where(eq(schema.users.id, user.id));
-  redirect("/dashboard");
-}
 
 export async function saveRecipe(
   recipeId: string | null,
@@ -81,6 +47,10 @@ export async function setRecipeStatus(recipeId: string, status: "draft" | "publi
   revalidatePath("/dashboard");
   revalidatePath("/recipes");
   revalidateTag("recipes", { expire: 0 });
+}
+
+export interface ActionResult {
+  error?: string;
 }
 
 const creatorProfileSchema = z.object({

@@ -108,8 +108,13 @@ export async function login(_: AuthState, formData: FormData): Promise<AuthState
   }
 
   await clear("login-fail", idKey);
+  // Only after the right password, so a block tells a stranger nothing about which accounts exist.
+  if (user.blockedAt) return { error: t("auth.a.blocked") };
   await createSession(user.id);
-  redirect(safeNext(formData.get("next")));
+  // Without a page to return to, bloggers land in their studio and admins in the admin panel.
+  const asked = formData.get("next");
+  const home = user.role === "admin" ? "/admin" : user.role === "creator" ? "/dashboard" : "/recipes";
+  redirect(typeof asked === "string" && asked && asked !== "/recipes" ? safeNext(asked) : home);
 }
 
 export async function logout() {

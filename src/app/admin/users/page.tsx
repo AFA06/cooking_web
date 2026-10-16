@@ -60,12 +60,15 @@ export default async function AdminUsersPage({ searchParams }: { searchParams: P
                         <Avatar name={u.name} />
                         <span className="min-w-0">
                           <span className="block font-medium group-hover:text-amber-700 group-hover:underline">{u.name}</span>
-                          <span className="block truncate text-xs text-amber-600">{u.email}</span>
+                          <span className="block truncate text-xs text-amber-600">{u.contact}</span>
                         </span>
                       </Link>
                     </td>
                     <td className={table.td}>
-                      <StatusPill tone={u.role === "admin" ? "accent" : u.role === "creator" ? "good" : "neutral"}>{t(`role.${u.role}`)}</StatusPill>
+                      <span className="flex flex-wrap gap-1.5">
+                        <StatusPill tone={u.role === "admin" ? "accent" : u.role === "creator" ? "good" : "neutral"}>{t(`role.${u.role}`)}</StatusPill>
+                        {u.blockedAt && <StatusPill tone="warn">{t("adm.blocked")}</StatusPill>}
+                      </span>
                     </td>
                     <td className={cn(table.td, table.tdNum)}>{formatNumber(u.saves)}</td>
                     <td className={cn(table.td, table.tdNum)}>

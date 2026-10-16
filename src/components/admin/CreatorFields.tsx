@@ -6,6 +6,7 @@ interface Values {
   slug?: string;
   bio?: string | null;
   avatarUrl?: string | null;
+  telegramUsername?: string | null;
   isFoundingCreator?: boolean;
   isFeatured?: boolean;
 }
@@ -31,6 +32,9 @@ export async function CreatorFields({ values = {}, slugOptional = false }: { val
       </Field>
       <Field label={t("profile.avatarUrl")} htmlFor="avatarUrl" hint={t("adm.f.avatarHint")}>
         <TextInput id="avatarUrl" name="avatarUrl" type="url" maxLength={1000} defaultValue={values.avatarUrl ?? ""} />
+      </Field>
+      <Field label={t("adm.f.telegram")} htmlFor="telegramUsername" hint={t("adm.f.telegramHint")}>
+        <TextInput id="telegramUsername" name="telegramUsername" maxLength={60} placeholder="@username" autoComplete="off" spellCheck={false} defaultValue={values.telegramUsername ? `@${values.telegramUsername}` : ""} />
       </Field>
       <div className="grid gap-3 sm:grid-cols-2">
         <CheckboxField name="isFoundingCreator" label={t("creator.foundingCreator")} hint={t("adm.f.foundingHint")} defaultChecked={values.isFoundingCreator} />

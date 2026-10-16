@@ -87,6 +87,9 @@ export default async function SettingsPage() {
         </aside>
 
         <div className="max-w-2xl">
+          {user.mustChangePassword && (
+            <p role="status" className="mb-8 rounded-2xl bg-clay-100 px-5 py-4 font-medium text-amber-950">{t("settings.mustChange")}</p>
+          )}
           {sections.map(({ id, icon: Icon, title, note, form }) => (
             <section key={id} id={`sozlama-${id}`} aria-labelledby={`${id}-heading`} className="scroll-mt-28 border-t border-amber-200 py-10 first:border-t-0 first:pt-0">
               <div className="mb-7 flex items-start gap-4">

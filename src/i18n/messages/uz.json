@@ -38,6 +38,7 @@
     "pwUpdated": "Parol yangilandi. Boshqa qurilmalardagi sessiyalar yopildi."
   },
   "adm": {
+    "access": "Kirish huquqi",
     "act": {
       "cook_done": "Pishirib bo‘ldi",
       "cook_start": "Pishirishni boshladi",
@@ -45,6 +46,7 @@
     },
     "activity": "Faollik",
     "activityNote": "So‘nggi harakatlar",
+    "activityRange": "Faollik · {range}",
     "addFirstCreator": "Birinchi ijodkorni qo‘shing.",
     "addFirstRecipe": "Bu ijodkor nomidan birinchi retseptni qo‘shing.",
     "addRecipe": "Retsept qo‘shish",
@@ -53,6 +55,22 @@
     "allTimeShort": "butun davr",
     "amount": "Summa",
     "analysis": "Tahlil",
+    "block": "Bloklash",
+    "blockNote": "Bloklangan odam saytga kira olmaydi, barcha seanslari darhol tugaydi. Ma’lumotlari o‘chmaydi.",
+    "blocked": "Bloklangan",
+    "blockedNote": "Bu hisob bloklangan. Blokdan chiqarsangiz, odam yana kira oladi.",
+    "blockedSince": "{date} dan beri bloklangan",
+    "blogger": {
+      "copy": "Xabar sifatida nusxalash",
+      "created": "{name} qo‘shildi",
+      "desc": "Ijodkor uchun hisob va ommaviy profil bir martada yaratiladi. Kirish ma’lumotlarini o‘zingiz yuborasiz.",
+      "handover": "Assalomu alaykum, {name}! Damda studiyasiga kirish:\nLogin: {login}\nVaqtinchalik parol: {password}\nBirinchi kirishda o‘z parolingizni tanlaysiz.",
+      "login": "Login",
+      "open": "Ijodkor sahifasi",
+      "password": "Vaqtinchalik parol",
+      "phone": "Telefon (kirish uchun)",
+      "submit": "Ijodkorni qo‘shish"
+    },
     "buyer": "Xaridor",
     "cannotDeleteSelf": "O‘z hisobingizni bu yerdan o‘chira olmaysiz.",
     "changeFilter": "Qidiruv yoki filtrni o‘zgartirib ko‘ring.",
@@ -75,11 +93,15 @@
     "createCreator": "Ijodkorni yaratish",
     "createCreatorFirst": "Retsept qo‘shish uchun avval ijodkor yarating.",
     "createCreatorLink": "Ijodkor yaratish",
+    "creatorBlocked": "Bu ijodkorning hisobi bloklangan: u studiyaga kira olmaydi.",
     "creatorProfile": "Ijodkor profili: {name}",
     "creatorRank": "Ijodkorlar reytingi",
     "creatorRecipesNote": "Bu ijodkor nomidan nashr etilgan va qoralama retseptlar",
+    "creatorSales": "Ijodkorlar sotuvi",
     "creatorsCount": "{count} ta ijodkor",
     "creatorsDesc": "Blogerlar, ularning ma’lumotlari va natijalari.",
+    "dailyActive": "Kunlik faol foydalanuvchilar",
+    "dailyActiveNote": "Har kuni hisobiga kirib saytdan foydalangan odamlar soni.",
     "dailyTable": "Kunlik ma’lumotlar jadvali",
     "dailyViews": "Kunlik ko‘rishlar",
     "dailyViewsNote": "Retsept sahifalariga kirishlar, so‘nggi {range}",
@@ -105,7 +127,8 @@
       "emailTaken": "Bu email boshqa hisobga tegishli.",
       "slugEmpty": "Manzil bo‘sh bo‘lmasligi kerak.",
       "slugFormat": "Manzil faqat lotin harflari, raqam va chiziqchadan iborat bo‘lishi kerak",
-      "slugTaken": "Bu manzil band. Boshqasini tanlang."
+      "slugTaken": "Bu manzil band. Boshqasini tanlang.",
+      "telegram": "Telegram nomi 5–32 ta lotin harfi, raqam yoki pastki chiziqdan iborat bo‘lsin."
     },
     "f": {
       "avatarHint": "https:// bilan boshlanadigan rasm havolasi. Ixtiyoriy.",
@@ -114,7 +137,9 @@
       "foundingHint": "Asoschilik davrida komissiyasiz",
       "slug": "Sahifa manzili",
       "slugHint": "Ommaviy havola: /creators/manzil. O‘zgartirilsa, eski havolalar ishlamaydi.",
-      "slugOptional": "Bo‘sh qoldirilsa, ismdan yaratiladi. /creators/manzil"
+      "slugOptional": "Bo‘sh qoldirilsa, ismdan yaratiladi. /creators/manzil",
+      "telegram": "Telegram nomi",
+      "telegramHint": "Premium retsept xaridorlari shu nomga yo‘naltiriladi (t.me/nom). Faqat administrator o‘zgartira oladi."
     },
     "feature": "Tavsiya qilish",
     "featured": "Tavsiya",
@@ -132,7 +157,20 @@
     "hide": "Yashirish",
     "lastRange": "So‘nggi {range}",
     "lastSeen": "Oxirgi kirish",
+    "login": {
+      "badPhone": "Telefon raqami noto‘g‘ri.",
+      "create": "Hisob yaratish",
+      "done": "Login: {login} · Vaqtinchalik parol: {password}",
+      "linked": "Hisob ulangan. Yangi vaqtinchalik parol bering.",
+      "once": "Parol faqat bir marta ko‘rsatiladi. Uni muallifga shaxsiy xabarda yuboring: birinchi kirishda u yangisini tanlaydi.",
+      "phoneHint": "Muallif shu raqam bilan kiradi.",
+      "phoneTaken": "Bu raqam bilan hisob allaqachon bor.",
+      "reset": "Yangi parol berish",
+      "title": "Kirish ma’lumotlari",
+      "unlinked": "Hisob yo‘q. Telefon raqami bo‘yicha yarating."
+    },
     "manage": "Boshqaruv",
+    "manageAccount": "Hisobni boshqarish",
     "menu": "Admin menyusi",
     "metaDefault": "Admin paneli",
     "moreStats": "Batafsil statistika →",
@@ -146,6 +184,7 @@
     "new": "Yangi",
     "newCreator": "Yangi ijodkor",
     "newCreatorDesc": "Profil foydalanuvchi hisobiga ulanmagan holda yaratiladi. Retseptlarni admin sifatida siz qo‘shasiz.",
+    "newToday": "Bugun +{count}",
     "noActivity": "Hali faollik yo‘q",
     "noActivityText": "Foydalanuvchi retsept saqlasa yoki pishirsa, shu yerda ko‘rinadi.",
     "noCreators": "Hali ijodkorlar yo‘q",
@@ -158,6 +197,7 @@
     "noViews": "Bu davrda hali ko‘rishlar yo‘q.",
     "noVisits": "Bu davrda hali tashriflar yo‘q.",
     "notLinked": "Hisobga ulanmagan",
+    "ofUsers": "Barcha foydalanuvchilarning {pct}%",
     "openSite": "Saytni ochish",
     "overviewDesc": "Platforma holati — so‘nggi {range}.",
     "pageOf": "{page} / {pages} sahifa · jami {total} ta",
@@ -166,6 +206,7 @@
     "paidHint": "to‘langan xaridlar",
     "paidPurchases": "To‘langan xaridlar",
     "paymentsNotConnected": "To‘lov tizimi hali ulanmagan.",
+    "people": "Foydalanuvchilar",
     "pickCreator": "Ijodkorni tanlang",
     "pickCreatorDesc": "Avval retsept qaysi ijodkor nomidan nashr etilishini tanlang.",
     "platformTotal": "Platforma jami",
@@ -204,6 +245,7 @@
     "role": "Rol",
     "roleHint": "Admin barcha ma’lumotlarni boshqara oladi.",
     "roleHintSelf": "O‘zingizning admin huquqingizni olib tashlay olmaysiz.",
+    "salesNote": "{paid} ta tasdiqlangan, {pending} ta to‘lov kutilmoqda. Hozircha pul to‘liq ijodkorga tushadi.",
     "same": "O‘zgarishsiz",
     "saveChanges": "O‘zgarishlarni saqlash",
     "saved": "Saqlandi.",
@@ -217,12 +259,17 @@
     "sourcesNote": "Havoladagi ?src= belgisi bo‘yicha",
     "statsDesc": "So‘nggi {range} bo‘yicha faollik, konversiya va natijalar.",
     "tile": {
+      "active30": "30 kunda faol",
+      "active7": "7 kunda faol",
+      "activeToday": "Bugun faol",
       "completionRate": "Tugatish darajasi",
       "cooksStarted": "Pishirish boshlangan",
+      "registered": "Ro‘yxatdan o‘tganlar",
       "signups": "Yangi foydalanuvchilar"
     },
     "topViewed": "Eng ko‘p ko‘rilgan retseptlar",
     "type": "Turi",
+    "unblock": "Blokdan chiqarish",
     "unfeature": "Tavsiyadan olib tashlash",
     "unpriced": "narxsiz",
     "updated": "Yangilangan: {when}",
@@ -231,9 +278,76 @@
     "vsPrev": "o‘tgan davrga nisbatan",
     "welcome": "Xush kelibsiz, {name}"
   },
+  "apply": {
+    "about": "O‘zingiz haqingizda qisqacha",
+    "aboutPlaceholder": "Qanday taomlar tayyorlaysiz, auditoriyangiz kimlar?",
+    "adm": {
+      "account": "Hisob: {name}",
+      "approve": "Tasdiqlash va studiyani ochish",
+      "approveHint": "Odam o‘z hisobi bilan qoladi: profil yaratiladi, ijodkor paneli ochiladi.",
+      "approvedOk": "Ariza tasdiqlandi. Telegram nomini tekshirib, kerak bo‘lsa to‘g‘rilang: xaridorlar shu yerga yo‘naltiriladi.",
+      "desc": "Auditoriyani tekshiring, odam bilan gaplashing, keyin tasdiqlang yoki rad eting.",
+      "empty": {
+        "approved": "Hali tasdiqlangan ariza yo‘q.",
+        "pending": "Yangi ariza yo‘q.",
+        "rejected": "Rad etilgan ariza yo‘q."
+      },
+      "nav": "Arizalar",
+      "note": "Izoh",
+      "notePlaceholder": "Ixtiyoriy: arizachi ko‘radigan qisqa izoh",
+      "reject": "Rad etish",
+      "rejectConfirm": "Rad etishni tasdiqlash",
+      "rejectedOk": "Ariza rad etildi.",
+      "review": "Ko‘rib chiqish",
+      "status": {
+        "approved": "Tasdiqlangan",
+        "pending": "Yangi",
+        "rejected": "Rad etilgan"
+      },
+      "title": "Ijodkor arizalari",
+      "waiting": {
+        "one": "{count} ta yangi ijodkor arizasi kutmoqda",
+        "other": "{count} ta yangi ijodkor arizasi kutmoqda"
+      }
+    },
+    "audience": "Obunachilar soni (taxminan)",
+    "audiencePick": "Tanlang",
+    "cta": "Ijodkor bo‘lish uchun ariza",
+    "err": {
+      "about": "O‘zingiz haqingizda bir-ikki gap yozing.",
+      "aboutLong": "Matn juda uzun (600 belgigacha).",
+      "already": "Siz allaqachon ijodkorsiz.",
+      "audience": "Obunachilar sonini tanlang.",
+      "instagram": "Instagram manzili noto‘g‘ri. @username yoki havola yozing.",
+      "name": "Ism va familiyani yozing.",
+      "oneLink": "Instagram yoki Telegram’dan kamida bittasini yozing.",
+      "pending": "Sizda ko‘rib chiqilayotgan ariza bor.",
+      "telegram": "Telegram manzili noto‘g‘ri. @username yoki havola yozing."
+    },
+    "fullName": "Ism va familiya",
+    "intro": "Instagram yoki Telegram’dagi auditoriyangizni ko‘rib chiqamiz va siz bilan bog‘lanamiz. Ma’qul kelsa, studiyangizni ochamiz.",
+    "linksHint": "Kamida bittasini yozing: auditoriyangizni shu yerda ko‘ramiz.",
+    "pendingShort": "Arizangiz ko‘rib chiqilmoqda",
+    "pendingText": "Jamoa uni ko‘rib chiqib, {phone} raqamiga bog‘lanadi. Tasdiqlansa, menyuda «Ijodkor paneli» paydo bo‘ladi.",
+    "pendingTitle": "Arizangiz qabul qilindi",
+    "phone": "Bog‘lanish uchun telefon",
+    "rejected": "Oldingi arizangiz hozircha tasdiqlanmadi. Ma’lumotlarni yangilab, qayta yuborishingiz mumkin.",
+    "signupCta": "Ro‘yxatdan o‘tib, ariza qoldirish",
+    "signupFirst": "Avval bir daqiqada ro‘yxatdan o‘ting, keyin qisqa ariza qoldirasiz.",
+    "size": {
+      "100k+": "100 000 dan ko‘p",
+      "10k-50k": "10 000 – 50 000",
+      "1k-10k": "1 000 – 10 000",
+      "50k-100k": "50 000 – 100 000",
+      "lt1k": "1 000 dan kam"
+    },
+    "submit": "Arizani yuborish",
+    "title": "Ijodkor bo‘lish"
+  },
   "auth": {
     "a": {
       "badCode": "Kod noto‘g‘ri yoki muddati tugagan.",
+      "blocked": "Bu hisob bloklangan. Savollar bo‘lsa, Damda jamoasiga yozing.",
       "codeExpiredRestart": "Kod muddati tugagan. Qaytadan boshlang.",
       "codeSent": "Kod yuborildi.",
       "genericSent": "Agar hisob mavjud bo‘lsa, kod yuborildi.",
@@ -283,6 +397,9 @@
     "password": "Parol",
     "phoneHint": "Raqamingizga SMS orqali tasdiqlash kodi yuboramiz.",
     "pick": "Bugungi tavsiya",
+    "reasonApply": "Ijodkor bo‘lish uchun ariza qoldirishdan oldin hisob oching yoki kiring.",
+    "reasonCook": "Pishirishni boshlash uchun bir daqiqada hisob oching yoki kiring. Keyin darhol pishirishga o‘tasiz.",
+    "reasonRecipe": "Davom etish uchun hisob oching yoki kiring.",
     "resendCode": "Kodni qayta yuborish",
     "resetDone": "Parol yangilandi. Yangi parol bilan kiring.",
     "resetEm": "o‘rnating.",
@@ -298,6 +415,7 @@
     "signupNote": "Retseptlarni saqlang va pishirgan taomlaringizni kuzating.",
     "signupNoteSms": "Telefon raqamingiz bilan ro‘yxatdan o‘ting: retseptlarni saqlang va pishirgan taomlaringizni kuzating.",
     "smsInstead": "Emailga kira olmayman — SMS yuborish",
+    "switchLabel": "Kirish yoki ro‘yxatdan o‘tish",
     "verifyEm": "kiriting.",
     "verifyEyebrow": "Tasdiqlash",
     "verifyLead": "Kodni",
@@ -359,7 +477,7 @@
     "nextUp": "Keyingisi: {title}",
     "otherRecipes": "Boshqa retseptlar",
     "overview": "Barcha bosqichlar",
-    "premiumLocked": "Premium retseptlar uchun qadam-baqadam rejim pullik versiyaga kiradi. To‘lov tizimi hozircha ulanmagan, shuning uchun bu retseptni ochib bo‘lmaydi.",
+    "premiumLocked": "Premium retseptlar uchun qadam-baqadam rejim sotib olgandan keyin ochiladi. Retsept sahifasidan Telegram orqali xarid qiling.",
     "progress": "Pishirish jarayoni",
     "rateInvite": "Baho bering, natija rasmini qo‘shing — boshqa oshpazlarga yordam beradi.",
     "ready": "Tayyor!",
@@ -459,10 +577,11 @@
     "noRatings": "Hali baholar yo‘q. Bu retseptni faqat uni oxirigacha pishirgan odamlar baholay oladi.",
     "originalServings": "Asl porsiya",
     "paymentSoon": "To‘lov tez orada ulanadi",
-    "paymentSoonNote": "Hozircha saqlab qo‘ying — to‘lov ochilganda kutubxonangizda bo‘ladi.",
+    "paymentSoonNote": "Muallif Telegram’ni ulaganda sotib olish ochiladi.",
     "premiumIntro": {
       "other": "Masalliqlar va {count} ta qadam bepul."
     },
+    "premiumIntroNone": "Masalliqlar bepul; qadamlar to‘liq qo‘llanmada.",
     "premiumRecipe": "Premium retsept",
     "premiumStep": "Premium qadam",
     "premiumSteps": "Premium qadamlar",
@@ -495,8 +614,7 @@
     "updateRating": "Bahoyingizni yangilang",
     "video": "Video",
     "videoTitle": "{title} — video",
-    "withTimer": "Taymer bilan · {time}",
-    "premiumIntroNone": "Masalliqlar bepul; qadamlar to‘liq qo‘llanmada."
+    "withTimer": "Taymer bilan · {time}"
   },
   "dialog": {
     "createSave": "Yaratish va saqlash",
@@ -525,10 +643,10 @@
     "carbs": "Uglevod (g)",
     "category": "Toifa",
     "check": {
+      "freeStep": "Kamida bitta bepul qadam",
       "nutrition": "Ozuqaviy qiymat (ixtiyoriy)",
       "secrets": "Yashirin ma’lumotlar (premium)",
-      "title": "Sarlavha va tavsif",
-      "freeStep": "Kamida bitta bepul qadam"
+      "title": "Sarlavha va tavsif"
     },
     "checkTitle": "Tayyorlik",
     "cookMin": "Pishirish (daq.)",
@@ -547,6 +665,7 @@
     "galleryHint2": "Taom jarayoni va natijasini ko‘rsating.",
     "galleryNote": "Har bir qatorga bitta rasm havolasi, ko‘pi bilan 5 ta. Retsept sahifasida muqovadan keyin galereyada ko‘rinadi.",
     "ingName": "{n}-masalliq nomi",
+    "ingUnitsHint": "Miqdor — raqam (1, 1.5, 1/2) yoki so‘z (yarim, chorak, bir yarim). Birlik: g, kg, ml, l, osh qoshiq, choy qoshiq, stakan, chomich, hovuch, chimdim, ta… O‘zbekcha, ruscha, qozoqcha yoki inglizcha yozsa bo‘ladi. “Ta’bga ko‘ra” uchun birlikni bo‘sh qoldiring.",
     "ingredients": "Masalliqlar",
     "instruction": "Ko‘rsatma",
     "moveStepDown": "Qadamni pastga",
@@ -575,6 +694,8 @@
     "secretsHint": "Hech kim aytmaydigan sirlar: ustalik nozikliklari, almashtirish usullari, xatolardan saqlanish. Faqat sotib olganlar ko‘radi.",
     "secretsPh": "Masalan: Yog‘ni 180° gacha qizdiring, aks holda xamir yopishadi…",
     "servings": "Porsiya",
+    "stepAccess": "Bu qadamni kim o‘qiy oladi",
+    "stepFree": "Bepul",
     "stepImage": "Rasm havolasi (ixtiyoriy)",
     "stepIngs": "Ishlatiladigan masalliq raqamlari",
     "stepIngsNone": "Avval masalliqlarni qo‘shing",
@@ -582,7 +703,11 @@
     "stepIngsPick": "Bu qadamda ishlatiladigan masalliqlar",
     "stepN": "Qadam {n}",
     "stepPhoto": "Qadam rasmi (ixtiyoriy)",
+    "stepPremium": "Premium",
+    "stepVideo": "Qadam videosi (ixtiyoriy)",
+    "stepVideoHint": "Bu qadam qanday bajarilishini qisqa videoda ko‘rsating, {mb} MB gacha. Ikkalasini ham qo‘shsangiz, rasm va video ketma-ket, alohida ko‘rsatiladi.",
     "steps": "Qadamlar",
+    "stepsAccessNote": "Qaysi qadamlar hamma uchun bepul ekanini o‘zingiz tanlaysiz. {total} tadan {free} tasi bepul, qolganlari retseptni sotib olgach ochiladi.",
     "tags": "Teglar (vergul bilan)",
     "tagsPlaceholder": "O‘zbek, Guruch, Qo‘y go‘shti",
     "temp": "Harorat (°C)",
@@ -600,23 +725,7 @@
     "videoBad": "Bu havola qo‘llab-quvvatlanmaydi",
     "videoHint": "YouTube yoki Vimeo havolasi, yoki .mp4 fayl havolasi. Video retsept sahifasida ko‘rsatiladi.",
     "videoOk": "Video tanildi",
-    "stepVideo": "Qadam videosi (ixtiyoriy)",
-    "stepVideoHint": "Bu qadam qanday bajarilishini qisqa videoda ko‘rsating, {mb} MB gacha. Ikkalasini ham qo‘shsangiz, rasm va video ketma-ket, alohida ko‘rsatiladi.",
-    "stepAccess": "Bu qadamni kim o‘qiy oladi",
-    "stepFree": "Bepul",
-    "stepPremium": "Premium",
-    "stepsAccessNote": "Qaysi qadamlar hamma uchun bepul ekanini o‘zingiz tanlaysiz. {total} tadan {free} tasi bepul, qolganlari retseptni sotib olgach ochiladi.",
-    "waitUploads": "Saqlashdan oldin yuklash tugashini kuting.",
-    "ingUnitsHint": "Miqdor — raqam (1, 1.5, 1/2) yoki so‘z (yarim, chorak, bir yarim). Birlik: g, kg, ml, l, osh qoshiq, choy qoshiq, stakan, chomich, hovuch, chimdim, ta… O‘zbekcha, ruscha, qozoqcha yoki inglizcha yozsa bo‘ladi. “Ta’bga ko‘ra” uchun birlikni bo‘sh qoldiring."
-  },
-  "email": {
-    "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",
-    "label": {
-      "email_change": "Emailni tasdiqlash kodi",
-      "password_reset": "Parolni tiklash kodi",
-      "phone_change": "Telefonni tasdiqlash kodi",
-      "signup": "Tasdiqlash kodi"
-    }
+    "waitUploads": "Saqlashdan oldin yuklash tugashini kuting."
   },
   "email": {
     "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",
@@ -643,12 +752,15 @@
     "ingQty": "Har bir masalliqning miqdori bo‘lishi kerak",
     "maxBooks": "Ko‘pi bilan {max} ta kitob yaratish mumkin.",
     "maxGallery": "Ko‘pi bilan 5 ta qo‘shimcha rasm",
+    "mediaInvalid": "Qadamlardan biridagi rasm yoki videoni ishlatib bo‘lmaydi. Uni qayta yuklang.",
     "nameDisplay": "Ko‘rinadigan ismni kiriting",
     "nameShort": "Ism juda qisqa",
     "needCreator": "Retsept nashr etish uchun ijodkor profili kerak.",
     "noCreator": "Ijodkor tanlanmagan.",
     "nutritionAll": "Ozuqaviy qiymatning to‘rttasini ham to‘ldiring yoki hammasini bo‘sh qoldiring",
     "photoBig": "Rasm juda katta",
+    "photoBigMb": "Rasm juda katta ({mb} MB gacha)",
+    "photoFormat": "Faqat JPEG, PNG yoki WebP rasm yuklanadi.",
     "photoType": "Faqat rasm fayli yuklanadi (JPEG).",
     "premiumPrice": "Premium retsept uchun narx kerak",
     "rateCookFirst": "Baholash uchun avval shu retseptni oxirigacha pishiring.",
@@ -662,18 +774,15 @@
     "stepInstr": "Har bir qadamning ko‘rsatmasi bo‘lishi kerak",
     "stepMin": "Kamida bitta qadam qo‘shing",
     "stepTitle": "Har bir qadamning sarlavhasi bo‘lishi kerak",
+    "storageOff": "Fayl yuklash hali sozlanmagan.",
     "titleLong": "Sarlavha juda uzun",
     "titleShort": "Sarlavha juda qisqa",
     "uploadLimit": "Yuklangan rasmlar chegarasiga yetdingiz.",
-    "videoUrl": "Video havolasi YouTube, Vimeo yoki https:// bilan boshlanadigan .mp4 fayl bo‘lishi kerak",
-    "videoBig": "Video juda katta ({mb} MB gacha)",
-    "videoType": "Faqat video fayli yuklanadi (MP4, MOV, WebM).",
-    "videoLimit": "Yuklangan videolar chegarasiga yetdingiz.",
-    "storageOff": "Fayl yuklash hali sozlanmagan.",
-    "mediaInvalid": "Qadamlardan biridagi rasm yoki videoni ishlatib bo‘lmaydi. Uni qayta yuklang.",
     "uploadMissing": "Fayl yetib kelmadi. Qayta urinib ko‘ring.",
-    "photoBigMb": "Rasm juda katta ({mb} MB gacha)",
-    "photoFormat": "Faqat JPEG, PNG yoki WebP rasm yuklanadi."
+    "videoBig": "Video juda katta ({mb} MB gacha)",
+    "videoLimit": "Yuklangan videolar chegarasiga yetdingiz.",
+    "videoType": "Faqat video fayli yuklanadi (MP4, MOV, WebM).",
+    "videoUrl": "Video havolasi YouTube, Vimeo yoki https:// bilan boshlanadigan .mp4 fayl bo‘lishi kerak"
   },
   "error": {
     "retry": "Qayta urinish",
@@ -748,6 +857,7 @@
     "whyTitle": "Qo‘lingiz band bo‘lganda ham keyingi qadam ko‘z oldingizda."
   },
   "join": {
+    "byInvite": "Studiyaga kirish Damda jamoasining taklifi bilan beriladi.",
     "createProfile": "Profil yaratish",
     "deckNote": "O‘ngdagi karta — haqiqiy retseptning birinchi qadami. Sizning retseptingiz ham xuddi shunday ochiladi.",
     "deckStep": "{n}-qadam",
@@ -758,12 +868,13 @@
     "heroText": "Retseptlaringizni masalliq, taymer va maslahatlar bilan qadam-baqadam nashr eting, bitta havolani auditoriyangizga ulashing va premium retseptlar taklif qiling.",
     "howEm": "xuddi retseptdek.",
     "howLead": "Uch qadam,",
+    "inviteText": "Ijodkorlarni Damda jamoasi o‘zi qo‘shadi va kirish ma’lumotlarini yuboradi. Taklif olgan bo‘lsangiz, telefon raqamingiz va berilgan parol bilan kiring.",
     "openKitchen": "Oshxonangiz eshigini oching.",
-    "premiumNote": "Premium retseptlarni hozir nashr etish mumkin, lekin to‘lov tizimi ulanmaguncha o‘quvchilar ularni sotib ola olmaydi.",
+    "premiumNote": "Premium retseptlar Telegram orqali sotiladi: xaridor sizga yozadi, to‘lov kartangizga tushadi va narxning hammasi sizda qoladi.",
     "signupCta": "Boshlash uchun hisob yarating",
     "step1": {
-      "text": "Ism va qisqa tanishtiruv yetarli. Ijtimoiy tarmoqlaringizni keyin qo‘shasiz.",
-      "title": "Profil oching"
+      "text": "Ro‘yxatdan o‘tib, qisqa ariza yuboring. Jamoa auditoriyangizni ko‘rib, siz bilan bog‘lanadi va studiyangizni ochadi.",
+      "title": "Ariza qoldiring"
     },
     "step2": {
       "text": "Masalliqlar, har bir qadam, kerak joyda taymer va maslahat. Bepul yoki premium — o‘zingiz tanlaysiz.",
@@ -773,12 +884,13 @@
       "text": "Odamlar videoni ortga qaytarmasdan, ekrandagi qadamlar bo‘yicha pishiradi.",
       "title": "Havolani ulashing"
     },
+    "studioSignIn": "Studiyaga kirish",
     "term1": {
       "text": "Dastlabki {count} ta ijodkor asoschi hamkor sifatida qo‘shiladi.",
       "title": "Asoschi ijodkorlar"
     },
     "term2": {
-      "text": "Asoschilar davrida platforma komissiyasi olinmaydi.",
+      "text": "Hozircha platforma komissiya olmaydi: har bir sotuvning to‘liq summasi sizda qoladi.",
       "title": "Platforma komissiyasi"
     },
     "term3": {
@@ -843,8 +955,70 @@
     "g": "g",
     "kcal": "kkal",
     "perPerson": "1 kishi uchun",
-    "totalFor": "{count} porsiya uchun jami",
-    "protein": "Oqsil"
+    "protein": "Oqsil",
+    "totalFor": "{count} porsiya uchun jami"
+  },
+  "order": {
+    "buy": "Telegram orqali sotib olish",
+    "cancel": "Buyurtmani bekor qilish",
+    "closed": "Bu buyurtma yopilgan. Retsept sahifasidan yangisini boshlashingiz mumkin.",
+    "dialog": {
+      "hint": "To‘lovni {name}ga to‘g‘ridan-to‘g‘ri kartaga qilasiz. Damda karta ma’lumotlarini so‘ramaydi.",
+      "note": "Telegram’da aynan shu matn yoziladi. Yuborishni o‘zingiz bosasiz.",
+      "open": "Telegram’ni ochish",
+      "share": "Ismim va telefonimni yuborilsin, shunda {name} buyurtmamni topa oladi",
+      "title": "{name}ga xabar"
+    },
+    "err": {
+      "notFound": "Retsept topilmadi.",
+      "own": "Bu sizning o‘z retseptingiz.",
+      "owned": "Bu retsept allaqachon sizniki.",
+      "promoExpired": "Bu promokodning muddati tugagan.",
+      "promoInvalid": "Bunday promokod yo‘q.",
+      "promoNotForRecipe": "Bu promokod boshqa retseptlar uchun.",
+      "promoUsedUp": "Bu promokod tugab qolgan.",
+      "reason": "Qisqa sabab yozing.",
+      "signIn": "Avval hisobingizga kiring.",
+      "stale": "Bu buyurtma allaqachon o‘zgargan. Sahifani yangilang.",
+      "tooMany": "Ochiq buyurtmalar ko‘p. Avval birini yakunlang yoki bekor qiling.",
+      "unavailable": "Bu retseptni hozir sotib olib bo‘lmaydi."
+    },
+    "expires": "{date} gacha ochiq",
+    "free": {
+      "get": "Bepul olish",
+      "note": "{code} promokodi bilan bu retsept siz uchun bepul. {name} bergan sovg‘a: to‘lov va Telegram kerak emas.",
+      "price": "Bepul",
+      "title": "Bepul retsept"
+    },
+    "myOrders": "Buyurtmalarim",
+    "notReady": "Bu retseptni hozircha sotib olib bo‘lmaydi: muallif Telegram’ni ulamagan.",
+    "openChat": "Chatni qayta ochish",
+    "paidText": "{name} to‘lovingizni tasdiqladi. To‘liq retsept sizniki.",
+    "promo": {
+      "apply": "Qo‘llash",
+      "have": "Promokodingiz bormi?",
+      "label": "Promokod",
+      "remove": "Olib tashlash"
+    },
+    "safety": "To‘lashdan oldin tekshiring: karta egasining ismi {name} bilan mos bo‘lsin. Damda hech qachon boshqa joyga to‘lashni so‘ramaydi.",
+    "signInToBuy": "Sotib olish uchun kiring",
+    "startCooking": "Pishirishni boshlash",
+    "status": {
+      "paid": "Kirish ochildi",
+      "pending": "To‘lov kutilmoqda"
+    },
+    "step": {
+      "confirm": "{name} tasdiqlaydi va retseptni ochadi",
+      "pay": "{name} yuborgan kartaga to‘lang",
+      "payNote": "Keyin chatga chekni yuboring.",
+      "sent": "{name}ga xabar yuborildi"
+    }
+  },
+  "price": {
+    "leftDays": "Tugashiga {d} kun {h} soat",
+    "leftHours": "Tugashiga {h} soat {m} daqiqa",
+    "now": "Hozirgi narx:",
+    "was": "Avvalgi narx:"
   },
   "profile": {
     "add": "Qo‘shish",
@@ -863,6 +1037,81 @@
     "saved": "Profil saqlandi.",
     "socials": "Ijtimoiy tarmoqlar",
     "socialsNote": "Qo‘shilgan hisoblar ommaviy profilingizda, tanishtiruv ostida ko‘rinadi."
+  },
+  "promo": {
+    "allRecipes": "Barcha premium retseptlarim",
+    "appliesTo": "Qaysi retseptlarga",
+    "chosenRecipes": "Tanlanganlar",
+    "code": "Kod",
+    "codeHint": "4–20 ta lotin harfi yoki raqam. Bo‘sh qoldirsangiz, o‘zimiz yaratamiz.",
+    "codePlaceholder": "Masalan: PALOV20",
+    "codes": "Promokodlarim",
+    "codesDesc": "Har bir kod necha marta ishlatilganini shu yerda ko‘rasiz.",
+    "copy": "Nusxalash",
+    "create": "Promokod yaratish",
+    "created": "{code} promokodi yaratildi.",
+    "days": "kun",
+    "delete": "{code} kodini o‘chirish",
+    "desc": "Chegirma narxlar va promokodlar bilan obunachilaringizni xaridga undang.",
+    "draft": "Qoralama — xaridorlar hali ko‘rmaydi",
+    "endsOn": "Tugaydi: {date}",
+    "err": {
+      "amount": "Summani to‘g‘ri yozing.",
+      "code": "Kod 4–20 ta lotin harfi yoki raqamdan iborat bo‘lsin.",
+      "duration": "Muddat 1 soatdan 90 kungacha bo‘lsin.",
+      "kind": "Kod nima berishini tanlang.",
+      "maxUses": "Foydalanish soni 1 dan 100 000 gacha bo‘lsin.",
+      "noPrice": "Bu retseptning narxi yo‘q.",
+      "percent": "Foiz 1 dan 99 gacha bo‘lsin. 100% uchun «Bepul»ni tanlang.",
+      "recipes": "Kamida bitta retseptni tanlang.",
+      "salePrice": "Yangi narx hozirgidan past va 0 dan katta yoki teng bo‘lsin.",
+      "taken": "Bu kod band. Boshqasini yozing yoki «Yaratish»ni bosing."
+    },
+    "eyebrow": "Marketing",
+    "freeHint": "Kod bilan retsept bepul ochiladi, to‘lovsiz. Foydalanish sonini cheklash tavsiya etiladi.",
+    "generate": "Yaratish",
+    "gives": "Nima beradi",
+    "hours": "soat",
+    "kind": {
+      "amount": "Summa",
+      "free": "Bepul",
+      "percent": "Foiz"
+    },
+    "maxUses": "Necha marta",
+    "maxUsesHint": "Bo‘sh — cheksiz",
+    "newCode": "Yangi promokod",
+    "newCodeDesc": "Kodni obunachilaringizga bering: ular xarid oynasida kiritadi.",
+    "newPrice": "Yangi narx (so‘m)",
+    "noEnd": "Muddatsiz",
+    "noPremium": "Sizda hali premium retsept yo‘q.",
+    "noPrice": "Narx belgilanmagan",
+    "noneYet": "Hali promokod yo‘q.",
+    "pause": "To‘xtatish",
+    "recipesCount": {
+      "one": "{count} ta retsept",
+      "other": "{count} ta retsept"
+    },
+    "resume": "Yoqish",
+    "saleFor": "Davomiyligi",
+    "saleForHint": "Bo‘sh — to‘xtatguningizcha",
+    "saleOn": "Chegirma ishga tushdi.",
+    "salesDesc": "Yangi narx yozing. Muddat bersangiz, chegirma o‘zi tugaydi; bo‘sh qoldirsangiz, o‘zingiz to‘xtatguningizcha davom etadi.",
+    "salesTitle": "Chegirma narxlar",
+    "setPriceFirst": "Avval retsept muharririda narx qo‘ying.",
+    "startSale": "Chegirmani boshlash",
+    "status": {
+      "expired": "Muddati tugagan",
+      "live": "Faol",
+      "paused": "To‘xtatilgan",
+      "usedUp": "Tugagan"
+    },
+    "stopSale": "Chegirmani to‘xtatish",
+    "unit": "Birlik",
+    "until": "{date} gacha",
+    "updateSale": "Chegirmani yangilash",
+    "used": "{used}/{max} ishlatilgan",
+    "validFor": "Amal qilish muddati",
+    "validForHint": "Bo‘sh — muddatsiz"
   },
   "pw": {
     "common": "Bu parol juda oddiy. Boshqasini tanlang.",
@@ -975,6 +1224,7 @@
     "emailSectionNote": "Ixtiyoriy. Tasdiqlangan email parolni tiklash kodini qabul qiladi, SMS esa zaxira yo‘l bo‘lib qoladi.",
     "emailTitle": "Email",
     "member": "A’zo bo‘lgan sana",
+    "mustChange": "Davom etish uchun o‘z parolingizni tanlang. Hozirgi parol vaqtinchalik.",
     "newEmail": "Yangi email",
     "newPhone": "Yangi telefon raqami",
     "newPw": "Yangi parol",
@@ -1006,19 +1256,27 @@
   "shopping": {
     "add": "Xaridlar ro‘yxatiga qo‘shish",
     "allBought": "Hammasi olindi. Yoqimli pishiriq!",
+    "allShown": "Barcha retseptlar ko‘rsatilmoqda",
     "bought": "Olindi",
     "boughtCount": "{count} tasi olindi",
     "clear": "Ro‘yxatni tozalash",
     "clearBought": "Olinganlarni o‘chirish",
+    "clearPicked": "Tanlangan retseptlarni olib tashlash",
     "cleared": "Ro‘yxat tozalandi.",
     "confirmClear": "Butun ro‘yxat o‘chirilsinmi?",
+    "confirmClearPicked": "Tanlangan retseptlar ro‘yxatdan olib tashlansinmi?",
     "empty": "Ro‘yxat hozircha bo‘sh",
     "emptyText": "Retseptni oching, necha kishiga pishirishingizni tanlang va masalliqlar ostidagi “Xaridlar ro‘yxatiga qo‘shish” tugmasini bosing. Bir nechta retsept qo‘shsangiz, bir xil mahsulotlar jamlanib, bitta qatorda ko‘rinadi.",
     "eyebrow": "Do‘konga borishdan oldin",
     "onList": "Xaridlar ro‘yxatida · {count} kishilik",
     "openList": "Ro‘yxatni ochish",
+    "openRecipe": "{title} retseptini ochish",
+    "pickHint": "Faqat kerakli retsept mahsulotlarini ko‘rish uchun retseptni bosing. Bir nechtasini tanlasangiz, mahsulotlar jamlanadi.",
+    "pickRecipe": "{title} mahsulotlarini ko‘rsatish",
     "recipesList": "Ro‘yxatdagi retseptlar",
     "removeRecipe": "{title} masalliqlarini ro‘yxatdan olib tashlash",
+    "showAll": "Hammasini ko‘rsatish",
+    "showingPicked": "{total} ta retseptdan {count} tasi ko‘rsatilmoqda",
     "title": "Xaridlar ro‘yxati",
     "toBuy": "Olish kerak",
     "toBuyCount": {
@@ -1026,14 +1284,6 @@
     },
     "updateTo": "Ro‘yxatni {count} kishilikka yangilash",
     "yesClear": "Ha, tozalash",
-    "pickHint": "Faqat kerakli retsept mahsulotlarini ko‘rish uchun retseptni bosing. Bir nechtasini tanlasangiz, mahsulotlar jamlanadi.",
-    "showingPicked": "{total} ta retseptdan {count} tasi ko‘rsatilmoqda",
-    "allShown": "Barcha retseptlar ko‘rsatilmoqda",
-    "showAll": "Hammasini ko‘rsatish",
-    "pickRecipe": "{title} mahsulotlarini ko‘rsatish",
-    "openRecipe": "{title} retseptini ochish",
-    "clearPicked": "Tanlangan retseptlarni olib tashlash",
-    "confirmClearPicked": "Tanlangan retseptlar ro‘yxatdan olib tashlansinmi?",
     "yesRemove": "Ha, olib tashlash"
   },
   "site": {
@@ -1070,11 +1320,14 @@
     "gross": "Umumiy tushum",
     "hasVideo": "Video bor",
     "hello": "Salom, {name}",
+    "keepAll": "Sotuvning 100% sizda qoladi",
     "latest": "So‘nggi retseptlar",
     "lead": "Retseptlaringizni yarating, rasm va video qo‘shing va natijalarni kuzating.",
     "nav": {
       "group": "Studiya",
+      "orders": "Buyurtmalar",
       "profile": "Profil",
+      "promotions": "Aksiyalar",
       "reviews": "Fikrlar",
       "sales": "Sotuvlar",
       "sections": "Studiya bo‘limlari"
@@ -1083,6 +1336,40 @@
     "noCover": "Muqova yo‘q",
     "noSales": "Hali sotuvlar yo‘q",
     "noSalesText": "Premium retsept nashr eting — xaridlar shu yerda ko‘rinadi. To‘lov tizimi ulangach, sotuvlar boshlanadi.",
+    "ord": {
+      "amount": "Summa",
+      "back": "Orqaga",
+      "check1": "Pul kartamga tushdi",
+      "check2": "Summa {amount} yoki undan ko‘p",
+      "check3": "Chekda {name} yoki {code} buyurtma kodi ko‘rinadi",
+      "checks": "To‘lovni tekshirish",
+      "code": "Buyurtma",
+      "confirmGrant": "«{recipe}» retseptini {name} uchun ochamizmi?",
+      "confirmYes": "Ha, ochish",
+      "desc": "Xaridorlar Telegram orqali sizga yozadi. To‘lovni tekshirib, retseptni shu yerdan ochasiz.",
+      "grant": "Kirishni ochish",
+      "granted": "Kirish ochilgan",
+      "logged": "Ismingiz va vaqt saqlanadi. Kirishni keyinroq sabab bilan qaytarib olish mumkin.",
+      "noTelegram": "Xaridorlar sizga yozolmaydi: profilingizda Telegram nomi yo‘q. Administratordan uni qo‘shishni so‘rang.",
+      "noneGranted": "Hali hech kimga kirish ochilmagan.",
+      "noneWaiting": "Kutayotgan buyurtma yo‘q.",
+      "opened": "Sana",
+      "phone": "Telefon",
+      "pick": "To‘lovni tekshirish va kirishni ochish uchun buyurtmani tanlang.",
+      "recipe": "Retsept",
+      "reject": "Rad etish",
+      "revoke": "Kirishni qaytarib olish",
+      "revokeConfirm": "Kirishni qaytarib olish",
+      "revokeReason": "Sabab",
+      "search": {
+        "button": "Qidirish",
+        "help": "Foydalanuvchilar ro‘yxati ko‘rsatilmaydi. Aniq kod yoki raqam kerak, qidiruv faqat o‘z buyurtmalaringiz ichida.",
+        "label": "Xaridorni buyurtma kodi yoki to‘liq telefon raqami bo‘yicha toping",
+        "none": "Buyurtma topilmadi. Faqat o‘z retseptlaringiz buyurtmalari qidiriladi."
+      },
+      "telegram": "Xaridorlar @{name} ga yo‘naltiriladi.",
+      "waiting": "To‘lov kutilmoqda"
+    },
     "orders": "Xaridlar soni",
     "overviewTitle": "Studiya",
     "price": "Narxi",
@@ -1097,7 +1384,7 @@
     },
     "sales": {
       "desc": "Premium retseptlaringiz nechta sotilgani, kim sotib olgani va qancha ishlaganingiz.",
-      "paymentsNote": "To‘lov tizimi hozircha ulanmagan: sotuvlar shu tizim ulangach hisoblanadi.",
+      "paymentsNote": "To‘lovlar mualliflarning Telegram chatida kartaga o‘tkaziladi. Sotuv Buyurtmalar bo‘limida tasdiqlangach hisoblanadi.",
       "premiumHint": "Maslahat: premium retseptga yashirin sirlar qo‘shing — xaridorlar aynan shuni qadrlaydi.",
       "title": "Sotuvlar va daromad"
     },
@@ -1138,17 +1425,17 @@
   },
   "up": {
     "add": "Rasm qo‘shish",
+    "checking": "Fayl tekshirilmoqda…",
     "drop": "yoki shu yerga tashlang",
     "max": "Ko‘pi bilan {max} ta",
     "orLink": "Yoki rasm havolasini kiriting",
     "remove": "Olib tashlash",
     "replace": "Almashtirish",
+    "retry": "Qayta urinish",
     "upload": "Rasm yuklash",
     "useLink": "Havolani qo‘llash",
     "video": "Video yuklash",
-    "videoLink": "Yoki video havolasini kiriting",
     "videoFail": "Videoni yuklab bo‘lmadi. Qayta urinib ko‘ring.",
-    "retry": "Qayta urinish",
-    "checking": "Fayl tekshirilmoqda…"
+    "videoLink": "Yoki video havolasini kiriting"
   }
 }

@@ -37,6 +37,8 @@ const like = (q: string) => `%${q.replace(/[\\%_]/g, "\\$&")}%`;
 
 export interface DayPoint {
   day: string;
+  /** Distinct signed-in people who used the site that day. */
+  active: number;
   views: number;
   signups: number;
   saves: number;
@@ -56,6 +58,7 @@ export async function getDailySeries(days: number): Promise<DayPoint[]> {
       )::date as d
     )
     select to_char(d, 'YYYY-MM-DD') as day,
+      (select count(*) from user_activity a where a.day = d) as active,
       (select count(*) from analytics_events e where e.name = 'recipe_view' and ${local(sql`e.created_at`)} = d) as views,
       (select count(*) from users u where ${local(sql`u.created_at`)} = d) as signups,
       (select count(*) from saved_recipes s where ${local(sql`s.created_at`)} = d) as saves,
@@ -65,6 +68,7 @@ export async function getDailySeries(days: number): Promise<DayPoint[]> {
   `);
   return data.map((r) => ({
     day: r.day,
+    active: num(r.active),
     views: num(r.views),
     signups: num(r.signups),
     saves: num(r.saves),
@@ -75,6 +79,13 @@ export async function getDailySeries(days: number): Promise<DayPoint[]> {
 
 export interface PlatformTotals {
   users: number;
+  /** Accounts created today (Tashkent time). */
+  newToday: number;
+  /** Distinct people signed in and using the site today, in the last 7 days, in the last 30 days. */
+  activeToday: number;
+  active7: number;
+  active30: number;
+  pendingOrders: number;
   creators: number;
   published: number;
   drafts: number;
@@ -91,6 +102,11 @@ export async function getPlatformTotals(): Promise<PlatformTotals> {
   const [r] = await rows<Record<keyof PlatformTotals, string>>(sql`
     select
       (select count(*) from users) as users,
+      (select count(*) from users where (created_at at time zone ${TZ})::date = (now() at time zone ${TZ})::date) as "newToday",
+      (select count(*) from user_activity where day = (now() at time zone ${TZ})::date) as "activeToday",
+      (select count(distinct user_id) from user_activity where day > (now() at time zone ${TZ})::date - 7) as active7,
+      (select count(distinct user_id) from user_activity where day > (now() at time zone ${TZ})::date - 30) as active30,
+      (select count(*) from purchases where status = 'pending' and (expires_at is null or expires_at > now())) as "pendingOrders",
       (select count(*) from creators) as creators,
       (select count(*) from recipes where status = 'published') as published,
       (select count(*) from recipes where status = 'draft') as drafts,
@@ -254,6 +270,9 @@ export interface UserStat {
   id: string;
   name: string;
   email: string;
+  /** Email, or the phone number for phone-only accounts: what lists show under the name. */
+  contact: string | null;
+  blockedAt: string | null;
   role: "user" | "creator" | "admin";
   createdAt: string;
   lastSeenAt: string | null;
@@ -269,8 +288,8 @@ type UserStatRow = Omit<UserStat, "saves" | "cooks" | "completions"> & Record<"s
 const toUserStat = (r: UserStatRow): UserStat => ({ ...r, saves: num(r.saves), cooks: num(r.cooks), completions: num(r.completions) });
 
 const USER_STAT_SELECT = sql`
-  select u.id, u.name, u.email, u.role, u.created_at as "createdAt",
-    (select max(s.created_at) from sessions s where s.user_id = u.id) as "lastSeenAt",
+  select u.id, u.name, u.email, coalesce(u.email, u.phone) as contact, u.blocked_at as "blockedAt", u.role, u.created_at as "createdAt",
+    coalesce(u.last_seen_at, (select max(s.created_at) from sessions s where s.user_id = u.id)) as "lastSeenAt",
     (select count(*) from saved_recipes s where s.user_id = u.id) as saves,
     (select count(*) from cooking_sessions k where k.user_id = u.id) as cooks,
     (select count(*) from cooking_sessions k where k.user_id = u.id and k.status = 'completed') as completions,
@@ -279,7 +298,7 @@ const USER_STAT_SELECT = sql`
 
 export async function listUsersAdmin(f: { q?: string; role?: string; page?: number }): Promise<{ items: UserStat[]; total: number }> {
   const where = sql`where true
-    ${f.q ? sql`and (u.name ilike ${like(f.q)} or u.email ilike ${like(f.q)})` : sql``}
+    ${f.q ? sql`and (u.name ilike ${like(f.q)} or u.email ilike ${like(f.q)} or u.phone ilike ${like(f.q.replace(/[\s()-]/g, ""))})` : sql``}
     ${f.role === "user" || f.role === "creator" || f.role === "admin" ? sql`and u.role = ${f.role}` : sql``}`;
   const offset = ((f.page ?? 1) - 1) * PAGE_SIZE;
   const [items, [count]] = await Promise.all([
@@ -343,6 +362,6 @@ export async function listPurchasesAdmin(page: number): Promise<{ items: Purchas
   return { items: items.map((p) => ({ ...p, amount: num(p.amount) })), total: num(count.n) };
 }
 
-export async function getRecentUsers(limit = 6): Promise<Pick<UserStat, "id" | "name" | "email" | "role" | "createdAt">[]> {
-  return rows(sql`select id, name, email, role, created_at as "createdAt" from users order by created_at desc limit ${limit}`);
+export async function getRecentUsers(limit = 6): Promise<Pick<UserStat, "id" | "name" | "contact" | "role" | "createdAt">[]> {
+  return rows(sql`select id, name, coalesce(email, phone) as contact, role, created_at as "createdAt" from users order by created_at desc limit ${limit}`);
 }

@@ -18,6 +18,8 @@ import type { RecipeSecrets } from "@/server/secrets";
 import { DIFFICULTY_KEY, formatMinutes, formatPrice, toIsoDuration } from "@/lib/format";
 import { PLATFORM_CONFIG } from "@/lib/constants";
 import { cn } from "@/lib/utils";
+import { TelegramCheckout, type OrderView } from "@/components/order/TelegramCheckout";
+import { PriceTag } from "@/components/recipe/PriceTag";
 import { AddToShoppingList } from "@/components/shopping/AddToShoppingList";
 import { RatingStars, formatRating } from "@/components/reviews/RatingStars";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
@@ -80,7 +82,7 @@ function StepFacts({ step, t }: { step: RecipeStep; t: TFunction }) {
   );
 }
 
-function UnlockCard({ recipe, lockedCount, price, t }: { recipe: Recipe; lockedCount: number; price: string | null; t: TFunction }) {
+function UnlockCard({ recipe, lockedCount, price, t, checkout, isLoggedIn }: { recipe: Recipe; lockedCount: number; price: string | null; t: TFunction; checkout: Props["checkout"]; isLoggedIn: boolean }) {
   return (
     <div className="rounded-[1.75rem] bg-amber-950 p-7 text-amber-50 sm:p-10">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{t("detail.premiumRecipe")}</p>
@@ -94,13 +96,19 @@ function UnlockCard({ recipe, lockedCount, price, t }: { recipe: Recipe; lockedC
         ))}
       </ul>
       <div className="mt-8 flex flex-col gap-4 border-t border-amber-50/15 pt-7 sm:flex-row sm:items-center sm:justify-between">
-        {price && <p className="font-serif text-4xl font-semibold">{price}</p>}
-        <div className="sm:text-right">
-          <Button size="xl" disabled className="bg-amber-50 text-amber-950">
-            {t("detail.paymentSoon")}
-          </Button>
-          <p className="mt-2 text-sm text-amber-200">{t("detail.paymentSoonNote")}</p>
-        </div>
+        {price && <PriceTag price={recipe.price} salePrice={recipe.salePrice} saleEndsAt={recipe.saleEndsAt} currency={recipe.currency} tone="light" size="lg" details />}
+        {checkout && (
+          <TelegramCheckout
+            recipeId={recipe.id}
+            recipeSlug={recipe.slug}
+            isLoggedIn={isLoggedIn}
+            ready={checkout.ready}
+            order={checkout.order}
+            creatorName={recipe.creator.name}
+            previewPlain={checkout.previewPlain}
+            previewWithContact={checkout.previewWithContact}
+          />
+        )}
       </div>
       <p className="mt-6 text-sm text-amber-200">
         {t("detail.cookNow")}{" "}
@@ -128,15 +136,21 @@ interface Props {
   shoppingServings: number | null;
   /** Insider notes of a premium recipe; null for free recipes. */
   secrets: RecipeSecrets | null;
+  /** The viewer may read every step (own recipe, admin or paid). */
+  unlocked: boolean;
+  /** How to buy, for a premium recipe the viewer has not unlocked. */
+  checkout: { ready: boolean; previewPlain: string; previewWithContact: string; order: OrderView | null } | null;
 }
 
-export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds, reviews, rating, eligibility, shoppingServings, secrets }: Props) {
+export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, savedIds, reviews, rating, eligibility, shoppingServings, secrets, unlocked, checkout }: Props) {
   const [t, locale] = await Promise.all([getT(), getLocale()]);
   const { creator } = recipe;
   const times = { prepMinutes: recipe.prepTimeMinutes, cookMinutes: recipe.cookTimeMinutes };
   const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency, t) : null;
   // On a premium recipe the creator marks each step free or premium; a free recipe shows everything.
-  const isOpen = (step: Recipe["steps"][number]) => !recipe.isPremium || step.isFree;
+  /** Premium and not yet bought: the paywall applies. */
+  const locked = recipe.isPremium && !unlocked;
+  const isOpen = (step: Recipe["steps"][number]) => !recipe.isPremium || unlocked || step.isFree;
   const openCount = recipe.steps.filter(isOpen).length;
   const lockedCount = recipe.steps.length - openCount;
   const firstLocked = recipe.steps.findIndex((step) => !isOpen(step));
@@ -145,7 +159,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
 
   return (
     <ServingsProvider base={recipe.servings}>
-      <article className={cn("pb-24", !recipe.isPremium && "max-lg:pb-36")}>
+      <article className={cn("pb-24", !locked && "max-lg:pb-36")}>
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(recipeJsonLd(recipe, locale, t)).replace(/</g, "\\u003c") }} />
 
         <Container size="xl" className="pt-6">
@@ -164,7 +178,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                   {price && (
                     <>
                       <span className="h-3.5 w-px bg-amber-50/40" aria-hidden="true" />
-                      <span className="text-clay-100">{price}</span>
+                      <PriceTag price={recipe.price} salePrice={recipe.salePrice} saleEndsAt={recipe.saleEndsAt} currency={recipe.currency} className="text-clay-100" />
                     </>
                   )}
                 </span>
@@ -226,12 +240,17 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
               </p>
 
               <div className="mt-8">
-                {recipe.isPremium ? (
+                {locked ? (
                   <div className="rounded-2xl bg-amber-100 p-5">
                     <p className="font-medium text-amber-950">
                       {openCount > 0 ? t("detail.premiumIntro", { count: openCount }) : t("detail.premiumIntroNone")}
-                      {price && <> {t("detail.fullGuide")} <span className="font-serif text-xl font-semibold text-amber-700">{price}</span>.</>}
+                      {price && <> {t("detail.fullGuide")}</>}
                     </p>
+                    {price && (
+                      <div className="mt-3">
+                        <PriceTag price={recipe.price} salePrice={recipe.salePrice} saleEndsAt={recipe.saleEndsAt} currency={recipe.currency} tone="dark" size="md" details className="text-xl text-amber-700" />
+                      </div>
+                    )}
                     <Button asChild size="lg" className="mt-4 w-full sm:w-auto">
                       <a href="#steps-heading">{t("detail.readFree")}</a>
                     </Button>
@@ -319,7 +338,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                   <Fragment key={step.id}>
                     {index === firstLocked && (
                       <li className="list-none py-10">
-                        <UnlockCard recipe={recipe} lockedCount={lockedCount} price={price} t={t} />
+                        <UnlockCard recipe={recipe} lockedCount={lockedCount} price={price} t={t} checkout={checkout} isLoggedIn={isLoggedIn} />
                       </li>
                     )}
                     <li className="grid items-center gap-x-6 border-t border-amber-200 py-6 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
@@ -354,7 +373,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
               </section>
             )}
 
-            {!recipe.isPremium && (
+            {!locked && (
               <div className="mt-12 flex flex-col items-start justify-between gap-5 rounded-[1.75rem] bg-amber-100 p-7 sm:flex-row sm:items-center sm:p-9">
                 <div>
                   <h3 className="text-2xl font-medium text-amber-950 sm:text-3xl">{t("detail.readyTitle")}</h3>
@@ -386,7 +405,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                   <ReviewForm recipeId={recipe.id} initial={eligibility.existing} />
                 </div>
               )}
-              {!eligibility?.canReview && !recipe.isPremium && (
+              {!eligibility?.canReview && !locked && (
                 <p className="rounded-2xl bg-sage-50 px-5 py-4 text-sage-900">
                   {isLoggedIn
                     ? t("detail.rateHintIn")
@@ -412,7 +431,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
           </Container>
         )}
 
-        {!recipe.isPremium && (
+        {!locked && (
           <div className="fixed inset-x-0 bottom-0 z-40 border-t border-amber-200 bg-amber-50/95 p-3 backdrop-blur-md lg:hidden">
             <CookLink slug={recipe.slug} size="xl" className="w-full">{t("home.cookWithMe")}</CookLink>
           </div>

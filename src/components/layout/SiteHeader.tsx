@@ -13,7 +13,8 @@ import { NAVIGATION_LINKS, PLATFORM_CONFIG } from "@/lib/constants";
 
 export async function SiteHeader() {
   const [user, t] = await Promise.all([getCurrentUser(), getT()]);
-  const isCreator = user?.role === "creator" || user?.role === "admin";
+  // Only creators write recipes; admins manage the site from the admin panel.
+  const isCreator = user?.role === "creator";
   const isAdmin = user?.role === "admin";
 
   const personalItems = [
@@ -33,7 +34,7 @@ export async function SiteHeader() {
           ...personalItems,
           { label: t("nav.settings"), href: "/account/settings" },
         ]
-      : [{ label: t("nav.signup"), href: PLATFORM_CONFIG.urls.signup }]),
+      : [{ label: t("nav.login"), href: PLATFORM_CONFIG.urls.login }]),
   ];
 
   return (
@@ -67,14 +68,9 @@ export async function SiteHeader() {
                 <UserMenu name={user.name} email={user.email ?? (user.phone ? formatPhone(user.phone) : "")} isCreator={isCreator} isAdmin={isAdmin} />
               </>
             ) : (
-              <>
-                <Link href={PLATFORM_CONFIG.urls.login} className="flex h-10 items-center px-3 text-[0.95rem] font-medium text-amber-950 hover:text-amber-700">
-                  {t("nav.login")}
-                </Link>
-                <Button size="sm" asChild className="hidden min-[420px]:inline-flex">
-                  <Link href={PLATFORM_CONFIG.urls.signup}>{t("nav.signup")}</Link>
-                </Button>
-              </>
+              <Button size="sm" asChild className="hidden min-[380px]:inline-flex">
+                <Link href={PLATFORM_CONFIG.urls.login}>{t("nav.login")}</Link>
+              </Button>
             )}
             <MobileMenu items={mobileItems}>
               {user && (

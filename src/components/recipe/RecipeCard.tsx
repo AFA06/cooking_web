@@ -6,8 +6,8 @@ import { ChefHat, Clock, Star, Users } from "lucide-react";
 import { CaloriesBadge } from "@/components/recipe/NutritionFacts";
 import { BookmarkButton } from "@/components/recipe/BookmarkButton";
 import { useT } from "@/i18n/client";
-import { DIFFICULTY_KEY, formatMinutes, formatNumber, formatPrice } from "@/lib/format";
-import { PLATFORM_CONFIG } from "@/lib/constants";
+import { DIFFICULTY_KEY, formatMinutes, formatNumber } from "@/lib/format";
+import { PriceTag } from "@/components/recipe/PriceTag";
 import { cn } from "@/lib/utils";
 import type { Recipe } from "@/types/recipe";
 
@@ -24,7 +24,7 @@ interface Props {
 export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = "portrait", sizes = "(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 30vw", priority }: Props) {
   const t = useT();
   const total = recipe.prepTimeMinutes + recipe.cookTimeMinutes;
-  const price = recipe.isPremium && recipe.price !== undefined ? formatPrice(recipe.price, recipe.currency ?? PLATFORM_CONFIG.pricing.currency, t) : null;
+  const price = recipe.isPremium && recipe.price !== undefined;
   const { creator } = recipe;
   const facts = [
     { label: t("card.facts.time"), value: formatMinutes(total, t), icon: Clock },
@@ -53,7 +53,7 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
           {price && (
             <>
               <span className="h-3 w-px bg-amber-50/40" aria-hidden="true" />
-              <span className="text-clay-100">{price}</span>
+              <PriceTag price={recipe.price} salePrice={recipe.salePrice} saleEndsAt={recipe.saleEndsAt} currency={recipe.currency} className="text-clay-100" />
             </>
           )}
         </span>

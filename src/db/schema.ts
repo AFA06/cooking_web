@@ -2,6 +2,7 @@ import {
   boolean,
   check,
   customType,
+  date,
   index,
   integer,
   jsonb,
@@ -39,7 +40,13 @@ export const users = pgTable(
     phone: text("phone"),
     phoneVerifiedAt: timestamp("phone_verified_at", { withTimezone: true }),
     passwordHash: text("password_hash").notNull(),
+    /** Set on accounts an admin created with a temporary password; cleared when the person picks their own. */
+    mustChangePassword: boolean("must_change_password").notNull().default(false),
     role: roleEnum("role").notNull().default("user"),
+    /** Last time the person used the site while signed in; refreshed at most every few minutes. */
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true }),
+    /** Set by an admin: the person can no longer sign in and all their sessions are ended. */
+    blockedAt: timestamp("blocked_at", { withTimezone: true }),
     locale: text("locale").notNull().default("uz"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
@@ -47,6 +54,36 @@ export const users = pgTable(
     uniqueIndex("users_email_idx").on(t.email),
     uniqueIndex("users_username_idx").on(t.username),
     uniqueIndex("users_phone_idx").on(t.phone),
+  ],
+);
+
+export const applicationStatusEnum = pgEnum("application_status", ["pending", "approved", "rejected"]);
+
+/**
+ * A signed-in person asking to become a creator. The team checks their audience and either approves
+ * (which makes them a creator) or rejects. One open request per person at a time.
+ */
+export const creatorApplications = pgTable(
+  "creator_applications",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    fullName: text("full_name").notNull(),
+    phone: text("phone").notNull(),
+    instagram: text("instagram"),
+    telegram: text("telegram"),
+    /** Rough follower count across their channels, as the person picked it (e.g. "10k-50k"). */
+    audience: text("audience").notNull(),
+    about: text("about").notNull(),
+    status: applicationStatusEnum("status").notNull().default("pending"),
+    adminNote: text("admin_note"),
+    reviewedBy: uuid("reviewed_by").references(() => users.id, { onDelete: "set null" }),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("creator_applications_status_idx").on(t.status, t.createdAt),
+    uniqueIndex("creator_applications_open_idx").on(t.userId).where(sql`${t.status} = 'pending'`),
   ],
 );
 
@@ -90,6 +127,16 @@ export const authEvents = pgTable(
   (t) => [index("auth_events_lookup_idx").on(t.kind, t.keyHash, t.createdAt)],
 );
 
+/** One row per person per day (Tashkent time) they used the site signed in. Daily, weekly and monthly active users come from here. */
+export const userActivity = pgTable(
+  "user_activity",
+  {
+    userId: uuid("user_id").notNull().references(() => users.id, { onDelete: "cascade" }),
+    day: date("day").notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.day] }), index("user_activity_day_idx").on(t.day)],
+);
+
 export const sessions = pgTable(
   "sessions",
   {
@@ -112,6 +159,8 @@ export const creators = pgTable(
     bio: text("bio"),
     avatarUrl: text("avatar_url"),
     /** Profile links keyed by platform, e.g. { instagram: "https://instagram.com/…" }. */
+    /** Where buyers of this creator's premium recipes are sent (t.me/<username>). Set by an admin only. */
+    telegramUsername: text("telegram_username"),
     socialLinks: jsonb("social_links").$type<Record<string, string>>().notNull().default({}),
     isFoundingCreator: boolean("is_founding_creator").notNull().default(false),
     isFeatured: boolean("is_featured").notNull().default(false),
@@ -145,6 +194,9 @@ export const recipes = pgTable(
     isPremium: boolean("is_premium").notNull().default(false),
     priceAmount: integer("price_amount"),
     priceCurrency: text("price_currency"),
+    /** A lower price the creator runs for a while. Active while sale_ends_at is empty or still ahead. */
+    salePrice: integer("sale_price"),
+    saleEndsAt: timestamp("sale_ends_at", { withTimezone: true }),
     tags: text("tags").array().notNull().default([]),
     /** A YouTube or Vimeo link, or a direct video file, shown on the recipe page. */
     videoUrl: text("video_url"),
@@ -381,6 +433,37 @@ export const reviewPhotos = pgTable(
   (t) => [uniqueIndex("review_photos_review_idx").on(t.reviewId)],
 );
 
+export const promoKindEnum = pgEnum("promo_kind", ["percent", "amount", "free"]);
+
+/**
+ * A creator's promo code. Takes a percent or a fixed sum off, or makes the recipe free, on all of the creator's
+ * premium recipes or only the chosen ones. Optional limit on uses and an optional end time.
+ */
+export const promoCodes = pgTable(
+  "promo_codes",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    creatorId: uuid("creator_id").notNull().references(() => creators.id, { onDelete: "cascade" }),
+    /** Stored in capitals; buyers may type it in any case. */
+    code: text("code").notNull(),
+    kind: promoKindEnum("kind").notNull(),
+    /** Percent (1–99) for "percent", so'm for "amount", unused for "free". */
+    value: integer("value").notNull().default(0),
+    /** Empty means every premium recipe of the creator. */
+    recipeIds: uuid("recipe_ids").array().notNull().default([]),
+    maxUses: integer("max_uses"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    active: boolean("active").notNull().default(true),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("promo_codes_code_idx").on(t.code), index("promo_codes_creator_idx").on(t.creatorId)],
+);
+
+/**
+ * A buyer's order for a premium recipe. Payment happens outside the site (a card transfer agreed in the
+ * creator's Telegram chat), so an order starts `pending` and becomes `paid` only when the creator who owns
+ * the recipe confirms it. `paid` is what unlocks the recipe (see server/access).
+ */
 export const purchases = pgTable(
   "purchases",
   {
@@ -392,9 +475,40 @@ export const purchases = pgTable(
     provider: text("provider"),
     providerReference: text("provider_reference"),
     status: purchaseStatusEnum("status").notNull().default("pending"),
+    /** The recipe's normal price when the order was made; `amount` is what the buyer pays after a sale or promo code. */
+    originalAmount: integer("original_amount"),
+    promoCodeId: uuid("promo_code_id").references(() => promoCodes.id, { onDelete: "set null" }),
+    /** Short public code such as DM-7K4Q2P that ties the Telegram chat to this order. */
+    orderCode: text("order_code"),
+    creatorId: uuid("creator_id").references(() => creators.id, { onDelete: "set null" }),
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    confirmedBy: uuid("confirmed_by").references(() => users.id, { onDelete: "set null" }),
+    confirmedAt: timestamp("confirmed_at", { withTimezone: true }),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
   },
-  (t) => [index("purchases_user_idx").on(t.userId)],
+  (t) => [
+    index("purchases_user_idx").on(t.userId),
+    index("purchases_creator_idx").on(t.creatorId),
+    uniqueIndex("purchases_order_code_idx").on(t.orderCode),
+    // One open or paid order per person and recipe.
+    uniqueIndex("purchases_live_idx").on(t.userId, t.recipeId).where(sql`${t.status} in ('pending', 'paid')`),
+  ],
+);
+
+/** Append-only history of an order: who did what and when. Never updated or deleted by the app. */
+export const purchaseEvents = pgTable(
+  "purchase_events",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    purchaseId: uuid("purchase_id").notNull().references(() => purchases.id, { onDelete: "cascade" }),
+    actorId: uuid("actor_id").references(() => users.id, { onDelete: "set null" }),
+    /** created | chat_opened | granted | rejected | cancelled | expired | revoked */
+    action: text("action").notNull(),
+    note: text("note"),
+    clientHash: text("client_hash"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [index("purchase_events_purchase_idx").on(t.purchaseId)],
 );
 
 export const analyticsEvents = pgTable(

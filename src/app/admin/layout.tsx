@@ -3,6 +3,7 @@ import { LogOut } from "lucide-react";
 import { AdminShell } from "@/components/admin/AdminShell";
 import { requireAdminPage } from "@/server/admin";
 import { getT } from "@/i18n/server";
+import { countPendingApplications } from "@/server/applications";
 import { logout } from "@/app/auth/actions";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -12,12 +13,13 @@ export async function generateMetadata(): Promise<Metadata> {
 export const dynamic = "force-dynamic";
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [user, t] = await Promise.all([requireAdminPage(), getT()]);
+  const [user, t, pendingApplications] = await Promise.all([requireAdminPage(), getT(), countPendingApplications()]);
 
   return (
     <AdminShell
       userName={user.name}
       userEmail={user.email ?? user.phone ?? ""}
+      pendingApplications={pendingApplications}
       logout={
         <form action={logout}>
           <button type="submit" className="flex min-h-11 w-full items-center gap-3 rounded-md px-3 text-sm text-amber-200/80 hover:bg-white/5 hover:text-white">

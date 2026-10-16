@@ -2,7 +2,8 @@ import "server-only";
 import { createHash, randomBytes } from "node:crypto";
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { and, eq, gt, ne } from "drizzle-orm";
+import { after } from "next/server";
+import { and, eq, gt, isNull, ne, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 
 const COOKIE = "session";
@@ -36,19 +37,42 @@ export interface CurrentUser {
   phone: string | null;
   name: string;
   role: "user" | "creator" | "admin";
+  /** An admin set a temporary password; the person must choose their own before using the studio. */
+  mustChangePassword: boolean;
 }
 
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   const token = (await cookies()).get(COOKIE)?.value;
   if (!token) return null;
   const [row] = await db
-    .select({ id: schema.users.id, email: schema.users.email, phone: schema.users.phone, name: schema.users.name, role: schema.users.role })
+    .select({ id: schema.users.id, email: schema.users.email, phone: schema.users.phone, name: schema.users.name, role: schema.users.role, mustChangePassword: schema.users.mustChangePassword, lastSeenAt: schema.users.lastSeenAt })
     .from(schema.sessions)
     .innerJoin(schema.users, eq(schema.sessions.userId, schema.users.id))
-    .where(and(eq(schema.sessions.tokenHash, hashToken(token)), gt(schema.sessions.expiresAt, new Date())))
+    .where(and(eq(schema.sessions.tokenHash, hashToken(token)), gt(schema.sessions.expiresAt, new Date()), isNull(schema.users.blockedAt)))
     .limit(1);
-  return row ?? null;
+  if (!row) return null;
+  const { lastSeenAt, ...user } = row;
+  if (!lastSeenAt || Date.now() - lastSeenAt.getTime() > ACTIVITY_EVERY_MS) markActive(user.id);
+  return user;
 });
+
+/** How often a signed-in visit is written down. Often enough for daily counts, rare enough to cost nothing. */
+const ACTIVITY_EVERY_MS = 10 * 60 * 1000;
+
+/** Records that the person used the site today, after the response is sent. */
+function markActive(userId: string) {
+  try {
+    after(async () => {
+      await db.update(schema.users).set({ lastSeenAt: new Date() }).where(eq(schema.users.id, userId));
+      await db
+        .insert(schema.userActivity)
+        .values({ userId, day: sql`(now() at time zone 'Asia/Tashkent')::date` })
+        .onConflictDoNothing();
+    });
+  } catch {
+    // Outside a request (scripts, tests) there is nothing to record.
+  }
+}
 
 /** Signs the person out everywhere except the browser they are using now. */
 export async function destroyOtherSessions(userId: string) {

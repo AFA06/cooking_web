@@ -9,8 +9,9 @@ export const PLATFORM_CONFIG = {
     shopping: "/shopping",
   },
   creator: {
+    /** For now creators keep the whole price: they bring their audience, which is the platform's marketing. */
     foundingCommissionRate: 0,
-    standardCommissionRate: 0.1,
+    standardCommissionRate: 0,
     foundingCreatorCount: 10,
   },
   pricing: {

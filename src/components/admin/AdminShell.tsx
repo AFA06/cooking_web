@@ -3,13 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, ChartColumn, ChefHat, ExternalLink, LayoutDashboard, Menu, Receipt, Users, X } from "lucide-react";
+import { BookOpen, ChartColumn, ChefHat, ExternalLink, Inbox, LayoutDashboard, Menu, Receipt, Users, X } from "lucide-react";
 import { useT } from "@/i18n/client";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/admin", label: "adm.nav.overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/analytics", label: "adm.nav.stats", icon: ChartColumn },
+  { href: "/admin/applications", label: "apply.adm.nav", icon: Inbox },
   { href: "/admin/creators", label: "adm.nav.creators", icon: ChefHat },
   { href: "/admin/recipes", label: "nav.recipes", icon: BookOpen },
   { href: "/admin/users", label: "adm.nav.users", icon: Users },
@@ -19,12 +20,14 @@ const NAV = [
 interface Props {
   userName: string;
   userEmail: string;
+  /** New creator requests waiting for a decision, shown as a count in the menu. */
+  pendingApplications: number;
   /** Logout form rendered by the server layout. */
   logout: React.ReactNode;
   children: React.ReactNode;
 }
 
-export function AdminShell({ userName, userEmail, logout, children }: Props) {
+export function AdminShell({ userName, userEmail, pendingApplications, logout, children }: Props) {
   const t = useT();
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
@@ -67,6 +70,9 @@ export function AdminShell({ userName, userEmail, logout, children }: Props) {
                   {active && <span className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-amber-300" aria-hidden="true" />}
                   <Icon className="h-[1.1rem] w-[1.1rem] shrink-0" strokeWidth={1.75} aria-hidden="true" />
                   {t(label)}
+                  {href === "/admin/applications" && pendingApplications > 0 && (
+                    <span className="ml-auto rounded-full bg-clay-400 px-2 py-0.5 text-xs font-semibold tabular-nums text-white">{pendingApplications}</span>
+                  )}
                 </Link>
               </li>
             );

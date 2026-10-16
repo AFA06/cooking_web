@@ -9,7 +9,9 @@ import { EmptyState, Field, PageHeader, Panel, SelectInput, StatTile, TextInput 
 import { getLocale, getT } from "@/i18n/server";
 import { formatNumber, formatRelative, formatShortDate } from "@/lib/format";
 import { getUserActivity, getUserAdmin, requireAdminPage } from "@/server/admin";
-import { deleteUser, updateUser } from "../../actions";
+import { deleteUser, setUserBlocked, updateUser } from "../../actions";
+import { Button } from "@/components/ui/Button";
+import { Ban, ShieldCheck } from "lucide-react";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getT())("role.user") };
@@ -37,7 +39,8 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
         title={user.name}
         description={
           <span className="flex flex-wrap gap-x-3 gap-y-1">
-            <span>{user.email ?? "—"}</span>
+            <span>{user.contact ?? "—"}</span>
+            {user.blockedAt && <span className="font-semibold text-red-700">{t("adm.blockedSince", { date: formatShortDate(user.blockedAt, locale) })}</span>}
             <span>{t("adm.registeredOn", { date: formatShortDate(user.createdAt, locale) })}</span>
             {user.creatorId && (
               <Link href={`/admin/creators/${user.creatorId}`} className="text-amber-700 hover:underline">{t("adm.creatorProfile", { name: user.creatorName ?? "" })}</Link>
@@ -96,6 +99,18 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
               </Field>
             </ActionForm>
           </Panel>
+
+          {!isSelf && (
+            <Panel title={t("adm.access")} description={user.blockedAt ? t("adm.blockedNote") : t("adm.blockNote")}>
+              <form action={setUserBlocked.bind(null, user.id, !user.blockedAt)}>
+                {user.blockedAt ? (
+                  <Button type="submit" variant="secondary"><ShieldCheck className="h-4 w-4" aria-hidden="true" />{t("adm.unblock")}</Button>
+                ) : (
+                  <Button type="submit" variant="outline" className="border-red-700/40 text-red-700 hover:bg-red-600/5"><Ban className="h-4 w-4" aria-hidden="true" />{t("adm.block")}</Button>
+                )}
+              </form>
+            </Panel>
+          )}
 
           <Panel title={t("adm.danger")}>
             {isSelf ? (
