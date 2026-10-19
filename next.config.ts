@@ -58,6 +58,12 @@ const nextConfig: NextConfig = {
   images: {
     // Creators link cover images from any https host.
     remotePatterns: [{ protocol: "https", hostname: "**" }],
+    // Many visitors are on slow links to Vercel, so photos are kept small: AVIF where the browser takes it
+    // (about half the size of WebP), and one quality for every image. Every requested quality is served as 60.
+    formats: ["image/avif", "image/webp"],
+    qualities: [60],
+    // Uploads have their own ids and never change, so optimized copies can be kept for a month.
+    minimumCacheTTL: 2678400,
   },
   turbopack: {
     rules: {

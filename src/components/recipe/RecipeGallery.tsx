@@ -110,7 +110,6 @@ function Lightbox({ photos, index, onIndex, onClose }: { photos: Photo[]; index:
             alt={photo.alt}
             fill
             sizes="100vw"
-            quality={90}
             className="object-contain transition-transform duration-300 ease-out"
             style={{ transform: zoomed ? `scale(${ZOOM})` : "scale(1)", transformOrigin: origin }}
           />
