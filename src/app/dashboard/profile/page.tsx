@@ -25,7 +25,7 @@ export default async function CreatorProfilePage() {
       </p>
       <div className="mt-10">
         <CreatorProfileEditor
-          initial={{ name: creator.name, bio: creator.bio ?? "", avatarUrl: creator.avatarUrl ?? "", socialLinks: cleanSocialLinks(creator.socialLinks) }}
+          initial={{ name: creator.name, bio: creator.bio ?? "", avatarUrl: creator.avatarUrl ?? "", telegramUsername: creator.telegramUsername ?? "", socialLinks: cleanSocialLinks(creator.socialLinks) }}
         />
       </div>
     </div>

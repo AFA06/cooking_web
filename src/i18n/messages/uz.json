@@ -139,7 +139,7 @@
       "slugHint": "Ommaviy havola: /creators/manzil. O‘zgartirilsa, eski havolalar ishlamaydi.",
       "slugOptional": "Bo‘sh qoldirilsa, ismdan yaratiladi. /creators/manzil",
       "telegram": "Telegram nomi",
-      "telegramHint": "Premium retsept xaridorlari shu nomga yo‘naltiriladi (t.me/nom). Faqat administrator o‘zgartira oladi."
+      "telegramHint": "Premium retsept xaridorlari shu nomga yo‘naltiriladi (t.me/nom). Muallif uni o‘z profilida ham o‘zgartira oladi."
     },
     "feature": "Tavsiya qilish",
     "featured": "Tavsiya",
@@ -1070,8 +1070,12 @@
     "removeAccount": "{label} hisobini olib tashlash",
     "saveProfile": "Profilni saqlash",
     "saved": "Profil saqlandi.",
+    "selling": "Sotuvlar",
+    "sellingNote": "Premium retseptlaringizni sotib olmoqchi bo‘lgan odamlar Telegram’da sizga yozadi: buyurtma kodi, retsept va narx xabarda avtomatik bo‘ladi. To‘lovni olgach, «Buyurtmalar» bo‘limida ruxsat berasiz.",
     "socials": "Ijtimoiy tarmoqlar",
-    "socialsNote": "Qo‘shilgan hisoblar ommaviy profilingizda, tanishtiruv ostida ko‘rinadi."
+    "socialsNote": "Qo‘shilgan hisoblar ommaviy profilingizda, tanishtiruv ostida ko‘rinadi.",
+    "telegram": "Telegram foydalanuvchi nomi",
+    "telegramHint": "Masalan: @aziza_oshxona. Xaridorlar t.me/nom orqali sizga yo‘naltiriladi. Bo‘sh bo‘lsa, premium retseptlarni sotib bo‘lmaydi."
   },
   "promo": {
     "allRecipes": "Barcha premium retseptlarim",
@@ -1371,6 +1375,9 @@
     "noCover": "Muqova yo‘q",
     "noSales": "Hali sotuvlar yo‘q",
     "noSalesText": "Premium retsept nashr eting — xaridlar shu yerda ko‘rinadi. To‘lov tizimi ulangach, sotuvlar boshlanadi.",
+    "noTelegramCta": "Telegram’ni ulash",
+    "noTelegramText": "Telegram foydalanuvchi nomingizni qo‘shing: xaridorlar «Sotib olish» tugmasi orqali to‘g‘ridan-to‘g‘ri sizga yozadi.",
+    "noTelegramTitle": "Premium retseptlaringizni hozircha sotib bo‘lmaydi",
     "ord": {
       "amount": "Summa",
       "back": "Orqaga",

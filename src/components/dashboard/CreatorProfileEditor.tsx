@@ -13,7 +13,7 @@ const field = "mt-1.5 w-full min-h-12 rounded-xl border border-amber-300 bg-ambe
 const label = "text-sm font-medium text-amber-950";
 
 interface Props {
-  initial: { name: string; bio: string; avatarUrl: string; socialLinks: SocialLinks };
+  initial: { name: string; bio: string; avatarUrl: string; telegramUsername: string; socialLinks: SocialLinks };
 }
 
 export function CreatorProfileEditor({ initial }: Props) {
@@ -22,6 +22,7 @@ export function CreatorProfileEditor({ initial }: Props) {
   const [name, setName] = React.useState(initial.name);
   const [bio, setBio] = React.useState(initial.bio);
   const [avatarUrl, setAvatarUrl] = React.useState(initial.avatarUrl);
+  const [telegram, setTelegram] = React.useState(initial.telegramUsername);
   const [links, setLinks] = React.useState<SocialLinks>(initial.socialLinks);
   const [adding, setAdding] = React.useState<SocialPlatform | "">("");
   const [draft, setDraft] = React.useState("");
@@ -46,7 +47,7 @@ export function CreatorProfileEditor({ initial }: Props) {
   const save = (e: React.FormEvent) => {
     e.preventDefault();
     startTransition(async () => {
-      const result = await updateCreatorProfile({ name, bio, avatarUrl, socialLinks: links as Record<string, string> });
+      const result = await updateCreatorProfile({ name, bio, avatarUrl, telegramUsername: telegram, socialLinks: links as Record<string, string> });
       if (result.error) return setMessage({ kind: "error", text: result.error });
       setMessage({ kind: "ok", text: t("profile.saved") });
       router.refresh();
@@ -70,6 +71,30 @@ export function CreatorProfileEditor({ initial }: Props) {
           <label htmlFor="avatar" className={label}>{t("profile.avatarUrl")}</label>
           <input id="avatar" type="url" maxLength={1000} value={avatarUrl} onChange={(e) => setAvatarUrl(e.target.value)} placeholder="https://…" className={field} />
           <p className="mt-1 text-xs text-amber-600">{t("profile.noUpload")}</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="selling-heading" className="space-y-3">
+        <h2 id="selling-heading" className="text-2xl font-medium text-amber-950">{t("profile.selling")}</h2>
+        <p className="text-amber-900">{t("profile.sellingNote")}</p>
+        <div>
+          <label htmlFor="telegram" className={label}>{t("profile.telegram")}</label>
+          <div className="relative">
+            <span className="pointer-events-none absolute left-4 top-1/2 mt-[3px] -translate-y-1/2 text-amber-600" aria-hidden="true">@</span>
+            <input
+              id="telegram"
+              value={telegram}
+              onChange={(e) => setTelegram(e.target.value.replace(/^@/, ""))}
+              maxLength={60}
+              placeholder="username"
+              autoComplete="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              aria-describedby="telegram-hint"
+              className={`${field} pl-9`}
+            />
+          </div>
+          <p id="telegram-hint" className="mt-1 text-xs text-amber-600">{t("profile.telegramHint")}</p>
         </div>
       </section>
 

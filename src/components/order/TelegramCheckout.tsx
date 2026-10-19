@@ -115,11 +115,17 @@ interface Props {
   creatorName: string;
   previewPlain: string;
   previewWithContact: string;
+  /** "card" sits on the dark paywall card (light button); "page" sits on the normal page (regular button). */
+  tone?: "card" | "page";
+  /** Full width on phones, for the boxes in the recipe header. */
+  wide?: boolean;
 }
 
 /** The Buy button for a premium recipe, its confirmation sheet, and the waiting state once an order exists. */
-export function TelegramCheckout({ recipeId, recipeSlug, isLoggedIn, ready, order, creatorName, previewPlain, previewWithContact }: Props) {
+export function TelegramCheckout({ recipeId, recipeSlug, isLoggedIn, ready, order, creatorName, previewPlain, previewWithContact, tone = "card", wide = false }: Props) {
   const t = useT();
+  const onCard = tone === "card";
+  const trigger = cn(onCard && "bg-amber-50 text-amber-950 hover:bg-amber-100", wide && "w-full sm:w-auto");
   const router = useRouter();
   const [open, setOpen] = React.useState(false);
   const [share, setShare] = React.useState(true);
@@ -133,20 +139,20 @@ export function TelegramCheckout({ recipeId, recipeSlug, isLoggedIn, ready, orde
 
   if (!ready) {
     return (
-      <div className="sm:text-right">
-        <Button size="xl" disabled className="bg-amber-50 text-amber-950">{t("detail.paymentSoon")}</Button>
-        <p className="mt-2 text-sm text-amber-700">{t("order.notReady")}</p>
+      <div className={cn(onCard && "sm:text-right")}>
+        <Button size="xl" disabled className={trigger}>{t("detail.paymentSoon")}</Button>
+        <p className={cn("mt-2 text-sm", onCard ? "text-amber-700" : "text-amber-600")}>{t("order.notReady")}</p>
       </div>
     );
   }
   if (!isLoggedIn) {
     return (
-      <Button asChild size="xl" className="bg-amber-50 text-amber-950 hover:bg-amber-100">
+      <Button asChild size="xl" className={trigger}>
         <Link href={`/auth/signup?next=/recipes/${recipeSlug}`}>{t("order.signInToBuy")}</Link>
       </Button>
     );
   }
-  if (order && order.status === "pending") return <div className="w-full sm:max-w-md"><OrderStatus order={order} tone="card" /></div>;
+  if (order && order.status === "pending") return <div className="w-full sm:max-w-md"><OrderStatus order={order} tone={onCard ? "card" : "page"} /></div>;
 
   const applyPromo = async () => {
     if (!promoInput.trim()) return;
@@ -180,7 +186,7 @@ export function TelegramCheckout({ recipeId, recipeSlug, isLoggedIn, ready, orde
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger asChild>
-        <Button size="xl" className="bg-amber-50 text-amber-950 hover:bg-amber-100"><Send className="h-5 w-5" aria-hidden="true" />{t("order.buy")}</Button>
+        <Button size="xl" className={trigger}><Send className="h-5 w-5" aria-hidden="true" />{t("order.buy")}</Button>
       </Dialog.Trigger>
       <Dialog.Portal>
         <Dialog.Overlay className="fixed inset-0 z-[60] bg-ink/70 backdrop-blur-sm" />

@@ -29,6 +29,8 @@ export default async function StudioPage() {
   const completionRate = cooks > 0 ? Math.round((sum((r) => r.completions) / cooks) * 100) : 0;
   const net = Math.round(totals.revenue * (1 - commissionRate(creator.isFoundingCreator)));
   const first = recipes[0];
+  // Without a Telegram username the Buy button on premium recipes stays off.
+  const cannotSell = !creator.telegramUsername && recipes.some((r) => r.isPremium);
 
   const todo = [
     { done: !!creator.bio && !!creator.avatarUrl, label: t("studio.todo.profile"), href: "/dashboard/profile" },
@@ -69,6 +71,18 @@ export default async function StudioPage() {
           </Button>
         </div>
       </header>
+
+      {cannotSell && (
+        <div role="alert" className="mt-8 flex flex-col gap-4 rounded-[1.5rem] border border-clay-400/50 bg-clay-100/60 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+          <div className="min-w-0">
+            <p className="text-lg font-semibold text-amber-950">{t("studio.noTelegramTitle")}</p>
+            <p className="mt-1 text-amber-900">{t("studio.noTelegramText")}</p>
+          </div>
+          <Button asChild size="lg" className="shrink-0">
+            <Link href="/dashboard/profile#telegram">{t("studio.noTelegramCta")}</Link>
+          </Button>
+        </div>
+      )}
 
       <section className="mt-10 grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-6">
         {stats.map(({ label, value, icon: Icon, href }) => {

@@ -4,7 +4,6 @@ import Link from "next/link";
 import { NutritionFacts } from "@/components/recipe/NutritionFacts";
 import { StepMedia } from "@/components/recipe/StepMedia";
 import { ChefHat, Clock, Flame, Lock, Thermometer, Users } from "lucide-react";
-import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { RecipeCard } from "@/components/recipe/RecipeCard";
 import { RecipeGallery } from "@/components/recipe/RecipeGallery";
@@ -98,7 +97,7 @@ function UnlockCard({ recipe, lockedCount, price, t, checkout, isLoggedIn }: { r
       </ul>
       <div className="mt-8 flex flex-col gap-4 border-t border-amber-50/15 pt-7 sm:flex-row sm:items-center sm:justify-between">
         {price && <PriceTag price={recipe.price} salePrice={recipe.salePrice} saleEndsAt={recipe.saleEndsAt} currency={recipe.currency} tone="light" size="lg" details />}
-        {checkout && (
+        {checkout && checkout.order?.status !== "pending" && (
           <TelegramCheckout
             recipeId={recipe.id}
             recipeSlug={recipe.slug}
@@ -252,9 +251,27 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                         <PriceTag price={recipe.price} salePrice={recipe.salePrice} saleEndsAt={recipe.saleEndsAt} currency={recipe.currency} tone="dark" size="md" details className="text-xl text-amber-700" />
                       </div>
                     )}
-                    <Button asChild size="lg" className="mt-4 w-full sm:w-auto">
-                      <a href="#steps-heading">{t("detail.readFree")}</a>
-                    </Button>
+                    {checkout && (
+                      <div className="mt-4">
+                        <TelegramCheckout
+                          recipeId={recipe.id}
+                          recipeSlug={recipe.slug}
+                          isLoggedIn={isLoggedIn}
+                          ready={checkout.ready}
+                          order={checkout.order}
+                          creatorName={recipe.creator.name}
+                          previewPlain={checkout.previewPlain}
+                          previewWithContact={checkout.previewWithContact}
+                          tone="page"
+                          wide
+                        />
+                      </div>
+                    )}
+                    {openCount > 0 && (
+                      <a href="#steps-heading" className="mt-4 inline-flex min-h-11 items-center text-[0.95rem] font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
+                        {t("detail.readFree")}
+                      </a>
+                    )}
                   </div>
                 ) : (
                   <CookLink slug={recipe.slug} size="xl" className="hidden w-full lg:inline-flex">{t("home.cookWithMe")}</CookLink>
@@ -369,7 +386,25 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                 {secrets.notes ? (
                   <p className="mt-4 whitespace-pre-line text-xl leading-relaxed text-amber-950">{secrets.notes}</p>
                 ) : (
-                  <p className="mt-3 text-lg text-amber-900">{t("detail.secretsLocked", { name: creator.name })}</p>
+                  <>
+                    <p className="mt-3 text-lg text-amber-900">{t("detail.secretsLocked", { name: creator.name })}</p>
+                    {checkout && checkout.order?.status !== "pending" && (
+                      <div className="mt-6">
+                        <TelegramCheckout
+                          recipeId={recipe.id}
+                          recipeSlug={recipe.slug}
+                          isLoggedIn={isLoggedIn}
+                          ready={checkout.ready}
+                          order={checkout.order}
+                          creatorName={recipe.creator.name}
+                          previewPlain={checkout.previewPlain}
+                          previewWithContact={checkout.previewWithContact}
+                          tone="page"
+                          wide
+                        />
+                      </div>
+                    )}
+                  </>
                 )}
               </section>
             )}

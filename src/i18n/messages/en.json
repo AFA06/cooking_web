@@ -139,7 +139,7 @@
       "slugHint": "Public link: /creators/address. If changed, old links stop working.",
       "slugOptional": "If left empty, it's made from the name. /creators/address",
       "telegram": "Telegram username",
-      "telegramHint": "Buyers of premium recipes are sent to this name (t.me/name). Only an admin can change it."
+      "telegramHint": "Buyers of premium recipes are sent to this name (t.me/name). The creator can also change it in their profile."
     },
     "feature": "Feature",
     "featured": "Featured",
@@ -1078,8 +1078,12 @@
     "removeAccount": "Remove the {label} account",
     "saveProfile": "Save profile",
     "saved": "Profile saved.",
+    "selling": "Selling",
+    "sellingNote": "People who want to buy your premium recipes message you on Telegram: the order code, recipe and price are already in the message. Once you are paid, give access in Orders.",
     "socials": "Social networks",
-    "socialsNote": "Added accounts appear on your public profile, under the introduction."
+    "socialsNote": "Added accounts appear on your public profile, under the introduction.",
+    "telegram": "Telegram username",
+    "telegramHint": "For example: @aziza_kitchen. Buyers are sent to you at t.me/name. If it is empty, your premium recipes can’t be bought."
   },
   "promo": {
     "allRecipes": "All my premium recipes",
@@ -1385,6 +1389,9 @@
     "noCover": "No cover",
     "noSales": "No sales yet",
     "noSalesText": "Publish a premium recipe — purchases will show up here. Sales start once the payment system is connected.",
+    "noTelegramCta": "Connect Telegram",
+    "noTelegramText": "Add your Telegram username: buyers will message you directly from the Buy button.",
+    "noTelegramTitle": "Your premium recipes can’t be bought yet",
     "ord": {
       "amount": "Amount",
       "back": "Go back",

@@ -9,6 +9,7 @@ import { getCurrentCreator } from "@/server/creator";
 import { persistRecipe } from "@/server/recipe-write";
 import { recipeInputSchema, type RecipeInput } from "@/lib/recipe-schema";
 import { cleanSocialLinks } from "@/lib/social";
+import { TELEGRAM_PATTERN, normalizeTelegram } from "@/server/orders";
 
 export async function saveRecipe(
   recipeId: string | null,
@@ -61,10 +62,15 @@ const creatorProfileSchema = z.object({
     .trim()
     .max(1000)
     .refine((v) => v === "" || /^https?:\/\//i.test(v), "err.imgUrl"),
+  // Buyers of premium recipes are sent to this Telegram chat, so it is what turns the Buy button on.
+  telegramUsername: z
+    .string()
+    .transform(normalizeTelegram)
+    .refine((v) => v === "" || TELEGRAM_PATTERN.test(v), "adm.err.telegram"),
 });
 
 /** Saves the creator's public profile: name, bio, photo and social accounts. */
-export async function updateCreatorProfile(input: { name: string; bio: string; avatarUrl: string; socialLinks: Record<string, string> }): Promise<ActionResult & { ok?: true }> {
+export async function updateCreatorProfile(input: { name: string; bio: string; avatarUrl: string; telegramUsername: string; socialLinks: Record<string, string> }): Promise<ActionResult & { ok?: true }> {
   const t = await getT();
   const ctx = await getCurrentCreator();
   if (!ctx) return { error: t("err.creatorMissing") };
@@ -77,7 +83,7 @@ export async function updateCreatorProfile(input: { name: string; bio: string; a
 
   await db
     .update(schema.creators)
-    .set({ name: parsed.data.name, bio: parsed.data.bio || null, avatarUrl: parsed.data.avatarUrl || null, socialLinks })
+    .set({ name: parsed.data.name, bio: parsed.data.bio || null, avatarUrl: parsed.data.avatarUrl || null, telegramUsername: parsed.data.telegramUsername || null, socialLinks })
     .where(eq(schema.creators.id, ctx.creator.id));
   revalidatePath(`/creators/${ctx.creator.slug}`);
   revalidatePath("/dashboard");
