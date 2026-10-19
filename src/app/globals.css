@@ -295,3 +295,19 @@ button:disabled {
 @media (prefers-reduced-motion: reduce) {
   .nav-progress-run { animation: none; width: 60%; opacity: 1; }
 }
+
+/* Long words: Russian and Kazakh have single words wider than a small phone ("конфиденциальности" in a large
+   heading). Text breaks inside a word only when the word cannot fit a line on its own, and headings hyphenate
+   first (the page's lang attribute picks the language). `anywhere` also lets flex and grid items shrink below
+   such a word instead of pushing the page sideways. Tables are left alone so column labels stay whole. */
+@layer base {
+  h1, h2, h3, h4, p, li, dd, dt, label, blockquote, figcaption {
+    overflow-wrap: anywhere;
+  }
+  h1, h2, h3, h4 {
+    hyphens: auto;
+  }
+  table :is(p, li, label) {
+    overflow-wrap: normal;
+  }
+}

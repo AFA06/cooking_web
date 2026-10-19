@@ -60,7 +60,7 @@ export default async function CreatorPage({ params }: Props) {
   return (
     <div className="pb-24">
       <Container size="xl" className="pt-10 lg:pt-16">
-        <header className="grid items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
+        <header className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-16">
           <div className="flex flex-col gap-6 sm:flex-row sm:items-start sm:gap-8">
             {creator.avatarUrl ? (
               <Image src={creator.avatarUrl} alt="" width={160} height={160} priority className="h-28 w-28 shrink-0 rounded-full object-cover sm:h-40 sm:w-40" />

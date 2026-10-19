@@ -71,7 +71,7 @@ export function OrdersDesk({ pending, granted }: { pending: DeskOrder[]; granted
         )}
       </form>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,5fr)_minmax(0,6fr)]">
         <section aria-label={t("studio.ord.waiting")}>
           <div role="tablist" className="mb-3 inline-flex rounded-md border border-amber-200 bg-amber-100 p-0.5">
             {(["pending", "granted"] as const).map((k) => (

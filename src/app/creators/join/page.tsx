@@ -100,7 +100,7 @@ export default async function JoinPage() {
       <section className="relative">
         <span className="pointer-events-none absolute -right-40 top-1/2 h-[70rem] w-[70rem] -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,109,81,0.28),transparent)]" aria-hidden="true" />
         <Container size="xl" className="relative flex min-h-[calc(100svh-4rem)] flex-col pb-7 pt-10 lg:pt-12">
-          <div className="grid flex-1 items-center gap-16 lg:grid-cols-[1fr_auto] lg:gap-24 lg:pr-16">
+          <div className="grid grid-cols-1 flex-1 items-center gap-16 lg:grid-cols-[1fr_auto] lg:gap-24 lg:pr-16">
             <header className="rise">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{t("nav.becomeCreator")}</p>
               <h1 className="mt-6 font-serif text-[2.75rem] font-medium leading-[1.02] sm:text-7xl xl:text-[6rem]">
@@ -133,7 +133,7 @@ export default async function JoinPage() {
       </section>
 
       <section aria-label={t("join.termsLabel")} className="border-t border-amber-950/15">
-        <Container size="xl" className="grid gap-12 py-20 md:grid-cols-3 md:gap-10 lg:py-28">
+        <Container size="xl" className="grid grid-cols-1 gap-12 py-20 md:grid-cols-3 md:gap-10 lg:py-28">
           {TERMS(t).map((term) => (
             <div key={term.title}>
               <p className="font-serif text-[5.5rem] leading-none text-clay-400 lg:text-[8rem]">{term.figure}</p>
@@ -145,7 +145,7 @@ export default async function JoinPage() {
       </section>
 
       <section aria-labelledby="how-heading" className="border-t border-amber-950/15">
-        <Container size="xl" className="grid gap-12 py-20 lg:grid-cols-[1fr_2fr] lg:gap-20 lg:py-28">
+        <Container size="xl" className="grid grid-cols-1 gap-12 py-20 lg:grid-cols-[1fr_2fr] lg:gap-20 lg:py-28">
           <h2 id="how-heading" className="font-serif text-4xl font-medium leading-tight sm:text-5xl">
             {t("join.howLead")} <em className="text-clay-400">{t("join.howEm")}</em>
           </h2>
@@ -167,7 +167,7 @@ export default async function JoinPage() {
 
       <section id="ariza" className="scroll-mt-20 pb-20 lg:pb-28">
         <Container size="xl">
-          <div className="theme-light grid gap-10 rounded-[2rem] bg-amber-50 p-7 text-amber-950 sm:p-12 lg:grid-cols-[2fr_3fr] lg:gap-16 lg:p-16">
+          <div className="theme-light grid grid-cols-1 gap-10 rounded-[2rem] bg-amber-50 p-7 text-amber-950 sm:p-12 lg:grid-cols-[2fr_3fr] lg:gap-16 lg:p-16">
             <div>
               <h2 className="font-serif text-4xl font-medium leading-tight sm:text-5xl">{t("apply.title")}</h2>
               <p className="mt-5 max-w-md leading-relaxed text-amber-900">{t("apply.intro")}</p>

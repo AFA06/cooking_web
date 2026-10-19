@@ -46,7 +46,7 @@ export function AuthForm({ mode, action, next, notice }: Props) {
         </div>
       )}
       {isSignup && (
-        <div className="grid gap-5 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <div>
             <label htmlFor="firstName" className="text-sm font-medium text-amber-950">{t("auth.firstName")}</label>
             <input id="firstName" name="firstName" type="text" autoComplete="given-name" required maxLength={40} value={firstName} onChange={(e) => setFirstName(e.target.value)} className={authInputClass} />

@@ -37,7 +37,7 @@ export default async function PromotionsPage() {
         )}
       </Panel>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
         <Panel title={t("promo.newCode")} description={t("promo.newCodeDesc")}>
           <PromoForm recipes={recipes.map((r) => ({ id: r.id, title: r.title }))} prefix={prefix} />
         </Panel>

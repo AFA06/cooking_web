@@ -56,7 +56,7 @@ export function SaleRow({ recipe }: { recipe: SaleRecipe }) {
   const price = recipe.price ?? 0;
 
   return (
-    <li className="grid gap-5 border-b border-amber-200 px-5 py-5 last:border-b-0 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
+    <li className="grid grid-cols-1 gap-5 border-b border-amber-200 px-5 py-5 last:border-b-0 sm:px-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.4fr)]">
       <div className="min-w-0">
         <p className="truncate font-medium text-amber-950">{recipe.title}</p>
         {!recipe.published && <p className="text-xs text-amber-600">{t("promo.draft")}</p>}

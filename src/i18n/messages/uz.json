@@ -498,7 +498,6 @@
     "ready": "Tayyor!",
     "saving": "Pishirish natijasi saqlanmoqda…",
     "scaledNote": "Miqdorlar {servings} kishiga hisoblangan. Matndagi sonlar va taymer asl retsept ({base} kishilik) bo‘yicha — idish kattaligiga qarab vaqtni moslang.",
-    "screenOn": "Ekran o‘chmaydi",
     "stage": "{n}-bosqich",
     "stageOf": "Bosqich {n} / {total}",
     "stepOf": "Qadam {n} / {total}",
@@ -514,6 +513,7 @@
     "timerRunning": "Taymer ishlayapti",
     "tip": "Maslahat: {tip}",
     "tipTitle": "Maslahat",
+    "toHome": "Bosh sahifaga",
     "youCooked": "Siz buni pishirdingiz."
   },
   "cookbook": {
@@ -957,7 +957,9 @@
     "closeMenu": "Menyuni yopish",
     "createRecipe": "Retsept yaratish",
     "creatorPanel": "Ijodkor paneli",
+    "exitFullscreen": "To‘liq ekrandan chiqish",
     "footer": "Pastki menyu",
+    "fullscreen": "To‘liq ekran",
     "home": "Bosh sahifa",
     "homeLabel": "{name} — bosh sahifa",
     "language": "Til",

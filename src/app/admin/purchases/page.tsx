@@ -25,7 +25,7 @@ export default async function AdminPurchasesPage({ searchParams }: { searchParam
     <>
       <PageHeader eyebrow={t("adm.finance")} title={t("adm.nav.purchases")} description={t("adm.purchasesDesc")} />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatTile label={t("adm.revenueTile")} value={formatPrice(totals.revenue, "UZS", t)} hint={t("adm.paidHint")} />
         <StatTile label={t("adm.paidPurchases")} value={formatNumber(totals.paidPurchases)} />
         <StatTile label={t("adm.premiumRecipes")} value={formatNumber(totals.premium)} hint={t("adm.readyForSale")} />

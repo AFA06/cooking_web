@@ -33,7 +33,7 @@ export default async function HomePage() {
 
   return (
     <SiteShell>
-      <Container size="xl" className="grid gap-10 pb-16 pt-8 lg:grid-cols-[5fr_6fr] lg:gap-14 lg:pb-24 lg:pt-12">
+      <Container size="xl" className="grid grid-cols-1 gap-10 pb-16 pt-8 lg:grid-cols-[5fr_6fr] lg:gap-14 lg:pb-24 lg:pt-12">
         <div className="flex min-w-0 flex-col justify-center">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">
             {user ? `${greeting(t)}, ${user.name.split(" ")[0]}` : t("home.eyebrow")}

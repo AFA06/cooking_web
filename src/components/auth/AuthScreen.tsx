@@ -20,7 +20,7 @@ export async function AuthScreen({ eyebrow, title, note, children }: Props) {
   return (
     <section className="relative overflow-hidden">
       <span className="pointer-events-none absolute -right-40 top-1/2 hidden h-[70rem] w-[70rem] -translate-y-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(200,109,81,0.28),transparent)] lg:block" aria-hidden="true" />
-      <Container size="xl" className="relative grid min-h-[calc(100svh-4rem)] items-center gap-16 py-12 lg:grid-cols-[minmax(0,30rem)_1fr] lg:gap-24 lg:py-16">
+      <Container size="xl" className="relative grid grid-cols-1 min-h-[calc(100svh-4rem)] items-center gap-16 py-12 lg:grid-cols-[minmax(0,30rem)_1fr] lg:gap-24 lg:py-16">
         <div className="rise mx-auto w-full max-w-md lg:mx-0 lg:max-w-none">
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{eyebrow}</p>
           <h1 className="mt-5 font-serif text-[2.75rem] font-medium leading-[1.04] text-amber-950 sm:text-6xl">{title}</h1>

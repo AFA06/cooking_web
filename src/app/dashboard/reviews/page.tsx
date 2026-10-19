@@ -32,7 +32,7 @@ export default async function StudioReviewsPage() {
           />
         </div>
       ) : (
-        <div className="grid items-start gap-8 xl:grid-cols-[22rem_minmax(0,1fr)]">
+        <div className="grid grid-cols-1 items-start gap-8 xl:grid-cols-[22rem_minmax(0,1fr)]">
           <Panel>
             <RatingOverview rating={summary.rating} />
           </Panel>

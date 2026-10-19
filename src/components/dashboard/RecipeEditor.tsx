@@ -316,7 +316,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
               </select>
             </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)]">
             <div>
               <label htmlFor="category" className={label}>{t("ed.category")}</label>
               <select id="category" className={cn(field, "mt-1.5")} value={v.category} onChange={(e) => set("category", e.target.value as RecipeCategory)}>
@@ -509,7 +509,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
                     </div>
                   </div>
 
-                  <div className="mt-4 grid max-w-xl gap-4 sm:grid-cols-2">
+                  <div className="mt-4 grid grid-cols-1 max-w-xl gap-4 sm:grid-cols-2">
                     <div>
                       <p className={label}>{t("ed.stepPhoto")}</p>
                       <div className="mt-1.5">
@@ -591,7 +591,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
 
         {/* 5 — price and secrets */}
         <Section n={5} title={t("ed.sec.pricing")}>
-          <div role="radiogroup" aria-label={t("ed.type")} className="grid gap-3 sm:grid-cols-2">
+          <div role="radiogroup" aria-label={t("ed.type")} className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {([
               { premium: false, title: t("filter.free"), note: t("ed.typeFreeNote") },
               { premium: true, title: t("filter.premium"), note: t("ed.typePremiumNote") },

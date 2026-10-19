@@ -16,7 +16,7 @@ export async function LegalDocument({ doc, other }: Props) {
   const updated = new Intl.DateTimeFormat(LOCALE_INFO[locale].intl, { day: "numeric", month: "long", year: "numeric" }).format(new Date(`${LEGAL.updatedAt}T00:00:00`));
 
   return (
-    <Container size="xl" className="grid gap-10 py-12 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:gap-20 lg:py-16">
+    <Container size="xl" className="grid grid-cols-1 gap-10 py-12 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:gap-20 lg:py-16">
       <aside className="lg:sticky lg:top-28 lg:self-start">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{t("legal.document")}</p>
         <h1 className="mt-3 font-serif text-4xl font-medium leading-[1.08] text-amber-950 sm:text-5xl">{doc.title}</h1>

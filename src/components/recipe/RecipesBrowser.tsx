@@ -122,7 +122,7 @@ export function RecipesBrowser({ recipes, initialFilters, isLoggedIn, savedIds }
   return (
     <>
       <section className="overflow-hidden border-b border-amber-200">
-        <Container size="xl" className="grid items-end gap-10 pt-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:pt-14">
+        <Container size="xl" className="grid grid-cols-1 items-end gap-10 pt-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:pt-14">
           <div className="pb-10 lg:pb-14">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-amber-700">{t("recipes.eyebrow", { count: recipes.length })}</p>
             <h1 className="mt-4 max-w-3xl text-[2.6rem] font-medium leading-[1.04] text-amber-950 sm:text-6xl xl:text-7xl">

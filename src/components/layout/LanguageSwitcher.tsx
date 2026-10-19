@@ -43,7 +43,7 @@ export function LanguageSwitcher() {
         className="flex h-10 items-center gap-1.5 rounded-full px-2.5 text-sm font-medium text-amber-950 outline-none transition-colors hover:bg-amber-100 focus-visible:ring-2 focus-visible:ring-amber-700 data-[state=open]:bg-amber-100"
       >
         <Flag locale={current} />
-        {LOCALE_INFO[current].short}
+        <span className="hidden min-[380px]:inline">{LOCALE_INFO[current].short}</span>
       </DropdownMenu.Trigger>
       <DropdownMenu.Portal>
         <DropdownMenu.Content

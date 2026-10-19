@@ -500,7 +500,6 @@
     "ready": "Done!",
     "saving": "Saving your result…",
     "scaledNote": "Amounts are calculated for {servings} servings. Numbers in the text and the timer follow the original recipe ({base} servings) — adjust the time to your pot size.",
-    "screenOn": "Screen stays on",
     "stage": "Stage {n}",
     "stageOf": "Stage {n} of {total}",
     "stepOf": "Step {n} / {total}",
@@ -516,6 +515,7 @@
     "timerRunning": "Timer running",
     "tip": "Tip: {tip}",
     "tipTitle": "Tip",
+    "toHome": "Go to home page",
     "youCooked": "You cooked this."
   },
   "cookbook": {
@@ -965,7 +965,9 @@
     "closeMenu": "Close menu",
     "createRecipe": "Create a recipe",
     "creatorPanel": "Creator panel",
+    "exitFullscreen": "Exit full screen",
     "footer": "Footer menu",
+    "fullscreen": "Full screen",
     "home": "Home",
     "homeLabel": "{name} — home page",
     "language": "Language",

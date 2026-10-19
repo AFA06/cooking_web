@@ -88,7 +88,7 @@ function UnlockCard({ recipe, lockedCount, price, t, checkout, isLoggedIn }: { r
     <div className="rounded-[1.75rem] bg-amber-950 p-7 text-amber-50 sm:p-10">
       <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{t("detail.premiumRecipe")}</p>
       <h3 className="mt-3 max-w-xl text-3xl font-medium leading-tight sm:text-4xl">{t("detail.lockedTitle", { count: lockedCount, name: recipe.creator.name })}</h3>
-      <ul className="mt-6 grid gap-x-8 gap-y-2.5 text-amber-100 sm:grid-cols-2">
+      <ul className="mt-6 grid grid-cols-1 gap-x-8 gap-y-2.5 text-amber-100 sm:grid-cols-2">
         {PREMIUM_INCLUDES.map((item) => (
           <li key={item} className="flex gap-3">
             <span className="mt-2.5 h-1.5 w-1.5 shrink-0 rounded-full bg-clay-400" aria-hidden="true" />
@@ -170,7 +170,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
             <span className="text-amber-900">{recipe.title}</span>
           </nav>
 
-          <div className="mt-5 grid items-start gap-9 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-14 xl:gap-20">
+          <div className="mt-5 grid grid-cols-1 items-start gap-9 lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)] lg:gap-14 xl:gap-20">
             <RecipeGallery
               photos={recipe.media.map((m) => ({ url: m.url, alt: m.alt ?? recipe.title }))}
               badge={
@@ -289,7 +289,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
           </Container>
         )}
 
-        <Container size="xl" className="mt-16 grid items-start gap-12 lg:mt-24 lg:grid-cols-[23rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[26rem_minmax(0,1fr)] xl:gap-20">
+        <Container size="xl" className="mt-16 grid grid-cols-1 items-start gap-12 lg:mt-24 lg:grid-cols-[23rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[26rem_minmax(0,1fr)] xl:gap-20">
           <section aria-labelledby="ingredients-heading" className="rounded-[1.75rem] bg-sage-50 p-6 sm:p-8">
             <div className="flex items-baseline justify-between gap-4">
               <h2 id="ingredients-heading" className="text-3xl font-medium text-amber-950">{t("detail.ingredients")}</h2>
@@ -314,7 +314,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
             <ol>
               {recipe.steps.map((step, index) =>
                 isOpen(step) ? (
-                  <li key={step.id} className="grid gap-x-6 gap-y-4 border-b border-amber-200 py-10 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
+                  <li key={step.id} className="grid grid-cols-1 gap-x-6 gap-y-4 border-b border-amber-200 py-10 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
                     <p className="font-serif text-6xl font-medium leading-none text-clay-400 tabular-nums sm:text-7xl" aria-hidden="true">
                       {String(step.order).padStart(2, "0")}
                     </p>
@@ -342,7 +342,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
                         <UnlockCard recipe={recipe} lockedCount={lockedCount} price={price} t={t} checkout={checkout} isLoggedIn={isLoggedIn} />
                       </li>
                     )}
-                    <li className="grid items-center gap-x-6 border-t border-amber-200 py-6 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
+                    <li className="grid grid-cols-1 items-center gap-x-6 border-t border-amber-200 py-6 sm:grid-cols-[5.5rem_minmax(0,1fr)] lg:gap-x-10">
                       <p className="font-serif text-4xl font-medium leading-none text-amber-300 tabular-nums sm:text-5xl" aria-hidden="true">
                         {String(step.order).padStart(2, "0")}
                       </p>
@@ -390,7 +390,7 @@ export async function RecipeDetail({ recipe, isLoggedIn, isSaved, moreRecipes, s
           <h2 id="reviews-heading" className="scroll-mt-24 text-[1.9rem] font-medium leading-tight text-amber-950 sm:text-[2.4rem]">{t("detail.reviews")}</h2>
           <p className="mt-2 max-w-2xl text-amber-900">{t("detail.reviewsNote")}</p>
           <ResultPhotos reviews={reviews} className="mt-8" />
-          <div className="mt-8 grid items-start gap-12 lg:grid-cols-[23rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[26rem_minmax(0,1fr)] xl:gap-20">
+          <div className="mt-8 grid grid-cols-1 items-start gap-12 lg:grid-cols-[23rem_minmax(0,1fr)] lg:gap-14 xl:grid-cols-[26rem_minmax(0,1fr)] xl:gap-20">
             <div>
               {rating.count > 0 ? (
                 <RatingOverview rating={rating} />

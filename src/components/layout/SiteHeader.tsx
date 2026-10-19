@@ -6,6 +6,7 @@ import { Container } from "@/components/ui/Container";
 import { UserMenu } from "@/components/layout/UserMenu";
 import { MobileMenu } from "@/components/layout/MobileMenu";
 import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { FullscreenButton } from "@/components/layout/FullscreenButton";
 import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
 import { logout } from "@/app/auth/actions";
@@ -40,13 +41,13 @@ export async function SiteHeader() {
   return (
     <header className="sticky top-0 z-50 border-b border-amber-200/70 bg-amber-50/85 backdrop-blur-md">
       <Container size="xl">
-        <nav className="flex h-16 items-center gap-6" aria-label={t("nav.main")}>
+        <nav className="flex h-16 items-center gap-3 sm:gap-6" aria-label={t("nav.main")}>
           <Link href="/" className="flex items-center gap-2" aria-label={t("nav.homeLabel", { name: PLATFORM_CONFIG.name })}>
             <span className="h-2.5 w-2.5 rounded-full bg-clay-400" aria-hidden="true" />
             <span className="font-serif text-[1.6rem] font-semibold leading-none tracking-tight text-amber-950">{PLATFORM_CONFIG.name}</span>
           </Link>
 
-          <ul className="ml-4 hidden items-center gap-7 md:flex">
+          <ul className="ml-4 hidden items-center gap-7 lg:flex">
             {barItems.map((link) => (
               <li key={link.href}>
                 <Link href={link.href} className="text-[0.95rem] text-amber-900 transition-colors hover:text-amber-700">
@@ -57,6 +58,7 @@ export async function SiteHeader() {
           </ul>
 
           <div className="ml-auto flex items-center gap-1 sm:gap-2">
+            <FullscreenButton className="hidden md:flex" />
             <LanguageSwitcher />
             {user ? (
               <>

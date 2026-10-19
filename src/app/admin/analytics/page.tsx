@@ -50,7 +50,7 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
       <Panel title={t("adm.funnelTitle")} description={t("adm.funnelNote")}>
         <ol className="space-y-5">
           {funnel.map((step, i) => (
-            <li key={step.label} className="grid items-center gap-x-4 gap-y-1.5 sm:grid-cols-[14rem_1fr_9rem]">
+            <li key={step.label} className="grid grid-cols-1 items-center gap-x-4 gap-y-1.5 sm:grid-cols-[14rem_1fr_9rem]">
               <span className="text-sm font-medium text-amber-950">
                 <span className="mr-2 text-amber-500 tabular-nums">{i + 1}</span>
                 {step.label}
@@ -68,7 +68,7 @@ export default async function AdminAnalyticsPage({ searchParams }: { searchParam
         <p className="mt-5 text-xs text-amber-600">{t("adm.funnelFoot")}</p>
       </Panel>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         {charts.map((c) => (
           <Panel key={c.metric} title={c.label} description={c.metric === "active" ? t("adm.dailyActiveNote") : t("adm.chartTotal", { total: formatNumber(p.total(c.metric)), prev: formatNumber(p.previousTotal(c.metric)) })}>
             <TimeSeriesChart data={p.points(c.metric)} label={c.label} height={220} />

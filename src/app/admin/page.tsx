@@ -47,7 +47,7 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
         </Link>
       )}
       <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">{t("adm.people")}</h2>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label={t("adm.tile.registered")} value={formatNumber(totals.users)} hint={t("adm.newToday", { count: formatNumber(totals.newToday) })} />
         <StatTile label={t("adm.tile.activeToday")} value={formatNumber(totals.activeToday)} hint={t("adm.ofUsers", { pct: share(totals.activeToday) })} />
         <StatTile label={t("adm.tile.active7")} value={formatNumber(totals.active7)} hint={t("adm.ofUsers", { pct: share(totals.active7) })} />
@@ -55,14 +55,14 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
       </div>
 
       <h2 className="mb-3 mt-8 text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">{t("adm.activityRange", { range: t(RANGE_LABEL[range]) })}</h2>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label={t("dash.col.views")} value={formatNumber(p.total("views"))} current={p.total("views")} previous={p.previousTotal("views")} series={p.values("views")} />
         <StatTile label={t("adm.tile.signups")} value={formatNumber(p.total("signups"))} current={p.total("signups")} previous={p.previousTotal("signups")} series={p.values("signups")} />
         <StatTile label={t("adm.tile.cooksStarted")} value={formatNumber(p.total("cooks"))} current={p.total("cooks")} previous={p.previousTotal("cooks")} series={p.values("cooks")} />
         <StatTile label={t("adm.tile.completionRate")} value={String(p.completionRate)} suffix="%" current={p.completionRate} previous={p.previousCompletionRate} series={p.values("completions")} />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Panel title={t("adm.dailyActive")} description={t("adm.dailyActiveNote")}>
           <TimeSeriesChart data={p.points("active")} label={t("adm.tile.activeToday")} height={220} />
         </Panel>
@@ -75,7 +75,7 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
         </Panel>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <Panel title={t("adm.topViewed")} description={t("adm.lastRange", { range: t(RANGE_LABEL[range]) })}>
           <BarList
             empty={t("adm.noViews")}
@@ -87,7 +87,7 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
         </Panel>
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.4fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr_1fr]">
         <Panel title={t("adm.platformTotal")} description={t("adm.allTime")}>
           <dl className="grid grid-cols-2 gap-x-6 gap-y-7 sm:grid-cols-3">
             {platform.map((item) => (

@@ -53,7 +53,7 @@ export default async function StudioStatsPage({ searchParams }: { searchParams: 
         actions={<RangeTabs base="/dashboard/stats" range={range} />}
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label={t("dash.col.views")} value={formatNumber(p.total("views"))} current={p.total("views")} previous={p.previousTotal("views")} series={p.values("views")} />
         <StatTile label={t("dash.col.saves")} value={formatNumber(p.total("saves"))} current={p.total("saves")} previous={p.previousTotal("saves")} series={p.values("saves")} />
         <StatTile label={t("adm.tile.cooksStarted")} value={formatNumber(p.total("cooks"))} current={p.total("cooks")} previous={p.previousTotal("cooks")} series={p.values("cooks")} />
@@ -63,7 +63,7 @@ export default async function StudioStatsPage({ searchParams }: { searchParams: 
       <Panel className="mt-6" title={t("adm.funnelTitle")} description={t("adm.funnelNote")}>
         <ol className="space-y-5">
           {funnel.map((step, i) => (
-            <li key={step.label} className="grid items-center gap-x-4 gap-y-1.5 sm:grid-cols-[14rem_1fr_9rem]">
+            <li key={step.label} className="grid grid-cols-1 items-center gap-x-4 gap-y-1.5 sm:grid-cols-[14rem_1fr_9rem]">
               <span className="text-sm font-medium text-amber-950">
                 <span className="mr-2 tabular-nums text-amber-500">{i + 1}</span>
                 {step.label}
@@ -81,7 +81,7 @@ export default async function StudioStatsPage({ searchParams }: { searchParams: 
         <p className="mt-5 text-xs text-amber-600">{t("adm.funnelFoot")}</p>
       </Panel>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         {charts.map((c) => (
           <Panel key={c.metric} title={c.label} description={t("adm.chartTotal", { total: formatNumber(p.total(c.metric)), prev: formatNumber(p.previousTotal(c.metric)) })}>
             <TimeSeriesChart data={p.points(c.metric)} label={c.label} height={220} />
@@ -89,7 +89,7 @@ export default async function StudioStatsPage({ searchParams }: { searchParams: 
         ))}
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.6fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.6fr_1fr]">
         <Panel title={t("adm.recipePerf")} description={t("adm.recipePerfNote", { range: rangeLabel })} flush>
           {recipes.length === 0 ? (
             <EmptyState title={t("studio.empty")} text={t("studio.emptyText")} action={<Link href="/dashboard/recipes/new" className="font-medium text-amber-700 underline">{t("dash.createFirst")}</Link>} />

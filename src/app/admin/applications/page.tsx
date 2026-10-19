@@ -40,7 +40,7 @@ export default async function ApplicationsPage({ searchParams }: { searchParams:
       {items.length === 0 ? (
         <Panel><EmptyState title={t(`apply.adm.empty.${status}`)} /></Panel>
       ) : (
-        <ul className="grid gap-6 xl:grid-cols-2">
+        <ul className="grid grid-cols-1 gap-6 xl:grid-cols-2">
           {items.map((a) => (
             <li key={a.id}>
               <Panel className="h-full">

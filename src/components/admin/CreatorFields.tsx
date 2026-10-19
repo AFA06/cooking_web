@@ -15,7 +15,7 @@ export async function CreatorFields({ values = {}, slugOptional = false }: { val
   const t = await getT();
   return (
     <>
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <Field label={t("profile.displayName")} htmlFor="name">
           <TextInput id="name" name="name" required maxLength={80} defaultValue={values.name ?? ""} />
         </Field>
@@ -36,7 +36,7 @@ export async function CreatorFields({ values = {}, slugOptional = false }: { val
       <Field label={t("adm.f.telegram")} htmlFor="telegramUsername" hint={t("adm.f.telegramHint")}>
         <TextInput id="telegramUsername" name="telegramUsername" maxLength={60} placeholder="@username" autoComplete="off" spellCheck={false} defaultValue={values.telegramUsername ? `@${values.telegramUsername}` : ""} />
       </Field>
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <CheckboxField name="isFoundingCreator" label={t("creator.foundingCreator")} hint={t("adm.f.foundingHint")} defaultChecked={values.isFoundingCreator} />
         <CheckboxField name="isFeatured" label={t("adm.f.featured")} hint={t("adm.f.featuredHint")} defaultChecked={values.isFeatured} />
       </div>

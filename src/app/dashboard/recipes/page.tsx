@@ -80,7 +80,7 @@ export default async function StudioRecipesPage({ searchParams }: { searchParams
           />
         </div>
       ) : (
-        <ul className="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
           {items.map((r) => (
             <StudioRecipeCard key={r.id} recipe={r} />
           ))}

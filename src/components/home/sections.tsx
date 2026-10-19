@@ -147,14 +147,14 @@ export async function HowItCooks() {
   const t = await getT();
   return (
     <section aria-labelledby="how-heading" className="bg-sage-50">
-      <Container size="xl" className="grid gap-10 py-16 lg:grid-cols-[1fr_2fr] lg:gap-20 lg:py-24">
+      <Container size="xl" className="grid grid-cols-1 gap-10 py-16 lg:grid-cols-[1fr_2fr] lg:gap-20 lg:py-24">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-sage-600">{t("home.whyEyebrow")}</p>
           <h2 id="how-heading" className="mt-3 text-[1.9rem] font-medium leading-tight text-amber-950 sm:text-[2.4rem]">
             {t("home.whyTitle")}
           </h2>
         </div>
-        <ol className="grid gap-8 sm:grid-cols-3">
+        <ol className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           {HOW.map((step, i) => (
             <li key={step.title} className="border-t border-sage-700 pt-5">
               <span className="font-serif text-lg text-sage-600 tabular-nums">0{i + 1}</span>

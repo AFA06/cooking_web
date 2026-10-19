@@ -57,7 +57,7 @@ export default async function AdminRecipePage({ params }: { params: Promise<{ id
       />
 
       {stat && (
-        <div className="mb-6 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatTile label={t("dash.col.views")} value={formatNumber(stat.views)} hint={t("adm.allTimeShort")} />
           <StatTile label={t("dash.col.saves")} value={formatNumber(stat.saves)} hint={t("adm.allTimeShort")} />
           <StatTile label={t("adm.tile.cooksStarted")} value={formatNumber(stat.cooks)} hint={t("adm.allTimeShort")} />
@@ -65,7 +65,7 @@ export default async function AdminRecipePage({ params }: { params: Promise<{ id
         </div>
       )}
 
-      <div className="grid gap-6 xl:grid-cols-[1fr_20rem]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_20rem]">
         <Panel title={t("adm.recipeContent")}>
           <RecipeEditor initial={toEditorInitial(data)} save={adminSaveRecipe.bind(null, null)} basePath="/admin/recipes" sidebar={false} />
         </Panel>

@@ -103,7 +103,7 @@ export default async function StudioPage() {
       {todo.some((item) => !item.done) && (
         <section aria-labelledby="start-heading" className="mt-10 rounded-[2rem] bg-sage-50 p-6 sm:p-8">
           <h2 id="start-heading" className="font-serif text-2xl font-medium text-amber-950">{t("studio.getStarted")}</h2>
-          <ul className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {todo.map((item) => (
               <li key={item.label}>
                 <Link
@@ -129,7 +129,7 @@ export default async function StudioPage() {
           )}
         </div>
         {recipes.length === 0 ? (
-          <div className="mt-6 rounded-[2rem] border-2 border-dashed border-amber-300 px-6 py-16 text-center">
+          <div className="mt-6 rounded-[2rem] border-2 border-dashed border-amber-300 px-4 py-16 text-center sm:px-6">
             <h3 className="font-serif text-2xl text-amber-950">{t("studio.empty")}</h3>
             <p className="mx-auto mt-2 max-w-md text-amber-900">{t("studio.emptyText")}</p>
             <Button size="xl" className="mt-8" asChild>
@@ -140,7 +140,7 @@ export default async function StudioPage() {
             </Button>
           </div>
         ) : (
-          <ul className="mt-6 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <ul className="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {recipes.slice(0, 3).map((r) => (
               <StudioRecipeCard key={r.id} recipe={r} />
             ))}

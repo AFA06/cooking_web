@@ -71,7 +71,7 @@ export default async function AdminCreatorPage({ params, searchParams }: { param
           {t("adm.creatorBlocked")} <Link href={`/admin/users/${creator.userId}`} className="font-semibold underline">{t("adm.manageAccount")}</Link>
         </p>
       )}
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label={t("nav.recipes")} value={`${creator.published}`} suffix={`/ ${creator.recipes}`} hint={t("adm.publishedTotal")} />
         <StatTile label={t("dash.col.views")} value={formatNumber(creator.views)} hint={t("adm.allTimeShort")} />
         <StatTile label={t("dash.col.saves")} value={formatNumber(creator.saves)} hint={t("adm.allTimeShort")} />
@@ -86,7 +86,7 @@ export default async function AdminCreatorPage({ params, searchParams }: { param
         )}
       </Panel>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1fr_24rem]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1fr_24rem]">
         <Panel title={t("adm.details")} description={t("adm.detailsNote")}>
           <ActionForm action={updateCreator.bind(null, creator.id)} submitLabel={t("adm.saveChanges")}>
             <CreatorFields values={{ ...creator, telegramUsername: extra?.telegramUsername }} />

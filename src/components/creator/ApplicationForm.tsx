@@ -19,7 +19,7 @@ export function ApplicationForm({ defaultName, defaultPhone }: { defaultName: st
 
   return (
     <form action={action} className="space-y-5">
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="fullName" className={label}>{t("apply.fullName")}</label>
           <input id="fullName" name="fullName" required maxLength={80} autoComplete="name" defaultValue={v.fullName ?? defaultName} className={authInputClass} />

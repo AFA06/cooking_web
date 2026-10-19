@@ -49,14 +49,14 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label={t("account.savedRecipes")} value={formatNumber(user.saves)} />
         <StatTile label={t("adm.tile.cooksStarted")} value={formatNumber(user.cooks)} />
         <StatTile label={t("account.completed")} value={formatNumber(user.completions)} />
         <StatTile label={t("adm.lastSeen")} value={user.lastSeenAt ? formatShortDate(user.lastSeenAt, locale).split(" ")[0] : "—"} hint={formatRelative(user.lastSeenAt, t, locale)} />
       </div>
 
-      <div className="mt-6 grid gap-6 xl:grid-cols-[1.2fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-[1.2fr_1fr]">
         <Panel title={t("adm.activity")} description={t("adm.activityNote")} flush>
           {activity.length === 0 ? (
             <EmptyState title={t("adm.noActivity")} text={t("adm.noActivityText")} />

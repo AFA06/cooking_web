@@ -59,7 +59,7 @@ export default async function SettingsPage() {
 
   return (
     <SiteShell>
-      <Container size="xl" className="grid gap-12 py-12 lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-24 lg:py-16">
+      <Container size="xl" className="grid grid-cols-1 gap-12 py-12 lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-24 lg:py-16">
         <aside className="lg:sticky lg:top-28 lg:self-start">
           <Link href="/account" className="inline-flex items-center gap-2 text-sm font-medium text-amber-600 transition-colors hover:text-amber-950">
             <ArrowLeft className="h-4 w-4" aria-hidden="true" />

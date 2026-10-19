@@ -3,13 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ArrowLeft, ArrowRight, BellRing, Check, Clock, ListChecks, Sun, Thermometer, Type, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, BellRing, Check, Clock, ListChecks, Thermometer, Type, X } from "lucide-react";
 import { finishCookingSession, startCookingSession } from "@/app/recipes/actions";
 import { StepMedia } from "@/components/recipe/StepMedia";
 import { StageRail } from "@/components/recipe/cooking/StageRail";
 import { TimerRing } from "@/components/recipe/cooking/TimerRing";
 import { useCookTimers } from "@/components/recipe/cooking/useCookTimers";
 import { ReviewForm } from "@/components/reviews/ReviewForm";
+import { FullscreenButton } from "@/components/layout/FullscreenButton";
 import { Button } from "@/components/ui/Button";
 import { useLocale, useT } from "@/i18n/client";
 import { formatClock } from "@/lib/format";
@@ -87,7 +88,6 @@ export function GuidedCooking({ recipe, locked, isLoggedIn, servings }: { recipe
   const [reviewed, setReviewed] = React.useState(false);
   const [ringing, setRinging] = React.useState<string[]>([]);
   const [overviewOpen, setOverviewOpen] = React.useState(false);
-  const [awake, setAwake] = React.useState(false);
   const sessionId = React.useRef<Promise<string | null> | null>(null);
   const audio = React.useRef<AudioContext | null>(null);
   const touch = React.useRef<{ x: number; y: number } | null>(null);
@@ -149,8 +149,6 @@ export function GuidedCooking({ recipe, locked, isLoggedIn, servings }: { recipe
         if (!("wakeLock" in navigator)) return;
         lock = await navigator.wakeLock.request("screen");
         if (cancelled) return void lock.release();
-        setAwake(true);
-        lock.addEventListener("release", () => setAwake(false));
       } catch {
         // Not allowed (low battery, background tab): cooking works the same without it.
       }
@@ -279,11 +277,11 @@ export function GuidedCooking({ recipe, locked, isLoggedIn, servings }: { recipe
             </p>
           )}
 
-          <div className="mt-10 flex flex-wrap justify-center gap-3">
-            <Button size="xl" variant="outline" asChild>
-              <Link href={`/recipes/${recipe.slug}`}>{t("cook.backToRecipe")}</Link>
+          <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+            <Button size="xl" asChild>
+              <Link href="/">{t("cook.toHome")}</Link>
             </Button>
-            <Button size="xl" variant="ghost" asChild>
+            <Button size="xl" variant="outline" asChild>
               <Link href="/recipes">{t("cook.otherRecipes")}</Link>
             </Button>
           </div>
@@ -319,12 +317,7 @@ export function GuidedCooking({ recipe, locked, isLoggedIn, servings }: { recipe
             <span className="ml-2 hidden text-amber-600 sm:inline">· {servings} {t("servings.unit")}</span>
           </p>
           <div className="flex shrink-0 items-center gap-1">
-            {awake && (
-              <span title={t("cook.screenOn")} className="hidden h-12 w-12 items-center justify-center text-sage-600 md:flex">
-                <Sun className="h-5 w-5" aria-hidden="true" />
-                <span className="sr-only">{t("cook.screenOn")}</span>
-              </span>
-            )}
+            <FullscreenButton className="h-12 w-12" />
             <button
               type="button"
               onClick={() => writeSize(big ? "l" : "xl")}
@@ -454,7 +447,7 @@ export function GuidedCooking({ recipe, locked, isLoggedIn, servings }: { recipe
             {stepIngredients.length > 0 && (
               <section aria-label={t("servings.stepIngredients")}>
                 <h2 className="text-sm font-semibold uppercase tracking-[0.16em] text-amber-600">{t("cook.ingredientsNow")}</h2>
-                <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+                <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
                   {stepIngredients.map((i) => (
                     <li key={i.id} className="flex items-baseline gap-3 rounded-2xl bg-sage-50 px-5 py-4">
                       <span className={cn("shrink-0 font-serif font-semibold tabular-nums text-sage-700", big ? "text-4xl" : "text-3xl")}>

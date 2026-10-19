@@ -177,7 +177,8 @@ export function BarList({
 
 export function SegmentedLinks({ items, label }: { items: { href: string; label: string; active: boolean }[]; label: string }) {
   return (
-    <nav aria-label={label} className="inline-flex rounded-md border border-amber-200 bg-amber-100 p-0.5">
+    // Scrolls sideways on a narrow phone rather than pushing the page wider (long labels in Russian).
+    <nav aria-label={label} className="inline-flex max-w-full overflow-x-auto rounded-md border border-amber-200 bg-amber-100 p-0.5">
       {items.map((i) => (
         <Link
           key={i.href}
@@ -241,7 +242,8 @@ export async function Pagination({ page, total, pageSize, hrefFor }: { page: num
 }
 
 export const table = {
-  wrap: "overflow-x-auto",
+  // `relative` keeps absolutely positioned bits inside (sr-only labels): otherwise they escape the scroller and widen the page on phones.
+  wrap: "relative overflow-x-auto",
   root: "w-full min-w-[44rem] text-left text-sm",
   th: "whitespace-nowrap border-b border-amber-200 bg-amber-50/70 px-5 py-3 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-amber-600 first:pl-6 last:pr-6",
   thNum: "text-right",
