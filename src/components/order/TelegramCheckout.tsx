@@ -24,8 +24,11 @@ export interface OrderView {
 
 function openTelegram(link: string) {
   // A new tab keeps this page (and its order status) open; if the browser blocks it, leave the page instead.
-  const win = window.open(link, "_blank", "noopener");
-  if (!win) window.location.assign(link);
+  // "noopener" as a window feature makes window.open return null even when the tab opened, which used to
+  // send this page to Telegram as well. Open normally, then cut the link back to us.
+  const win = window.open(link, "_blank");
+  if (win) win.opener = null;
+  else window.location.assign(link);
 }
 
 /** Order progress: pay the card from the chat, wait for the creator, get access. */
