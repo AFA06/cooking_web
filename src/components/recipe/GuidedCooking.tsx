@@ -404,7 +404,7 @@ export function GuidedCooking({ recipe, locked, isLoggedIn, servings }: { recipe
 
             <h1 className={cn("mt-6 break-words font-serif font-medium leading-[1.08] text-amber-950", big ? "text-4xl sm:text-5xl lg:text-6xl" : "text-3xl sm:text-4xl lg:text-5xl")}>{step.title}</h1>
 
-            <StepMedia step={step} sizes="(max-width: 1024px) 100vw, 60vw" className="mt-7 w-full max-w-3xl rounded-3xl" />
+            <StepMedia key={step.id} step={step} autoPlayTimes={2} sizes="(max-width: 1024px) 100vw, 60vw" className="mt-7 w-full max-w-3xl rounded-3xl" />
 
             <p className={cn("mt-7 max-w-3xl leading-[1.55] text-amber-950", big ? "text-3xl sm:text-4xl lg:text-[2.75rem]" : "text-2xl sm:text-3xl lg:text-4xl")}>{step.instruction}</p>
 

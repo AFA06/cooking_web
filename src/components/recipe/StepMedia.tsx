@@ -10,13 +10,15 @@ interface Props {
   /** Passed to the photo, see next/image. */
   sizes: string;
   className?: string;
+  /** Cooking mode: the step's clip starts by itself and plays this many times. */
+  autoPlayTimes?: number;
 }
 
 /**
  * What a step shows: its photo and its clip, each as itself, one under the other. The photo is
  * never used as the clip's cover; a step may have either or both.
  */
-export function StepMedia({ step, sizes, className }: Props) {
+export function StepMedia({ step, sizes, className, autoPlayTimes }: Props) {
   const video = step.videoUrl ? parseVideoUrl(step.videoUrl) : null;
   if (!video && !step.mediaUrl) return null;
   // A stored photo is shown to this visitor only, so it must not pass through the shared image optimiser.
@@ -33,7 +35,7 @@ export function StepMedia({ step, sizes, className }: Props) {
       {video && (
         <div className={cn(frame, "bg-ink")}>
           {video.kind === "file" ? (
-            <FileVideo src={video.src} label={step.title} className="h-full w-full object-contain" />
+            <FileVideo src={video.src} label={step.title} className="h-full w-full object-contain" autoPlayTimes={autoPlayTimes} />
           ) : (
             <iframe src={video.embedUrl} title={step.title} loading="lazy" allowFullScreen className="h-full w-full" />
           )}
