@@ -175,6 +175,22 @@ export async function startSignup(_: AuthState, formData: FormData): Promise<Aut
   // Hash even when the account exists, so both paths cost the same time.
   const passwordHash = await bcrypt.hash(parsed.data.password, 12);
 
+  // Temporary: until SIGNUP_VERIFICATION=on is set, the account is created straight away with nothing marked
+  // as verified. Setting it brings the SMS/email code step back.
+  if (process.env.SIGNUP_VERIFICATION !== "on") {
+    if (phoneTaken || emailTaken) return { error: t("auth.a.phoneExists") };
+    try {
+      const [user] = await db
+        .insert(schema.users)
+        .values({ name, phone, email, passwordHash })
+        .returning({ id: schema.users.id });
+      await createSession(user.id);
+    } catch {
+      return { error: t("auth.a.phoneExists") };
+    }
+    redirect(safeNext(formData.get("next")));
+  }
+
   let challengeId: string;
   try {
     if (phoneTaken || emailTaken) {
