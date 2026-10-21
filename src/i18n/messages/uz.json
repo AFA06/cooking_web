@@ -17,7 +17,7 @@
     "emailVerified": "Email tasdiqlandi va yangilandi.",
     "err": {
       "cannotUse": "Bu raqam yoki emaildan foydalanib bo‘lmaydi. Boshqasini kiriting.",
-      "deliveryDown": "Kod yuborish xizmati hozircha ishlamayapti.",
+      "deliveryDown": "Email yuborish xizmati hozircha ishlamayapti.",
       "emailTaken": "Bu emaildan foydalanib bo‘lmaydi. Boshqasini kiriting.",
       "enterCurrentPw": "Joriy parolni kiriting",
       "locked": "Juda ko‘p noto‘g‘ri urinish. 15 daqiqadan so‘ng qayta urinib ko‘ring.",
@@ -34,7 +34,7 @@
       "usernameTaken": "Bu foydalanuvchi nomi band. Boshqasini tanlang.",
       "wrongPw": "Joriy parol noto‘g‘ri."
     },
-    "phoneUpdated": "Telefon raqami tasdiqlandi va yangilandi.",
+    "phoneUpdated": "Telefon raqami yangilandi.",
     "pwUpdated": "Parol yangilandi. Boshqa qurilmalardagi sessiyalar yopildi."
   },
   "adm": {
@@ -64,7 +64,7 @@
       "copy": "Xabar sifatida nusxalash",
       "created": "{name} qo‘shildi",
       "desc": "Ijodkor uchun hisob va ommaviy profil bir martada yaratiladi. Kirish ma’lumotlarini o‘zingiz yuborasiz.",
-      "handover": "Assalomu alaykum, {name}! Damda studiyasiga kirish:\nLogin: {login}\nVaqtinchalik parol: {password}\nBirinchi kirishda o‘z parolingizni tanlaysiz.",
+      "handover": "Assalomu alaykum, {name}! Retseplar studiyasiga kirish:\nLogin: {login}\nVaqtinchalik parol: {password}\nBirinchi kirishda o‘z parolingizni tanlaysiz.",
       "login": "Login",
       "open": "Ijodkor sahifasi",
       "password": "Vaqtinchalik parol",
@@ -276,108 +276,33 @@
     "usersDesc": "Hisoblar, rollar va faollik.",
     "viewOnSite": "Saytda ko‘rish",
     "vsPrev": "o‘tgan davrga nisbatan",
-    "welcome": "Xush kelibsiz, {name}"
-  },
-  "apply": {
-    "about": "O‘zingiz haqingizda qisqacha",
-    "aboutPlaceholder": "Qanday taomlar tayyorlaysiz, auditoriyangiz kimlar?",
-    "adm": {
-      "account": "Hisob: {name}",
-      "approve": "Tasdiqlash va studiyani ochish",
-      "approveHint": "Odam o‘z hisobi bilan qoladi: profil yaratiladi, ijodkor paneli ochiladi.",
-      "approvedOk": "Ariza tasdiqlandi. Telegram nomini tekshirib, kerak bo‘lsa to‘g‘rilang: xaridorlar shu yerga yo‘naltiriladi.",
-      "desc": "Auditoriyani tekshiring, odam bilan gaplashing, keyin tasdiqlang yoki rad eting.",
-      "empty": {
-        "approved": "Hali tasdiqlangan ariza yo‘q.",
-        "pending": "Yangi ariza yo‘q.",
-        "rejected": "Rad etilgan ariza yo‘q."
-      },
-      "nav": "Arizalar",
-      "note": "Izoh",
-      "notePlaceholder": "Ixtiyoriy: arizachi ko‘radigan qisqa izoh",
-      "reject": "Rad etish",
-      "rejectConfirm": "Rad etishni tasdiqlash",
-      "rejectedOk": "Ariza rad etildi.",
-      "review": "Ko‘rib chiqish",
-      "status": {
-        "approved": "Tasdiqlangan",
-        "pending": "Yangi",
-        "rejected": "Rad etilgan"
-      },
-      "title": "Ijodkor arizalari",
-      "waiting": {
-        "one": "{count} ta yangi ijodkor arizasi kutmoqda",
-        "other": "{count} ta yangi ijodkor arizasi kutmoqda"
-      }
-    },
-    "audience": "Obunachilar soni (taxminan)",
-    "audiencePick": "Tanlang",
-    "cta": "Ijodkor bo‘lish uchun ariza",
-    "err": {
-      "about": "O‘zingiz haqingizda bir-ikki gap yozing.",
-      "aboutLong": "Matn juda uzun (600 belgigacha).",
-      "already": "Siz allaqachon ijodkorsiz.",
-      "audience": "Obunachilar sonini tanlang.",
-      "instagram": "Instagram manzili noto‘g‘ri. @username yoki havola yozing.",
-      "name": "Ism va familiyani yozing.",
-      "oneLink": "Instagram yoki Telegram’dan kamida bittasini yozing.",
-      "pending": "Sizda ko‘rib chiqilayotgan ariza bor.",
-      "telegram": "Telegram manzili noto‘g‘ri. @username yoki havola yozing."
-    },
-    "fullName": "Ism va familiya",
-    "intro": "Instagram yoki Telegram’dagi auditoriyangizni ko‘rib chiqamiz va siz bilan bog‘lanamiz. Ma’qul kelsa, studiyangizni ochamiz.",
-    "linksHint": "Kamida bittasini yozing: auditoriyangizni shu yerda ko‘ramiz.",
-    "pendingShort": "Arizangiz ko‘rib chiqilmoqda",
-    "pendingText": "Jamoa uni ko‘rib chiqib, {phone} raqamiga bog‘lanadi. Tasdiqlansa, menyuda «Ijodkor paneli» paydo bo‘ladi.",
-    "pendingTitle": "Arizangiz qabul qilindi",
-    "phone": "Bog‘lanish uchun telefon",
-    "rejected": "Oldingi arizangiz hozircha tasdiqlanmadi. Ma’lumotlarni yangilab, qayta yuborishingiz mumkin.",
-    "signupCta": "Ro‘yxatdan o‘tib, ariza qoldirish",
-    "signupFirst": "Avval bir daqiqada ro‘yxatdan o‘ting, keyin qisqa ariza qoldirasiz.",
-    "size": {
-      "100k+": "100 000 dan ko‘p",
-      "10k-50k": "10 000 – 50 000",
-      "1k-10k": "1 000 – 10 000",
-      "50k-100k": "50 000 – 100 000",
-      "lt1k": "1 000 dan kam"
-    },
-    "submit": "Arizani yuborish",
-    "title": "Ijodkor bo‘lish"
+    "welcome": "Xush kelibsiz, {name}",
+    "tempPw": {
+      "title": "Vaqtinchalik parol",
+      "note": "Parolini unutgan va hisobida email bo‘lmagan foydalanuvchi uchun. Parol bir marta ko‘rsatiladi: uni shaxsiy xabarda yuboring, kirgach u yangisini tanlaydi. Barcha qurilmalardagi sessiyalar yopiladi."
+    }
   },
   "auth": {
     "a": {
       "badCode": "Kod noto‘g‘ri yoki muddati tugagan.",
-      "blocked": "Bu hisob bloklangan. Savollar bo‘lsa, Damda jamoasiga yozing.",
-      "codeExpiredRestart": "Kod muddati tugagan. Qaytadan boshlang.",
-      "codeSent": "Kod yuborildi.",
+      "blocked": "Bu hisob bloklangan. Savollar bo‘lsa, Retseplar jamoasiga yozing.",
       "genericSent": "Agar hisob mavjud bo‘lsa, kod yuborildi.",
       "identBad": "Telefon raqamingizni yoki emailingizni to‘g‘ri kiriting.",
       "loginWrong": "Telefon yoki email, yoki parol noto‘g‘ri.",
-      "newCodeSent": "Yangi kod yuborildi.",
       "phoneExists": "Bu raqam bilan hisob allaqachon mavjud. Tizimga kiring.",
       "pwMismatch": "Parollar bir xil emas.",
       "sendFailed": "Kod yuborib bo‘lmadi. Birozdan so‘ng qayta urinib ko‘ring.",
-      "tooMany": "Juda ko‘p urinish. Birozdan so‘ng qayta urinib ko‘ring.",
-      "unavailable": "SMS xizmati hozircha ishlamayapti. Birozdan so‘ng qayta urinib ko‘ring.",
-      "waitRetry": "Biroz kuting, so‘ng qayta urinib ko‘ring.",
-      "wrongBrowser": "Bu so‘rov boshqa qurilmadan boshlangan. Hisob yaratishni shu qurilmada qaytadan boshlang."
+      "tooMany": "Juda ko‘p urinish. Birozdan so‘ng qayta urinib ko‘ring."
     },
     "backToLogin": "Kirish sahifasiga qaytish",
-    "changeDetails": "Ma’lumotlarni o‘zgartirish",
-    "changeNumber": "Raqamni o‘zgartirish",
-    "codeExpired": "Kod muddati tugagan.",
     "codeLabel": "Tasdiqlash kodi",
-    "codeSentTo": "{phone} raqamiga 6 xonali kod yubordik.",
-    "codeSentToEmail": "{email} manziliga 6 xonali kod yubordik.",
     "confirm": "Tasdiqlash",
     "country": "Davlat",
     "createAccount": "Hisob yaratish",
     "email": "Email",
-    "emailHintCode": "Tasdiqlash kodini shu emailga yuboramiz.",
-    "emailHintOptional": "Parolni tiklash uchun foydali. Keyin sozlamalarda ham qo‘shishingiz mumkin.",
+    "emailHintOptional": "Parolni unutsangiz, tiklash kodi faqat emailga keladi. Keyin sozlamalarda ham qo‘shishingiz mumkin.",
     "err": {
       "email": "To‘g‘ri email kiriting",
-      "emailNeeded": "O‘zbekistondan tashqari raqam uchun email kerak: kodni shu yerga yuboramiz.",
       "exists": "Bu email bilan hisob allaqachon mavjud. Tizimga kirib ko‘ring.",
       "firstName": "Ismingizni yozing.",
       "lastName": "Familiyangizni yozing.",
@@ -393,7 +318,7 @@
     "forgotEm": "unutdingizmi?",
     "forgotLead": "Parolni",
     "forgotMeta": "Parolni tiklash",
-    "forgotNote": "Hisobingizga bog‘langan telefon raqami yoki emailni kiriting. Tasdiqlash kodini yuboramiz.",
+    "forgotNote": "Hisobingizga bog‘langan telefon raqami yoki emailni kiriting. Hisobingizda email bo‘lsa, unga tiklash kodini yuboramiz.",
     "haveAccount": "Hisobingiz bormi?",
     "hidePw": "Parolni yashirish",
     "identifier": "Telefon raqami yoki email",
@@ -407,10 +332,7 @@
     "optional": "ixtiyoriy",
     "otherIdentifier": "Boshqa raqam yoki email kiritish",
     "password": "Parol",
-    "phoneHint": "Raqamingizga SMS orqali tasdiqlash kodi yuboramiz.",
-    "phoneHintIntl": "O‘zbekistondan tashqari raqamlar uchun kod emailga yuboriladi.",
     "pick": "Bugungi tavsiya",
-    "reasonApply": "Ijodkor bo‘lish uchun ariza qoldirishdan oldin hisob oching yoki kiring.",
     "reasonCook": "Pishirishni boshlash uchun bir daqiqada hisob oching yoki kiring. Keyin darhol pishirishga o‘tasiz.",
     "reasonRecipe": "Davom etish uchun hisob oching yoki kiring.",
     "resendCode": "Kodni qayta yuborish",
@@ -418,23 +340,16 @@
     "resetEm": "o‘rnating.",
     "resetLead": "Yangi parol",
     "resetMeta": "Yangi parol",
-    "resetNote": "Agar hisob mavjud bo‘lsa, kod yuborildi: tasdiqlangan emailingizga, email bo‘lmasa telefoningizga SMS orqali. Emailingizga kira olmasangiz, pastdagi SMS tugmasini bosing.",
-    "restartSignup": "Hisob yaratishni qaytadan boshlang",
+    "resetNote": "Agar hisob mavjud va unda email bo‘lsa, kodni o‘sha emailga yubordik. Xat ko‘rinmasa, «Spam» papkasini tekshiring.",
     "sendCode": "Kod yuborish",
     "showPw": "Parolni ko‘rsatish",
     "signupEm": "qo‘shiling.",
     "signupEyebrow": "Hisob yaratish",
     "signupLead": "Dasturxonga",
     "signupNote": "Retseptlarni saqlang va pishirgan taomlaringizni kuzating.",
-    "signupNoteSms": "Telefon raqamingiz bilan ro‘yxatdan o‘ting: retseptlarni saqlang va pishirgan taomlaringizni kuzating.",
-    "smsInstead": "Emailga kira olmayman — SMS yuborish",
     "switchLabel": "Kirish yoki ro‘yxatdan o‘tish",
     "useEmail": "Email bilan kirish",
     "usePhone": "Telefon raqam bilan kirish",
-    "verifyEm": "kiriting.",
-    "verifyEyebrow": "Tasdiqlash",
-    "verifyLead": "Kodni",
-    "verifyMeta": "Ro‘yxatdan o‘tishni tasdiqlash",
     "wait": "{label} ({seconds} s)"
   },
   "card": {
@@ -758,13 +673,9 @@
   },
   "email": {
     "body": "{label}: {code}\n\nKod {minutes} daqiqa amal qiladi. Uni hech kimga bermang.\nAgar bu so‘rovni siz yubormagan bo‘lsangiz, bu xatga e’tibor bermang.",
-    "existsBody": "{brand}: bu ma’lumotlar bilan hisob allaqachon mavjud. Saytda «Kirish» yoki «Parolni unutdingizmi?» dan foydalaning.",
-    "existsSubject": "hisob allaqachon bor",
     "label": {
       "email_change": "Emailni tasdiqlash kodi",
-      "password_reset": "Parolni tiklash kodi",
-      "phone_change": "Telefonni tasdiqlash kodi",
-      "signup": "Tasdiqlash kodi"
+      "password_reset": "Parolni tiklash kodi"
     }
   },
   "err": {
@@ -869,9 +780,6 @@
       "title": "Taymer bilan davom eting"
     },
     "intro": "Sevimli oshpazlaringizning retseptlari — aniq miqdor, taymer va har bir qadamda ko‘rsatma bilan. Videoni ortga qaytarib o‘tirmaysiz.",
-    "inviteEyebrow": "Ijodkorlar uchun",
-    "inviteText": "Dastlabki {count} ta ijodkor asoschi hamkor sifatida qo‘shiladi va asoschilik davrida komissiya to‘lamaydi.",
-    "inviteTitle": "Auditoriyangiz retseptlaringizni yaxshi ko‘radi. Ularga pishirishning qulay yo‘lini bering.",
     "latest": "Yangi retseptlar",
     "latestNote": "Ijodkorlar yaqinda qo‘shgan taomlar",
     "pick": "Bugungi tavsiya",
@@ -884,51 +792,8 @@
     "titleEm": "pishiramiz?",
     "titleLead": "Bugun nima",
     "viewRecipe": "Retseptni ko‘rish",
-    "whyEyebrow": "Nima uchun Damda",
+    "whyEyebrow": "Nima uchun Retseplar",
     "whyTitle": "Qo‘lingiz band bo‘lganda ham keyingi qadam ko‘z oldingizda."
-  },
-  "join": {
-    "byInvite": "Studiyaga kirish Damda jamoasining taklifi bilan beriladi.",
-    "createProfile": "Profil yaratish",
-    "deckNote": "O‘ngdagi karta — haqiqiy retseptning birinchi qadami. Sizning retseptingiz ham xuddi shunday ochiladi.",
-    "deckStep": "{n}-qadam",
-    "desc": "Retseptlaringizni auditoriyangiz haqiqatan pishira oladigan qo‘llanmaga aylantiring.",
-    "haveAccount": "Hisobim bor",
-    "heroEm": "qo‘llanma.",
-    "heroLead": "Retseptingiz endi —",
-    "heroText": "Retseptlaringizni masalliq, taymer va maslahatlar bilan qadam-baqadam nashr eting, bitta havolani auditoriyangizga ulashing va premium retseptlar taklif qiling.",
-    "howEm": "xuddi retseptdek.",
-    "howLead": "Uch qadam,",
-    "inviteText": "Ijodkorlarni Damda jamoasi o‘zi qo‘shadi va kirish ma’lumotlarini yuboradi. Taklif olgan bo‘lsangiz, telefon raqamingiz va berilgan parol bilan kiring.",
-    "openKitchen": "Oshxonangiz eshigini oching.",
-    "premiumNote": "Premium retseptlar Telegram orqali sotiladi: xaridor sizga yozadi, to‘lov kartangizga tushadi va narxning hammasi sizda qoladi.",
-    "signupCta": "Boshlash uchun hisob yarating",
-    "step1": {
-      "text": "Ro‘yxatdan o‘tib, qisqa ariza yuboring. Jamoa auditoriyangizni ko‘rib, siz bilan bog‘lanadi va studiyangizni ochadi.",
-      "title": "Ariza qoldiring"
-    },
-    "step2": {
-      "text": "Masalliqlar, har bir qadam, kerak joyda taymer va maslahat. Bepul yoki premium — o‘zingiz tanlaysiz.",
-      "title": "Retseptni qadamlarga bo‘ling"
-    },
-    "step3": {
-      "text": "Odamlar videoni ortga qaytarmasdan, ekrandagi qadamlar bo‘yicha pishiradi.",
-      "title": "Havolani ulashing"
-    },
-    "studioSignIn": "Studiyaga kirish",
-    "term1": {
-      "text": "Dastlabki {count} ta ijodkor asoschi hamkor sifatida qo‘shiladi.",
-      "title": "Asoschi ijodkorlar"
-    },
-    "term2": {
-      "text": "Hozircha platforma komissiya olmaydi: har bir sotuvning to‘liq summasi sizda qoladi.",
-      "title": "Platforma komissiyasi"
-    },
-    "term3": {
-      "text": "Retseptingiz bitta havolada: auditoriyangiz uni ochadi va siz bilan birga pishiradi.",
-      "title": "Bitta havola"
-    },
-    "termsLabel": "Shartlar"
   },
   "legal": {
     "agree": {
@@ -949,11 +814,10 @@
     "keywords": "retseptlar, o‘zbek taomlari, qadam-baqadam retsept, osh, lag‘mon, pazandalik",
     "recipesDesc": "Ijodkorlarning qadam-baqadam retseptlarini ko‘ring. Bepul va premium retseptlar.",
     "shortDescription": "Pishirayotganda YouTube’ga qaytmang. Haqiqiy ijodkorlarning retseptlari qadam-baqadam yo‘l-yo‘riq bilan.",
-    "title": "Damda — sevimli ijodkorlaringizdan qadam-baqadam retseptlar"
+    "title": "Retseplar — sevimli ijodkorlaringizdan qadam-baqadam retseptlar"
   },
   "nav": {
     "adminPanel": "Admin paneli",
-    "becomeCreator": "Ijodkor bo‘lish",
     "closeMenu": "Menyuni yopish",
     "createRecipe": "Retsept yaratish",
     "creatorPanel": "Ijodkor paneli",
@@ -998,7 +862,7 @@
     "cancel": "Buyurtmani bekor qilish",
     "closed": "Bu buyurtma yopilgan. Retsept sahifasidan yangisini boshlashingiz mumkin.",
     "dialog": {
-      "hint": "To‘lovni {name}ga to‘g‘ridan-to‘g‘ri kartaga qilasiz. Damda karta ma’lumotlarini so‘ramaydi.",
+      "hint": "To‘lovni {name}ga to‘g‘ridan-to‘g‘ri kartaga qilasiz. Retseplar karta ma’lumotlarini so‘ramaydi.",
       "note": "Telegram’da aynan shu matn yoziladi. Yuborishni o‘zingiz bosasiz.",
       "open": "Telegram’ni ochish",
       "share": "Ismim va telefonimni yuborilsin, shunda {name} buyurtmamni topa oladi",
@@ -1035,7 +899,7 @@
       "label": "Promokod",
       "remove": "Olib tashlash"
     },
-    "safety": "To‘lashdan oldin tekshiring: karta egasining ismi {name} bilan mos bo‘lsin. Damda hech qachon boshqa joyga to‘lashni so‘ramaydi.",
+    "safety": "To‘lashdan oldin tekshiring: karta egasining ismi {name} bilan mos bo‘lsin. Retseplar hech qachon boshqa joyga to‘lashni so‘ramaydi.",
     "signInToBuy": "Sotib olish uchun kiring",
     "startCooking": "Pishirishni boshlash",
     "status": {
@@ -1260,7 +1124,7 @@
     "currentPw": "Joriy parol",
     "emailNote": "Tizimga shu email bilan kirasiz.",
     "emailPwNote": "Emailni faqat siz o‘zgartira olishingiz uchun parol so‘raladi.",
-    "emailSectionNote": "Ixtiyoriy. Tasdiqlangan email parolni tiklash kodini qabul qiladi, SMS esa zaxira yo‘l bo‘lib qoladi.",
+    "emailSectionNote": "Ixtiyoriy. Parolni unutsangiz, tiklash kodi shu emailga keladi.",
     "emailTitle": "Email",
     "member": "A’zo bo‘lgan sana",
     "mustChange": "Davom etish uchun o‘z parolingizni tanlang. Hozirgi parol vaqtinchalik.",
@@ -1271,22 +1135,21 @@
     "notVerified": "tasdiqlanmagan",
     "nothingChanges": "Kod kiritilmaguncha hech narsa o‘zgarmaydi.",
     "otherEmail": "Boshqa email kiritish",
-    "otherNumber": "Boshqa raqam kiritish",
     "passwordNote": "O‘zgartirilgach, boshqa qurilmalardagi sessiyalar yopiladi.",
     "passwordTitle": "Parol",
     "personal": "Shaxsiy ma’lumotlar",
     "personalNote": "Ismingiz retsept baholarida ko‘rinadi.",
     "phone": "Telefon raqami",
     "phoneNote": "Ixtiyoriy. Boshqa foydalanuvchilarga ko‘rinmaydi.",
-    "phoneSectionNote": "Tizimga kirish va parolni SMS orqali tiklash uchun.",
+    "phoneSectionNote": "Tizimga shu raqam bilan kirasiz.",
     "repeatPw": "Yangi parolni takrorlang",
     "sendNoteEmail": "Yangi emailga kod yuboramiz.",
-    "sendNotePhone": "Yangi raqamga SMS orqali kod yuboramiz.",
     "sentTo": "{to} manziliga yuborilgan 6 xonali kodni kiriting.",
     "updateEmail": "Emailni yangilash",
     "updatePw": "Parolni yangilash",
     "username": "Foydalanuvchi nomi",
-    "usernameNote": "Ixtiyoriy. 3–24 ta belgi: lotin harflari, raqamlar va “_”."
+    "usernameNote": "Ixtiyoriy. 3–24 ta belgi: lotin harflari, raqamlar va “_”.",
+    "updatePhone": "Raqamni yangilash"
   },
   "share": {
     "copied": "Havola nusxalandi",
@@ -1327,13 +1190,6 @@
   },
   "site": {
     "tagline": "Sevimli ijodkorlaringizdan qadam-baqadam retseptlar"
-  },
-  "sms": {
-    "email_change": "{brand}: email tasdiqlash kodi {code}. Kodni hech kimga bermang.",
-    "exists": "{brand}: bu raqamga hisob allaqachon ochilgan. Saytda Kirish yoki Parolni unutdim bo'limidan foydalaning.",
-    "password_reset": "{brand}: parolni tiklash kodi {code}. Kodni hech kimga bermang.",
-    "phone_change": "{brand}: telefon tasdiqlash kodi {code}. Kodni hech kimga bermang.",
-    "signup": "{brand}: tasdiqlash kodi {code}. Kodni hech kimga bermang."
   },
   "social": {
     "add": "Ijtimoiy tarmoq qo‘shish",
@@ -1479,5 +1335,10 @@
     "video": "Video yuklash",
     "videoFail": "Videoni yuklab bo‘lmadi. Qayta urinib ko‘ring.",
     "videoLink": "Yoki video havolasini kiriting"
+  },
+  "admLogin": {
+    "title": "Boshqaruv paneli",
+    "note": "Faqat administratorlar uchun.",
+    "wrong": "Email yoki parol noto‘g‘ri."
   }
 }

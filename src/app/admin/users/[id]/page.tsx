@@ -9,7 +9,7 @@ import { EmptyState, Field, PageHeader, Panel, SelectInput, StatTile, TextInput 
 import { getLocale, getT } from "@/i18n/server";
 import { formatNumber, formatRelative, formatShortDate } from "@/lib/format";
 import { getUserActivity, getUserAdmin, requireAdminPage } from "@/server/admin";
-import { deleteUser, setUserBlocked, updateUser } from "../../actions";
+import { deleteUser, issueTemporaryPassword, setUserBlocked, updateUser } from "../../actions";
 import { Button } from "@/components/ui/Button";
 import { Ban, ShieldCheck } from "lucide-react";
 
@@ -109,6 +109,12 @@ export default async function AdminUserPage({ params }: { params: Promise<{ id: 
                   <Button type="submit" variant="outline" className="border-red-700/40 text-red-700 hover:bg-red-600/5"><Ban className="h-4 w-4" aria-hidden="true" />{t("adm.block")}</Button>
                 )}
               </form>
+            </Panel>
+          )}
+
+          {user.role !== "admin" && (
+            <Panel title={t("adm.tempPw.title")} description={t("adm.tempPw.note")}>
+              <ActionForm action={issueTemporaryPassword.bind(null, user.id)} submitLabel={t("adm.login.reset")} />
             </Panel>
           )}
 

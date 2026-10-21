@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { RangeTabs } from "@/components/admin/RangeTabs";
 import { TimeSeriesChart } from "@/components/admin/TimeSeriesChart";
 import { EmptyState, PageHeader, Panel, StatTile, StatusPill, table } from "@/components/admin/ui";
@@ -29,7 +29,7 @@ export default async function StudioSalesPage({ searchParams }: { searchParams: 
   const [user, t, locale, sp] = await Promise.all([getCurrentUser(), getT(), getLocale(), searchParams]);
   if (!user) redirect("/auth/login?next=/dashboard/sales");
   const creator = await getCreatorForUser(user.id);
-  if (!creator) redirect("/creators/join");
+  if (!creator) notFound();
 
   const range = parseRange(sp.range);
   const [series, totals, perRecipe, purchases] = await Promise.all([

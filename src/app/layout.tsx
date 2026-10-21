@@ -4,6 +4,7 @@ import { LOCALE_INFO } from "@/i18n/core";
 import { I18nProvider } from "@/i18n/client";
 import { getLocale, getMessages, getT } from "@/i18n/server";
 import { SITE_URL } from "@/lib/site-url";
+import { BRAND_NAME } from "@/lib/brand";
 import { NavProgress } from "@/components/layout/NavProgress";
 import "./globals.css";
 
@@ -23,15 +24,15 @@ export async function generateMetadata(): Promise<Metadata> {
   const [t, locale] = await Promise.all([getT(), getLocale()]);
   const title = t("meta.title");
   return {
-    title: { default: title, template: "%s | Damda" },
+    title: { default: title, template: `%s | ${BRAND_NAME}` },
     description: t("meta.description"),
     keywords: t("meta.keywords").split(", "),
-    authors: [{ name: "Damda" }],
-    creator: "Damda",
-    publisher: "Damda",
+    authors: [{ name: BRAND_NAME }],
+    creator: BRAND_NAME,
+    publisher: BRAND_NAME,
     formatDetection: { email: false, address: false, telephone: false },
     metadataBase: new URL(SITE_URL),
-    openGraph: { type: "website", locale: LOCALE_INFO[locale].og, url: SITE_URL, siteName: "Damda", title, description: t("meta.shortDescription") },
+    openGraph: { type: "website", locale: LOCALE_INFO[locale].og, url: SITE_URL, siteName: BRAND_NAME, title, description: t("meta.shortDescription") },
     twitter: { card: "summary_large_image", title, description: t("meta.shortDescription") },
     robots: {
       index: true,

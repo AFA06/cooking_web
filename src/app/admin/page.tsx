@@ -5,19 +5,17 @@ import { Avatar, BarList, PageHeader, Panel, StatTile, StatusPill } from "@/comp
 import { RANGE_LABEL, comparePeriods } from "@/lib/admin-stats";
 import { getLocale, getT } from "@/i18n/server";
 import { formatNumber, formatPrice, formatRelative } from "@/lib/format";
-import { countPendingApplications } from "@/server/applications";
 import { DIRECT_SOURCE, getDailySeries, getPlatformTotals, getRecentUsers, getSources, getTopRecipes, parseRange, requireAdminPage } from "@/server/admin";
 
 export default async function AdminOverviewPage({ searchParams }: { searchParams: Promise<{ range?: string }> }) {
   const [admin, t, locale] = await Promise.all([requireAdminPage(), getT(), getLocale()]);
   const range = parseRange((await searchParams).range);
-  const [series, totals, topRecipes, sources, recentUsers, pendingApplications] = await Promise.all([
+  const [series, totals, topRecipes, sources, recentUsers] = await Promise.all([
     getDailySeries(range * 2),
     getPlatformTotals(),
     getTopRecipes(range),
     getSources(range),
     getRecentUsers(),
-    countPendingApplications(),
   ]);
   const p = comparePeriods(series, range);
   const share = (n: number) => (totals.users === 0 ? 0 : Math.round((n / totals.users) * 100));
@@ -40,12 +38,6 @@ export default async function AdminOverviewPage({ searchParams }: { searchParams
         actions={<RangeTabs base="/admin" range={range} />}
       />
 
-      {pendingApplications > 0 && (
-        <Link href="/admin/applications" className="mb-6 flex items-center justify-between gap-4 rounded-lg border border-clay-400/50 bg-clay-100 px-5 py-4 text-amber-950 hover:border-clay-400">
-          <span className="font-medium">{t("apply.adm.waiting", { count: pendingApplications })}</span>
-          <span className="text-sm font-semibold text-amber-700">{t("apply.adm.review")} →</span>
-        </Link>
-      )}
       <h2 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-amber-600">{t("adm.people")}</h2>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label={t("adm.tile.registered")} value={formatNumber(totals.users)} hint={t("adm.newToday", { count: formatNumber(totals.newToday) })} />

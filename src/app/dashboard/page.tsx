@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Bookmark, CheckCircle2, Circle, ExternalLink, Eye, Flame, Plus, Star, Wallet } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { RatingStars, formatRating } from "@/components/reviews/RatingStars";
@@ -21,7 +21,7 @@ export default async function StudioPage() {
   const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   if (!user) redirect("/auth/login?next=/dashboard");
   const creator = await getCreatorForUser(user.id);
-  if (!creator) redirect("/creators/join");
+  if (!creator) notFound();
   const [recipes, summary, totals] = await Promise.all([listCreatorRecipes(creator.id), getCreatorSummary(creator.id), getStudioTotals(creator.id)]);
 
   const sum = (pick: (r: (typeof recipes)[number]) => number) => recipes.reduce((total, r) => total + pick(r), 0);

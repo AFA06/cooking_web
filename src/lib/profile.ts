@@ -2,7 +2,7 @@
 export const USERNAME_PATTERN = /^[a-z][a-z0-9_]{2,23}$/;
 
 /** Names that would be confused with parts of the site. */
-const RESERVED = new Set(["admin", "administrator", "damda", "support", "moderator", "root", "system", "null", "undefined"]);
+const RESERVED = new Set(["admin", "administrator", "damda", "retseplar", "support", "moderator", "root", "system", "null", "undefined"]);
 
 export function normalizeUsername(input: string): string {
   return input.trim().replace(/^@/, "").toLowerCase();

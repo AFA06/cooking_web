@@ -1,6 +1,6 @@
 import "server-only";
 import { sql, type SQL } from "drizzle-orm";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { db } from "@/db";
 import { getCurrentUser, type CurrentUser } from "@/server/auth";
 
@@ -19,11 +19,10 @@ export function parsePage(value: string | undefined): number {
   return Number.isFinite(n) && n > 0 ? n : 1;
 }
 
-/** Page guard: sends visitors to login, hides the panel from non-admins. */
+/** Page guard: to anyone but a signed-in admin the panel does not exist, so it never points to a sign-in page. */
 export async function requireAdminPage(): Promise<CurrentUser> {
   const user = await getCurrentUser();
-  if (!user) redirect("/auth/login?next=/admin");
-  if (user.role !== "admin") notFound();
+  if (user?.role !== "admin") notFound();
   return user;
 }
 

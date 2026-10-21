@@ -34,7 +34,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ c
         <ResetPasswordForm action={completePasswordReset} challengeId={c} />
         <div className="mt-6 flex flex-col gap-4">
           <ResendButton action={resendPasswordResetCode} challengeId={c} label={t("auth.resendCode")} />
-          <ResendButton action={resendPasswordResetCode} challengeId={c} via="sms" label={t("auth.smsInstead")} />
           <Link href="/auth/forgot" className="text-sm font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
             {t("auth.otherIdentifier")}
           </Link>

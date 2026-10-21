@@ -7,7 +7,6 @@ import { LegalConsent } from "@/components/legal/LegalConsent";
 import { PasswordField, authInputClass } from "@/components/auth/PasswordField";
 import { PhoneField } from "@/components/auth/PhoneField";
 import { useT } from "@/i18n/client";
-import { SMS_COUNTRY } from "@/lib/phone";
 import type { AuthState } from "@/app/auth/actions";
 
 interface Props {
@@ -29,8 +28,6 @@ export function AuthForm({ mode, action, next, notice }: Props) {
   const [country, setCountry] = React.useState("UZ");
   const [withEmail, setWithEmail] = React.useState(false);
   const suffix = next ? `?next=${encodeURIComponent(next)}` : "";
-  // Codes go by SMS to Uzbek numbers only; everyone else confirms with an email code, so email is required for them.
-  const smsCountry = country === SMS_COUNTRY;
 
   return (
     <form action={formAction} className="mt-6 space-y-5">
@@ -68,7 +65,6 @@ export function AuthForm({ mode, action, next, notice }: Props) {
           id="phone"
           name={isSignup ? "phone" : "identifier"}
           label={t("settings.phone")}
-          hint={isSignup ? (smsCountry ? t("auth.phoneHint") : t("auth.phoneHintIntl")) : undefined}
           value={phone}
           onChange={setPhone}
           country={country}
@@ -85,10 +81,10 @@ export function AuthForm({ mode, action, next, notice }: Props) {
         <div>
           <label htmlFor="email" className="text-sm font-medium text-amber-950">
             {t("auth.email")}
-            {smsCountry && <span className="font-normal text-amber-600"> · {t("auth.optional")}</span>}
+            <span className="font-normal text-amber-600"> · {t("auth.optional")}</span>
           </label>
-          <input id="email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} required={!smsCountry} maxLength={254} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@mail.com" className={authInputClass} />
-          <p className="mt-1.5 text-sm text-amber-600">{smsCountry ? t("auth.emailHintOptional") : t("auth.emailHintCode")}</p>
+          <input id="email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} maxLength={254} value={email} onChange={(e) => setEmail(e.target.value)} placeholder="name@mail.com" className={authInputClass} />
+          <p className="mt-1.5 text-sm text-amber-600">{t("auth.emailHintOptional")}</p>
         </div>
       )}
 
@@ -114,7 +110,7 @@ export function AuthForm({ mode, action, next, notice }: Props) {
       )}
       {isSignup && <LegalConsent />}
       <Button type="submit" size="xl" className="w-full rounded-full" loading={pending}>
-        {isSignup ? t("auth.sendCode") : t("nav.login")}
+        {isSignup ? t("auth.createAccount") : t("nav.login")}
       </Button>
     </form>
   );

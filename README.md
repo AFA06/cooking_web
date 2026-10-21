@@ -41,5 +41,4 @@ PostgreSQL (Neon) with Drizzle. Copy `.env.example` to `.env.local` and set `DAT
 
 ```bash
 npm run db:migrate   # apply migrations
-npm run db:seed      # load demo creators and recipes
 ```

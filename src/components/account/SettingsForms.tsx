@@ -4,10 +4,9 @@ import * as React from "react";
 import { Button } from "@/components/ui/Button";
 import {
   changePassword,
+  changePhone,
   confirmEmailChange,
-  confirmPhoneChange,
   startEmailChange,
-  startPhoneChange,
   updateProfile,
   type AccountState,
 } from "@/app/account/actions";
@@ -79,28 +78,50 @@ export function ProfileForm({ initial }: { initial: { name: string; username: st
 interface ContactProps {
   /** Current value, or null when none is set yet. */
   current: string | null;
-  verified: boolean;
+}
+
+function Current({ text, value, note }: { text: string; value: string | null; note?: string }) {
+  const t = useT();
+  return (
+    <p className="text-amber-900">
+      {text} <span className="font-semibold text-amber-950">{value ?? t("settings.notSet")}</span>
+      {note && <span className="ml-2 text-sm text-red-700">{note}</span>}
+    </p>
+  );
+}
+
+/** One step for now: the new number and the current password. Numbers are not confirmed by SMS. */
+export function PhoneForm({ current }: ContactProps) {
+  const t = useT();
+  const [state, action, pending] = React.useActionState<AccountState, FormData>(changePhone, {});
+  const { bind } = useFields({ value: "", currentPassword: "" });
+  if (state.ok) return <p role="status" className="text-sm font-medium text-sage-700">{state.ok}</p>;
+  return (
+    <div className="space-y-5">
+      <Current text={t("settings.currentNumber")} value={current} />
+      <form action={action} className="space-y-5">
+        <div>
+          <label htmlFor="phone-value" className={label}>{t("settings.newPhone")}</label>
+          <input id="phone-value" {...bind("value")} type="tel" inputMode="tel" required maxLength={40} autoComplete="tel" placeholder="+998 90 123 45 67" className={field} />
+        </div>
+        <div>
+          <label htmlFor="phone-password" className={label}>{t("settings.currentPw")}</label>
+          <input id="phone-password" {...bind("currentPassword")} type="password" required maxLength={72} autoComplete="current-password" className={field} />
+        </div>
+        <Footer state={state} pending={pending}>{t("settings.updatePhone")}</Footer>
+      </form>
+    </div>
+  );
 }
 
 /**
- * Changing a phone number or email is two steps: password and new value, then the code sent to the
- * new value. Until the code is entered nothing changes, so a typo or a stranger's address can never be saved.
+ * Changing the email is two steps: password and new address, then the code sent to that address. Until the
+ * code is entered nothing changes, so a typo or a stranger's address can never be saved.
  */
-function ContactForm({
-  kind,
-  current,
-  verified,
-  start,
-  confirm,
-}: ContactProps & {
-  kind: "phone" | "email";
-  start: (state: AccountState, formData: FormData) => Promise<AccountState>;
-  confirm: (state: AccountState, formData: FormData) => Promise<AccountState>;
-}) {
+export function EmailForm({ current, verified }: ContactProps & { verified: boolean }) {
   const t = useT();
-  const isPhone = kind === "phone";
-  const [startState, startAction, starting] = React.useActionState<AccountState, FormData>(start, {});
-  const [confirmState, confirmAction, confirming] = React.useActionState<AccountState, FormData>(confirm, {});
+  const [startState, startAction, starting] = React.useActionState<AccountState, FormData>(startEmailChange, {});
+  const [confirmState, confirmAction, confirming] = React.useActionState<AccountState, FormData>(confirmEmailChange, {});
   const { bind } = useFields({ value: "", currentPassword: "" });
   const [dismissed, setDismissed] = React.useState<string | null>(null);
 
@@ -115,20 +136,16 @@ function ContactForm({
 
   return (
     <div className="space-y-5">
-      <p className="text-amber-900">
-        {isPhone ? `${t("settings.currentNumber")} ` : `${t("settings.currentEmail")} `}
-        <span className="font-semibold text-amber-950">{current ?? t("settings.notSet")}</span>
-        {current && !verified && <span className="ml-2 text-sm text-red-700">{t("settings.notVerified")}</span>}
-      </p>
+      <Current text={t("settings.currentEmail")} value={current} note={current && !verified ? t("settings.notVerified") : undefined} />
 
       {waitingForCode ? (
         <form action={confirmAction} className="space-y-5">
           <input type="hidden" name="challengeId" value={challengeId} />
           <input type="hidden" name="sentTo" value={sentTo ?? ""} />
           <div>
-            <label htmlFor={`${kind}-code`} className={label}>{t("auth.codeLabel")}</label>
+            <label htmlFor="email-code" className={label}>{t("auth.codeLabel")}</label>
             <input
-              id={`${kind}-code`}
+              id="email-code"
               name="code"
               inputMode="numeric"
               autoComplete="one-time-code"
@@ -139,33 +156,21 @@ function ContactForm({
               placeholder="••••••"
               className={`${field} text-center font-mono text-2xl tracking-[0.5em]`}
             />
-            <p className={hint}>
-              {t("settings.sentTo", { to: sentTo ?? "" })}
-            </p>
+            <p className={hint}>{t("settings.sentTo", { to: sentTo ?? "" })}</p>
           </div>
           <Footer state={codeState} pending={confirming}>{t("auth.confirm")}</Footer>
         </form>
       ) : (
         <form action={startAction} className="space-y-5">
           <div>
-            <label htmlFor={`${kind}-value`} className={label}>{isPhone ? t("settings.newPhone") : t("settings.newEmail")}</label>
-            <input
-              id={`${kind}-value`}
-              {...bind("value")}
-              type={isPhone ? "tel" : "email"}
-              inputMode={isPhone ? "tel" : "email"}
-              required
-              maxLength={254}
-              autoComplete={isPhone ? "tel" : "email"}
-              placeholder={isPhone ? "+998 90 123 45 67" : undefined}
-              className={field}
-            />
+            <label htmlFor="email-value" className={label}>{t("settings.newEmail")}</label>
+            <input id="email-value" {...bind("value")} type="email" inputMode="email" required maxLength={254} autoComplete="email" className={field} />
           </div>
           <div>
-            <label htmlFor={`${kind}-password`} className={label}>{t("settings.currentPw")}</label>
-            <input id={`${kind}-password`} {...bind("currentPassword")} type="password" required maxLength={72} autoComplete="current-password" className={field} />
+            <label htmlFor="email-password" className={label}>{t("settings.currentPw")}</label>
+            <input id="email-password" {...bind("currentPassword")} type="password" required maxLength={72} autoComplete="current-password" className={field} />
             <p className={hint}>
-              {isPhone ? t("settings.sendNotePhone") : t("settings.sendNoteEmail")} {t("settings.nothingChanges")}
+              {t("settings.sendNoteEmail")} {t("settings.nothingChanges")}
             </p>
           </div>
           <Footer state={startState} pending={starting}>{t("auth.sendCode")}</Footer>
@@ -173,19 +178,11 @@ function ContactForm({
       )}
       {waitingForCode && (
         <button type="button" onClick={() => setDismissed(challengeId ?? null)} className="text-sm font-semibold text-amber-700 underline underline-offset-4 hover:text-amber-800">
-          {isPhone ? t("settings.otherNumber") : t("settings.otherEmail")}
+          {t("settings.otherEmail")}
         </button>
       )}
     </div>
   );
-}
-
-export function PhoneForm(props: ContactProps) {
-  return <ContactForm kind="phone" start={startPhoneChange} confirm={confirmPhoneChange} {...props} />;
-}
-
-export function EmailForm(props: ContactProps) {
-  return <ContactForm kind="email" start={startEmailChange} confirm={confirmEmailChange} {...props} />;
 }
 
 export function PasswordForm() {

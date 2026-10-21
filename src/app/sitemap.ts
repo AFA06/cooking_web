@@ -24,12 +24,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     },
     { url: `${baseUrl}/terms`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
     { url: `${baseUrl}/privacy`, lastModified: new Date(), changeFrequency: "yearly", priority: 0.3 },
-    {
-      url: `${baseUrl}${PLATFORM_CONFIG.urls.becomeCreator}`,
-      lastModified: new Date(),
-      changeFrequency: "monthly",
-      priority: 0.6,
-    },
     ...RECIPES.map((r) => ({
       url: `${baseUrl}/recipes/${r.slug}`,
       lastModified: new Date(r.publishedAt),

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { z } from "zod";
 import { RecipeEditor } from "@/components/dashboard/RecipeEditor";
 import { toEditorInitial } from "@/lib/recipe-editor";
@@ -15,7 +15,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function EditRecipePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const [ctx, t] = await Promise.all([getCurrentCreator(), getT()]);
-  if (!ctx) redirect("/creators/join");
+  if (!ctx) notFound();
   if (!z.string().uuid().safeParse(id).success) notFound();
   const data = await loadRecipeForEdit(id, ctx.creator.id);
   if (!data) notFound();

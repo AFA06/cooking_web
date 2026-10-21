@@ -6,7 +6,7 @@ import { AuthTabs, authReason } from "@/components/auth/AuthTabs";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { getT } from "@/i18n/server";
 import { getCurrentUser } from "@/server/auth";
-import { startSignup } from "../actions";
+import { signup } from "../actions";
 
 export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getT())("auth.signupEyebrow"), robots: { index: false } };
@@ -21,9 +21,9 @@ export default async function Page({ searchParams }: { searchParams: Promise<{ n
 
   return (
     <SiteShell>
-      <AuthScreen eyebrow={t("auth.signupEyebrow")} title={<>{t("auth.signupLead")} <em className="text-clay-400">{t("auth.signupEm")}</em></>} note={t("auth.signupNoteSms")}>
+      <AuthScreen eyebrow={t("auth.signupEyebrow")} title={<>{t("auth.signupLead")} <em className="text-clay-400">{t("auth.signupEm")}</em></>} note={t("auth.signupNote")}>
         <AuthTabs active="signup" next={safe} />
-        <AuthForm mode="signup" action={startSignup} next={safe} notice={reason} />
+        <AuthForm mode="signup" action={signup} next={safe} notice={reason} />
       </AuthScreen>
     </SiteShell>
   );

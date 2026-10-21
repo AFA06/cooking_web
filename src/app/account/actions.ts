@@ -6,10 +6,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
-import { checkPassword, normalizeEmail, normalizeUzPhone } from "@/lib/auth-rules";
+import { checkPassword, normalizeEmail } from "@/lib/auth-rules";
+import { parseInternational } from "@/lib/phone";
 import { isUsernameAllowed, normalizeUsername } from "@/lib/profile";
 import { getT } from "@/i18n/server";
-import { destroyOtherSessions, getCurrentUser } from "@/server/auth";
+import { destroyOtherSessions, getCurrentUser, type CurrentUser } from "@/server/auth";
 import { TTL_MINUTES, createChallenge, verifyChallenge } from "@/server/challenges";
 import { DeliveryUnavailable, deliverCode } from "@/server/notify";
 import { WINDOW, allow, clear, peek, record } from "@/server/rate-limit";
@@ -85,21 +86,21 @@ const changeSchema = z.object({ value: z.string().max(254), currentPassword: z.s
 
 type ContactKind = "phone" | "email";
 
-/** Step one: needs the password, then sends a code to the NEW number or email. Nothing changes yet. */
-async function startContactChange(kind: ContactKind, formData: FormData): Promise<AccountState> {
+/** What every contact change needs first: the current password, and a new value that is valid and free. */
+async function checkContactChange(kind: ContactKind, formData: FormData): Promise<{ error: string } | { user: CurrentUser; value: string }> {
   const t = await getT();
   const user = await getCurrentUser();
   if (!user) return { error: t("acct.err.signedOut") };
   const parsed = changeSchema.safeParse({ value: formData.get("value") ?? "", currentPassword: formData.get("currentPassword") });
   if (!parsed.success) return { error: t(parsed.error.issues[0].message) };
 
-  const value = kind === "phone" ? normalizeUzPhone(parsed.data.value) : normalizeEmail(parsed.data.value);
+  const value = kind === "phone" ? (parseInternational(parsed.data.value)?.phone ?? null) : normalizeEmail(parsed.data.value);
   if (!value) return { error: kind === "phone" ? t("acct.err.phone") : t("auth.err.email") };
   if (value === (kind === "phone" ? user.phone : user.email)) return { error: kind === "phone" ? t("acct.err.sameNumber") : t("acct.err.sameEmail") };
 
   if (!(await allow("contact-change", keyedHash("user", user.id), 6, WINDOW.hour))) return { error: t("auth.a.tooMany") };
   const denied = await confirmPassword(user.id, parsed.data.currentPassword);
-  if (denied) return denied;
+  if (denied?.error) return { error: denied.error };
 
   const [taken] = await db
     .select({ id: schema.users.id })
@@ -107,23 +108,46 @@ async function startContactChange(kind: ContactKind, formData: FormData): Promis
     .where(kind === "phone" ? eq(schema.users.phone, value) : eq(schema.users.email, value))
     .limit(1);
   if (taken) return { error: t(CANNOT_USE) };
+  return { user, value };
+}
+
+/** Phone numbers are not confirmed by SMS for now: the current password is enough, and the number stays unverified. */
+export async function changePhone(_: AccountState, formData: FormData): Promise<AccountState> {
+  const t = await getT();
+  const checked = await checkContactChange("phone", formData);
+  if ("error" in checked) return checked;
+  try {
+    await db.update(schema.users).set({ phone: checked.value, phoneVerifiedAt: null }).where(eq(schema.users.id, checked.user.id));
+  } catch {
+    // The unique index is the final word if someone took the number a moment earlier.
+    return { error: t(CANNOT_USE) };
+  }
+  await destroyOtherSessions(checked.user.id);
+  revalidatePath("/", "layout");
+  return { ok: t("acct.phoneUpdated") };
+}
+
+/** Email step one: sends a code to the NEW address. Nothing changes yet. */
+export async function startEmailChange(_: AccountState, formData: FormData): Promise<AccountState> {
+  const t = await getT();
+  const checked = await checkContactChange("email", formData);
+  if ("error" in checked) return checked;
+  const { user, value } = checked;
   if (!(await allow("send-dest", keyedHash("dest", value), 6, WINDOW.hour))) return { error: t("auth.a.tooMany") };
 
-  const channel = kind === "phone" ? "sms" : "email";
-  const purpose = kind === "phone" ? "phone_change" : "email_change";
-  const created = await createChallenge({ purpose, channel, destination: value, userId: user.id });
+  const created = await createChallenge({ purpose: "email_change", channel: "email", destination: value, userId: user.id });
   try {
-    await deliverCode(channel, value, created.code, purpose, TTL_MINUTES[channel], t);
+    await deliverCode(value, created.code, "email_change", TTL_MINUTES.email, t);
   } catch (e) {
     await db.delete(schema.authChallenges).where(eq(schema.authChallenges.id, created.id));
-    console.error("contact change delivery failed:", e instanceof Error ? e.message : "unknown");
+    console.error("email change delivery failed:", e instanceof Error ? e.message : "unknown");
     return { error: e instanceof DeliveryUnavailable ? t("acct.err.deliveryDown") : t("auth.a.sendFailed") };
   }
   return { challengeId: created.id, sentTo: value };
 }
 
-/** Step two: the code proves the person controls the new number or email, and only then does it replace the old one. */
-async function confirmContactChange(kind: ContactKind, formData: FormData): Promise<AccountState> {
+/** Email step two: the code proves the person controls the new address, and only then does it replace the old one. */
+export async function confirmEmailChange(_: AccountState, formData: FormData): Promise<AccountState> {
   const t = await getT();
   const user = await getCurrentUser();
   if (!user) return { error: t("acct.err.signedOut") };
@@ -131,27 +155,19 @@ async function confirmContactChange(kind: ContactKind, formData: FormData): Prom
   const retry = { challengeId, sentTo: String(formData.get("sentTo") ?? "") };
   if (!(await allow("verify-user", keyedHash("user", user.id), 20, WINDOW.hour))) return { ...retry, error: t("auth.a.tooMany") };
 
-  const row = await verifyChallenge(challengeId, String(formData.get("code") ?? "").trim(), kind === "phone" ? "phone_change" : "email_change");
+  const row = await verifyChallenge(challengeId, String(formData.get("code") ?? "").trim(), "email_change");
   // A code issued to one account must never complete a change on another.
   if (!row || row.userId !== user.id || !row.destination) return { ...retry, error: t(BAD_CODE) };
 
   try {
-    await db
-      .update(schema.users)
-      .set(kind === "phone" ? { phone: row.destination, phoneVerifiedAt: new Date() } : { email: row.destination, emailVerifiedAt: new Date() })
-      .where(eq(schema.users.id, user.id));
+    await db.update(schema.users).set({ email: row.destination, emailVerifiedAt: new Date() }).where(eq(schema.users.id, user.id));
   } catch {
     return { error: t(CANNOT_USE) };
   }
   await destroyOtherSessions(user.id);
   revalidatePath("/", "layout");
-  return { ok: kind === "phone" ? t("acct.phoneUpdated") : t("acct.emailVerified") };
+  return { ok: t("acct.emailVerified") };
 }
-
-export const startPhoneChange = async (_: AccountState, formData: FormData) => startContactChange("phone", formData);
-export const confirmPhoneChange = async (_: AccountState, formData: FormData) => confirmContactChange("phone", formData);
-export const startEmailChange = async (_: AccountState, formData: FormData) => startContactChange("email", formData);
-export const confirmEmailChange = async (_: AccountState, formData: FormData) => confirmContactChange("email", formData);
 
 const passwordSchema = z.object({
   currentPassword: z.string().min(1, "acct.err.enterCurrentPw").max(72),

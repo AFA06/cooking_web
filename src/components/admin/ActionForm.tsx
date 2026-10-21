@@ -7,7 +7,7 @@ import type { FormState } from "@/app/admin/actions";
 interface Props {
   action: (state: FormState, formData: FormData) => Promise<FormState>;
   submitLabel: string;
-  children: React.ReactNode;
+  children?: React.ReactNode;
 }
 
 /** Form wrapper that shows the server action's result and a pending state. */

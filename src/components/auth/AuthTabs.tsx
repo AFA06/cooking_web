@@ -34,7 +34,6 @@ export async function AuthTabs({ active, next }: { active: "login" | "signup"; n
 export async function authReason(next: string): Promise<string | undefined> {
   const t = await getT();
   if (/^\/recipes\/[^/]+\/cook/.test(next)) return t("auth.reasonCook");
-  if (next.startsWith("/creators/join")) return t("auth.reasonApply");
   if (/^\/recipes\/[^/?#]+/.test(next)) return t("auth.reasonRecipe");
   return undefined;
 }

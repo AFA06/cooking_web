@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { EmptyState, PageHeader, Panel } from "@/components/admin/ui";
 import { RatingOverview, ResultPhotos, ReviewList } from "@/components/reviews/ReviewList";
 import { getT } from "@/i18n/server";
@@ -16,7 +16,7 @@ export default async function StudioReviewsPage() {
   const [user, t] = await Promise.all([getCurrentUser(), getT()]);
   if (!user) redirect("/auth/login?next=/dashboard/reviews");
   const creator = await getCreatorForUser(user.id);
-  if (!creator) redirect("/creators/join");
+  if (!creator) notFound();
   const [summary, reviews] = await Promise.all([getCreatorSummary(creator.id), getCreatorReviews(creator.id)]);
 
   return (

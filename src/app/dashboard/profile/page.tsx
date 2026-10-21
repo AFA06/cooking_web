@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { CreatorProfileEditor } from "@/components/dashboard/CreatorProfileEditor";
 import { getT } from "@/i18n/server";
 import { cleanSocialLinks } from "@/lib/social";
@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function CreatorProfilePage() {
   const [ctx, t] = await Promise.all([getCurrentCreator(), getT()]);
-  if (!ctx) redirect("/creators/join");
+  if (!ctx) notFound();
   const { creator } = ctx;
 
   return (

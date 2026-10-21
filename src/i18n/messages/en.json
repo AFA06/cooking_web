@@ -17,7 +17,7 @@
     "emailVerified": "Email confirmed and updated.",
     "err": {
       "cannotUse": "This number or email can't be used. Enter another one.",
-      "deliveryDown": "The code delivery service is unavailable right now.",
+      "deliveryDown": "The email service is unavailable right now.",
       "emailTaken": "This email can't be used. Enter another one.",
       "enterCurrentPw": "Enter your current password",
       "locked": "Too many wrong attempts. Try again in 15 minutes.",
@@ -34,7 +34,7 @@
       "usernameTaken": "This username is taken. Choose another one.",
       "wrongPw": "The current password is incorrect."
     },
-    "phoneUpdated": "Phone number confirmed and updated.",
+    "phoneUpdated": "Phone number updated.",
     "pwUpdated": "Password updated. Sessions on other devices were signed out."
   },
   "adm": {
@@ -64,7 +64,7 @@
       "copy": "Copy as message",
       "created": "{name} has been added",
       "desc": "Creates the creator's sign-in account and public profile in one step. You hand over the sign-in details yourself.",
-      "handover": "Hello {name}! Your Damda studio sign-in:\nLogin: {login}\nTemporary password: {password}\nYou'll choose your own password the first time you sign in.",
+      "handover": "Hello {name}! Your Retseplar studio sign-in:\nLogin: {login}\nTemporary password: {password}\nYou'll choose your own password the first time you sign in.",
       "login": "Login",
       "open": "Open creator page",
       "password": "Temporary password",
@@ -276,108 +276,33 @@
     "usersDesc": "Accounts, roles and activity.",
     "viewOnSite": "View on the site",
     "vsPrev": "vs the previous period",
-    "welcome": "Welcome, {name}"
-  },
-  "apply": {
-    "about": "A few words about you",
-    "aboutPlaceholder": "What do you cook, and who follows you?",
-    "adm": {
-      "account": "Account: {name}",
-      "approve": "Approve and open studio",
-      "approveHint": "They keep their own account: a creator profile is made and the creator panel opens for them.",
-      "approvedOk": "Request approved. Check the Telegram username and fix it if needed: buyers are sent there.",
-      "desc": "Check the audience, talk to the person, then approve or decline.",
-      "empty": {
-        "approved": "No approved requests yet.",
-        "pending": "No new requests.",
-        "rejected": "No declined requests."
-      },
-      "nav": "Requests",
-      "note": "Note",
-      "notePlaceholder": "Optional: a short note the applicant will see",
-      "reject": "Decline",
-      "rejectConfirm": "Confirm decline",
-      "rejectedOk": "Request declined.",
-      "review": "Review",
-      "status": {
-        "approved": "Approved",
-        "pending": "New",
-        "rejected": "Declined"
-      },
-      "title": "Creator requests",
-      "waiting": {
-        "one": "{count} new creator request is waiting",
-        "other": "{count} new creator requests are waiting"
-      }
-    },
-    "audience": "Followers (roughly)",
-    "audiencePick": "Choose one",
-    "cta": "Apply to become a creator",
-    "err": {
-      "about": "Write a sentence or two about yourself.",
-      "aboutLong": "That's too long (600 characters max).",
-      "already": "You're already a creator.",
-      "audience": "Choose your follower count.",
-      "instagram": "That Instagram isn't valid. Enter @username or a link.",
-      "name": "Enter your full name.",
-      "oneLink": "Enter your Instagram or Telegram.",
-      "pending": "You already have a request being reviewed.",
-      "telegram": "That Telegram isn't valid. Enter @username or a link."
-    },
-    "fullName": "Full name",
-    "intro": "We'll look at your audience on Instagram or Telegram and get in touch. If it's a fit, we'll open your studio.",
-    "linksHint": "Give at least one: that's where we'll look at your audience.",
-    "pendingShort": "Your request is being reviewed",
-    "pendingText": "The team will review it and contact you at {phone}. Once approved, “Creator panel” appears in your menu.",
-    "pendingTitle": "We've got your request",
-    "phone": "Phone to reach you",
-    "rejected": "Your last request wasn't approved this time. You can update the details and send it again.",
-    "signupCta": "Sign up and apply",
-    "signupFirst": "First sign up in a minute, then fill in a short request.",
-    "size": {
-      "100k+": "Over 100,000",
-      "10k-50k": "10,000 – 50,000",
-      "1k-10k": "1,000 – 10,000",
-      "50k-100k": "50,000 – 100,000",
-      "lt1k": "Under 1,000"
-    },
-    "submit": "Send request",
-    "title": "Become a creator"
+    "welcome": "Welcome, {name}",
+    "tempPw": {
+      "title": "Temporary password",
+      "note": "For someone who forgot their password and has no email on the account. The password is shown once: send it privately, and they choose a new one after signing in. All their sessions are signed out."
+    }
   },
   "auth": {
     "a": {
       "badCode": "The code is wrong or has expired.",
-      "blocked": "This account is blocked. If you have questions, contact the Damda team.",
-      "codeExpiredRestart": "The code has expired. Start again.",
-      "codeSent": "Code sent.",
+      "blocked": "This account is blocked. If you have questions, contact the Retseplar team.",
       "genericSent": "If the account exists, a code was sent.",
       "identBad": "Enter your phone number or email correctly.",
       "loginWrong": "Incorrect phone, email or password.",
-      "newCodeSent": "A new code has been sent.",
       "phoneExists": "An account with this number already exists. Please sign in.",
       "pwMismatch": "The passwords don't match.",
       "sendFailed": "Couldn't send the code. Please try again shortly.",
-      "tooMany": "Too many attempts. Please try again in a little while.",
-      "unavailable": "The SMS service is unavailable right now. Please try again shortly.",
-      "waitRetry": "Wait a moment, then try again.",
-      "wrongBrowser": "This request was started on another device. Start sign-up again on this device."
+      "tooMany": "Too many attempts. Please try again in a little while."
     },
     "backToLogin": "Back to sign in",
-    "changeDetails": "Change details",
-    "changeNumber": "Change the number",
-    "codeExpired": "The code has expired.",
     "codeLabel": "Confirmation code",
-    "codeSentTo": "We sent a 6-digit code to {phone}.",
-    "codeSentToEmail": "We sent a 6-digit code to {email}.",
     "confirm": "Confirm",
     "country": "Country",
     "createAccount": "Create account",
     "email": "Email",
-    "emailHintCode": "We'll send the confirmation code to this email.",
-    "emailHintOptional": "Useful for password recovery. You can also add it later in settings.",
+    "emailHintOptional": "If you forget your password, the reset code can only be sent by email. You can also add it later in settings.",
     "err": {
       "email": "Enter a valid email",
-      "emailNeeded": "Numbers outside Uzbekistan need an email: that's where we send the code.",
       "exists": "An account with this email already exists. Try signing in.",
       "firstName": "Enter your first name.",
       "lastName": "Enter your last name.",
@@ -393,7 +318,7 @@
     "forgotEm": "password?",
     "forgotLead": "Forgot your",
     "forgotMeta": "Reset password",
-    "forgotNote": "Enter the phone number or email linked to your account. We'll send a confirmation code.",
+    "forgotNote": "Enter the phone number or email linked to your account. If the account has an email, we'll send a reset code to it.",
     "haveAccount": "Already have an account?",
     "hidePw": "Hide password",
     "identifier": "Phone number or email",
@@ -407,10 +332,7 @@
     "optional": "optional",
     "otherIdentifier": "Enter another number or email",
     "password": "Password",
-    "phoneHint": "We'll send a confirmation code to your number by SMS.",
-    "phoneHintIntl": "For numbers outside Uzbekistan, the code goes to your email.",
     "pick": "Today's pick",
-    "reasonApply": "Create an account or sign in first, then send your creator request.",
     "reasonCook": "To start cooking, create an account in a minute or sign in. You'll go straight to cooking afterwards.",
     "reasonRecipe": "Create an account or sign in to continue.",
     "resendCode": "Resend the code",
@@ -418,23 +340,16 @@
     "resetEm": "new password.",
     "resetLead": "Set a",
     "resetMeta": "New password",
-    "resetNote": "If the account exists, a code was sent: to its confirmed email or, if there's none, by SMS to its phone. If you can't reach your email, press the SMS button below.",
-    "restartSignup": "Start sign-up again",
+    "resetNote": "If the account exists and has an email, we sent the code to it. Can't see the message? Check your spam folder.",
     "sendCode": "Send code",
     "showPw": "Show password",
     "signupEm": "table.",
     "signupEyebrow": "Create account",
     "signupLead": "Join the",
     "signupNote": "Save recipes and keep track of the dishes you've cooked.",
-    "signupNoteSms": "Sign up with your phone number: save recipes and keep track of the dishes you've cooked.",
-    "smsInstead": "Can't reach my email — send an SMS",
     "switchLabel": "Sign in or create an account",
     "useEmail": "Sign in with email instead",
     "usePhone": "Sign in with phone number instead",
-    "verifyEm": "code.",
-    "verifyEyebrow": "Verification",
-    "verifyLead": "Enter the",
-    "verifyMeta": "Confirm sign-up",
     "wait": "{label} ({seconds} s)"
   },
   "card": {
@@ -766,13 +681,9 @@
   },
   "email": {
     "body": "{label}: {code}\n\nThe code is valid for {minutes} minutes. Do not share it with anyone.\nIf you did not make this request, ignore this email.",
-    "existsBody": "{brand}: an account with these details already exists. Use Sign in or Forgot password on the site.",
-    "existsSubject": "account already exists",
     "label": {
       "email_change": "Email confirmation code",
-      "password_reset": "Password reset code",
-      "phone_change": "Phone confirmation code",
-      "signup": "Confirmation code"
+      "password_reset": "Password reset code"
     }
   },
   "err": {
@@ -877,9 +788,6 @@
       "title": "Carry on with the timer"
     },
     "intro": "Recipes from the chefs you love — with exact amounts, a timer and guidance at every step. No more rewinding videos.",
-    "inviteEyebrow": "For creators",
-    "inviteText": "The first {count} creators join as founding partners and pay no commission during the founding period.",
-    "inviteTitle": "Your audience loves your recipes. Give them an easier way to cook.",
     "latest": "New recipes",
     "latestNote": "Dishes creators added recently",
     "pick": "Today's pick",
@@ -892,51 +800,8 @@
     "titleEm": "cook today?",
     "titleLead": "What shall we",
     "viewRecipe": "View recipe",
-    "whyEyebrow": "Why Damda",
+    "whyEyebrow": "Why Retseplar",
     "whyTitle": "Even when your hands are busy, the next step is right in front of you."
-  },
-  "join": {
-    "byInvite": "Studio access is by invitation from the Damda team.",
-    "createProfile": "Create a profile",
-    "deckNote": "The card on the right is the first step of a real recipe. Yours will open the same way.",
-    "deckStep": "Step {n}",
-    "desc": "Turn your recipes into a guide your audience can actually cook from.",
-    "haveAccount": "I already have an account",
-    "heroEm": "guide.",
-    "heroLead": "Your recipe is now a",
-    "heroText": "Publish your recipes step by step — with ingredients, timers and tips — share one link with your audience and offer premium recipes.",
-    "howEm": "just like a recipe.",
-    "howLead": "Three steps,",
-    "inviteText": "The Damda team adds creators and sends their sign-in details. If you've been invited, sign in with your phone number and the password you received.",
-    "openKitchen": "Open the door to your kitchen.",
-    "premiumNote": "Premium recipes are sold through Telegram: the buyer messages you, pays to your card, and you keep the full price.",
-    "signupCta": "Create an account to get started",
-    "step1": {
-      "text": "Sign up and send a short request. The team looks at your audience, gets in touch and opens your studio.",
-      "title": "Send a request"
-    },
-    "step2": {
-      "text": "Ingredients, each step, a timer and a tip where needed. Free or premium — your choice.",
-      "title": "Break the recipe into steps"
-    },
-    "step3": {
-      "text": "People cook from the steps on screen, without rewinding a video.",
-      "title": "Share the link"
-    },
-    "studioSignIn": "Sign in to the studio",
-    "term1": {
-      "text": "The first {count} creators join as founding partners.",
-      "title": "Founding creators"
-    },
-    "term2": {
-      "text": "For now the platform takes no commission: you keep the full price of every sale.",
-      "title": "Platform commission"
-    },
-    "term3": {
-      "text": "Your recipe lives at one link: your audience opens it and cooks along with you.",
-      "title": "One link"
-    },
-    "termsLabel": "Terms"
   },
   "legal": {
     "agree": {
@@ -957,11 +822,10 @@
     "keywords": "recipes, uzbek cuisine, step-by-step recipes, plov, lagman, cooking",
     "recipesDesc": "Browse step-by-step recipes from creators. Free and premium recipes.",
     "shortDescription": "Stop going back to YouTube while you cook. Recipes from real creators with step-by-step guidance.",
-    "title": "Damda — step-by-step recipes from the creators you love"
+    "title": "Retseplar — step-by-step recipes from the creators you love"
   },
   "nav": {
     "adminPanel": "Admin panel",
-    "becomeCreator": "Become a creator",
     "closeMenu": "Close menu",
     "createRecipe": "Create a recipe",
     "creatorPanel": "Creator panel",
@@ -1006,7 +870,7 @@
     "cancel": "Cancel order",
     "closed": "This order is closed. You can start a new one from the recipe page.",
     "dialog": {
-      "hint": "You pay {name} directly by card. Damda never asks for card details.",
+      "hint": "You pay {name} directly by card. Retseplar never asks for card details.",
       "note": "This exact text will be typed in Telegram. You press send yourself.",
       "open": "Open Telegram",
       "share": "Include my name and phone so {name} can find my order",
@@ -1043,7 +907,7 @@
       "label": "Promo code",
       "remove": "Remove"
     },
-    "safety": "Check before paying: the card holder's name should match {name}. Damda never asks you to pay anywhere else.",
+    "safety": "Check before paying: the card holder's name should match {name}. Retseplar never asks you to pay anywhere else.",
     "signInToBuy": "Sign in to buy",
     "startCooking": "Start cooking",
     "status": {
@@ -1273,7 +1137,7 @@
     "currentPw": "Current password",
     "emailNote": "You sign in with this email.",
     "emailPwNote": "We ask for your password so only you can change the email.",
-    "emailSectionNote": "Optional. A confirmed email receives the password-reset code; SMS stays as the fallback.",
+    "emailSectionNote": "Optional. If you forget your password, the reset code is sent to this email.",
     "emailTitle": "Email",
     "member": "Member since",
     "mustChange": "Choose your own password to continue. The current one is temporary.",
@@ -1284,22 +1148,21 @@
     "notVerified": "not confirmed",
     "nothingChanges": "Nothing changes until you enter the code.",
     "otherEmail": "Enter another email",
-    "otherNumber": "Enter another number",
     "passwordNote": "After changing it, sessions on other devices are signed out.",
     "passwordTitle": "Password",
     "personal": "Personal details",
     "personalNote": "Your name appears on recipe ratings.",
     "phone": "Phone number",
     "phoneNote": "Optional. Not visible to other users.",
-    "phoneSectionNote": "For signing in and recovering your password by SMS.",
+    "phoneSectionNote": "You sign in with this number.",
     "repeatPw": "Repeat the new password",
     "sendNoteEmail": "We'll send a code to the new email.",
-    "sendNotePhone": "We'll send a code by SMS to the new number.",
     "sentTo": "Enter the 6-digit code sent to {to}.",
     "updateEmail": "Update email",
     "updatePw": "Update password",
     "username": "Username",
-    "usernameNote": "Optional. 3–24 characters: Latin letters, digits and “_”."
+    "usernameNote": "Optional. 3–24 characters: Latin letters, digits and “_”.",
+    "updatePhone": "Update number"
   },
   "share": {
     "copied": "Link copied",
@@ -1341,13 +1204,6 @@
   },
   "site": {
     "tagline": "Step-by-step recipes from the creators you love"
-  },
-  "sms": {
-    "email_change": "{brand}: email confirmation code {code}. Do not share this code with anyone.",
-    "exists": "{brand}: an account already exists for this number. Use Sign in or Forgot password on the site.",
-    "password_reset": "{brand}: password reset code {code}. Do not share this code with anyone.",
-    "phone_change": "{brand}: phone confirmation code {code}. Do not share this code with anyone.",
-    "signup": "{brand}: confirmation code {code}. Do not share this code with anyone."
   },
   "social": {
     "add": "Add a social network",
@@ -1493,5 +1349,10 @@
     "video": "Upload a video",
     "videoFail": "The video couldn't be uploaded. Try again.",
     "videoLink": "Or paste a video link"
+  },
+  "admLogin": {
+    "title": "Admin panel",
+    "note": "Administrators only.",
+    "wrong": "Incorrect email or password."
   }
 }

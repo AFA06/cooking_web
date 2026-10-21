@@ -1,5 +1,5 @@
 import { LogOut } from "lucide-react";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { StudioShell } from "@/components/studio/StudioShell";
 import { getT } from "@/i18n/server";
 import { logout } from "@/app/auth/actions";
@@ -13,7 +13,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!user) redirect("/auth/login?next=/dashboard");
   if (user.mustChangePassword) redirect("/account/settings?newpw=1#sozlama-parol");
   const creator = await getCreatorForUser(user.id);
-  if (!creator) redirect("/creators/join");
+  if (!creator) notFound();
 
   return (
     <StudioShell

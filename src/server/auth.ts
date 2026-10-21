@@ -6,7 +6,8 @@ import { after } from "next/server";
 import { and, eq, gt, isNull, ne, sql } from "drizzle-orm";
 import { db, schema } from "@/db";
 
-const COOKIE = "session";
+export const SESSION_COOKIE = "session";
+const COOKIE = SESSION_COOKIE;
 const SESSION_DAYS = 30;
 
 const hashToken = (token: string) => createHash("sha256").update(token).digest("hex");
@@ -39,6 +40,18 @@ export interface CurrentUser {
   role: "user" | "creator" | "admin";
   /** An admin set a temporary password; the person must choose their own before using the studio. */
   mustChangePassword: boolean;
+}
+
+/** The role behind a session token, or null for a missing, expired or blocked session. Used by the proxy, which has no cookies() helper. */
+export async function roleForSession(token: string | undefined): Promise<CurrentUser["role"] | null> {
+  if (!token) return null;
+  const [row] = await db
+    .select({ role: schema.users.role })
+    .from(schema.sessions)
+    .innerJoin(schema.users, eq(schema.sessions.userId, schema.users.id))
+    .where(and(eq(schema.sessions.tokenHash, hashToken(token)), gt(schema.sessions.expiresAt, new Date()), isNull(schema.users.blockedAt)))
+    .limit(1);
+  return row?.role ?? null;
 }
 
 export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { BadgePercent, BookOpen, ChartColumn, ClipboardCheck, ExternalLink, LayoutDashboard, Menu, Plus, Star, UserRound, Wallet, X } from "lucide-react";
 import { useT } from "@/i18n/client";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -46,7 +47,7 @@ export function StudioShell({ name, avatarUrl, publicHref, logout, children }: P
     <div className="theme-light flex h-full flex-col bg-amber-950 text-amber-100">
       <div className="flex h-16 items-center justify-between px-6">
         <Link href="/dashboard" className="flex items-baseline gap-2" onClick={() => setOpen(false)}>
-          <span className="font-serif text-2xl font-semibold text-white">Damda</span>
+          <span className="font-serif text-2xl font-semibold text-white">{BRAND_NAME}</span>
           <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-amber-400">{t("studio.nav.group")}</span>
         </Link>
         <button type="button" className="flex h-10 w-10 items-center justify-center lg:hidden" aria-label={t("nav.closeMenu")} onClick={() => setOpen(false)}>
@@ -130,7 +131,7 @@ export function StudioShell({ name, avatarUrl, publicHref, logout, children }: P
         <button type="button" className="flex h-11 w-11 items-center justify-center text-amber-950" aria-label={t("nav.openMenu")} aria-expanded={open} onClick={() => setOpen(true)}>
           <Menu className="h-6 w-6" aria-hidden="true" />
         </button>
-        <span className="font-serif text-xl font-semibold text-amber-950">Damda</span>
+        <span className="font-serif text-xl font-semibold text-amber-950">{BRAND_NAME}</span>
         <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-amber-700">{t("studio.nav.group")}</span>
         <Link href="/dashboard/recipes/new" className="ml-auto flex h-10 items-center gap-1.5 rounded-full bg-amber-700 px-4 text-sm font-semibold text-amber-50">
           <Plus className="h-4 w-4" aria-hidden="true" />

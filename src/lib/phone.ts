@@ -29,9 +29,6 @@ export const COUNTRIES: Country[] = [
 
 export const DEFAULT_COUNTRY = COUNTRIES[0];
 
-/** SMS codes only go to Uzbek numbers; everyone else confirms by email. */
-export const SMS_COUNTRY = "UZ";
-
 export function countryByIso(iso: string | null | undefined): Country {
   return COUNTRIES.find((c) => c.iso === iso) ?? DEFAULT_COUNTRY;
 }
@@ -89,8 +86,4 @@ export function parseInternational(input: string): { phone: string; country: Cou
     if (phone) return { phone, country };
   }
   return null;
-}
-
-export function isUzbekPhone(phone: string): boolean {
-  return /^\+998\d{9}$/.test(phone);
 }

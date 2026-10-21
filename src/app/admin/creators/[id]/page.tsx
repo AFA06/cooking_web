@@ -21,7 +21,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return { title: (await getT())("role.creator") };
 }
 
-export default async function AdminCreatorPage({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ approved?: string }> }) {
+export default async function AdminCreatorPage({ params }: { params: Promise<{ id: string }> }) {
   const [, t, locale] = await Promise.all([requireAdminPage(), getT(), getLocale()]);
   const { id } = await params;
   if (!z.string().uuid().safeParse(id).success) notFound();
@@ -34,7 +34,6 @@ export default async function AdminCreatorPage({ params, searchParams }: { param
     .leftJoin(schema.users, eq(schema.users.id, schema.creators.userId))
     .where(eq(schema.creators.id, id))
     .limit(1);
-  const { approved } = await searchParams;
   const completion = creator.cooks > 0 ? Math.round((creator.completions / creator.cooks) * 100) : 0;
 
   return (
@@ -65,7 +64,6 @@ export default async function AdminCreatorPage({ params, searchParams }: { param
         }
       />
 
-      {approved === "1" && <p role="status" className="mb-6 rounded-lg bg-sage-100 px-5 py-4 font-medium text-sage-900">{t("apply.adm.approvedOk")}</p>}
       {extra?.blockedAt && creator.userId && (
         <p role="alert" className="mb-6 rounded-lg bg-clay-100 px-5 py-4 text-amber-950">
           {t("adm.creatorBlocked")} <Link href={`/admin/users/${creator.userId}`} className="font-semibold underline">{t("adm.manageAccount")}</Link>

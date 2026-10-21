@@ -6,7 +6,8 @@ export default function robots(): MetadataRoute.Robots {
     rules: {
       userAgent: "*",
       allow: "/",
-      disallow: ["/auth/", "/account", "/dashboard", "/admin"],
+      // The admin panel is left out on purpose: listing it here would advertise it. Its pages are noindex.
+      disallow: ["/auth/", "/account", "/dashboard"],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,
   };

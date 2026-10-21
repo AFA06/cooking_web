@@ -19,7 +19,7 @@ export async function LegalDocument({ doc, other }: Props) {
     <Container size="xl" className="grid grid-cols-1 gap-10 py-12 lg:grid-cols-[minmax(0,17rem)_minmax(0,1fr)] lg:gap-20 lg:py-16">
       <aside className="lg:sticky lg:top-28 lg:self-start">
         <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{t("legal.document")}</p>
-        <h1 className="mt-3 font-serif text-4xl font-medium leading-[1.08] text-amber-950 sm:text-5xl">{doc.title}</h1>
+        <h1 className="mt-3 font-serif text-4xl font-medium leading-[1.08] text-amber-950 sm:text-5xl lg:text-4xl">{doc.title}</h1>
         <p className="mt-4 text-sm text-amber-600">{t("legal.updated", { date: updated })}</p>
         <nav aria-label={t("legal.contents")} className="mt-8 hidden lg:block">
           <ol className="space-y-2 border-l border-amber-200 pl-4 text-sm">

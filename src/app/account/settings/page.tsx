@@ -24,7 +24,6 @@ export default async function SettingsPage() {
     .select({
       username: schema.users.username,
       phone: schema.users.phone,
-      phoneVerifiedAt: schema.users.phoneVerifiedAt,
       emailVerifiedAt: schema.users.emailVerifiedAt,
       createdAt: schema.users.createdAt,
     })
@@ -45,7 +44,7 @@ export default async function SettingsPage() {
       icon: Phone,
       title: t("settings.phone"),
       note: t("settings.phoneSectionNote"),
-      form: <PhoneForm current={details.phone ? formatPhone(details.phone) : null} verified={!!details.phoneVerifiedAt} />,
+      form: <PhoneForm current={details.phone ? formatPhone(details.phone) : null} />,
     },
     {
       id: "email",

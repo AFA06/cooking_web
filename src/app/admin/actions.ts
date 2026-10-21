@@ -8,7 +8,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 import { db, schema } from "@/db";
 import { getT } from "@/i18n/server";
-import { destroyOtherSessions, getCurrentUser, type CurrentUser } from "@/server/auth";
+import { destroyAllSessions, getCurrentUser, type CurrentUser } from "@/server/auth";
 import { listRecipeMedia, removeAssets } from "@/server/media";
 import { persistRecipe } from "@/server/recipe-write";
 import { getStorage } from "@/server/storage";
@@ -197,6 +197,33 @@ function temporaryPassword(): string {
   return `${pick(letters, 4)}-${pick(digits, 4)}-${pick(letters, 4)}`;
 }
 
+/** Replaces the password with a temporary one and signs the person out everywhere. Returns their login. */
+async function setTemporaryPassword(userId: string, passwordHash: string): Promise<string | null> {
+  const [user] = await db
+    .update(schema.users)
+    .set({ passwordHash, mustChangePassword: true })
+    .where(eq(schema.users.id, userId))
+    .returning({ phone: schema.users.phone, email: schema.users.email });
+  await destroyAllSessions(userId);
+  return user ? (user.phone ?? user.email) : null;
+}
+
+/**
+ * For people who forgot their password and have no email to receive a reset code. The admin hands the
+ * temporary password over in person or by message; the person must choose a new one right after signing in.
+ * Admin accounts are left out: they recover through their own email.
+ */
+export async function issueTemporaryPassword(userId: string): Promise<FormState> {
+  const t = await getT();
+  await requireAdmin();
+  if (!uuid.safeParse(userId).success) return { error: t("adm.err.badUser") };
+  const [user] = await db.select({ role: schema.users.role }).from(schema.users).where(eq(schema.users.id, userId)).limit(1);
+  if (!user || user.role === "admin") return { error: t("adm.err.badUser") };
+  const password = temporaryPassword();
+  const login = await setTemporaryPassword(userId, await bcrypt.hash(password, 12));
+  return { ok: t("adm.login.done", { login: login ?? "", password }) };
+}
+
 /**
  * Gives a creator a way to sign in. If the profile has no account yet, creates one from the phone number;
  * if it has, issues a new temporary password. The password is shown once and must be changed at first sign-in.
@@ -212,9 +239,8 @@ export async function issueCreatorLogin(creatorId: string, _: FormState, formDat
   const passwordHash = await bcrypt.hash(password, 12);
 
   if (creator.userId) {
-    const [user] = await db.update(schema.users).set({ passwordHash, mustChangePassword: true }).where(eq(schema.users.id, creator.userId)).returning({ phone: schema.users.phone, email: schema.users.email });
-    await destroyOtherSessions(creator.userId);
-    return { ok: t("adm.login.done", { login: user?.phone ?? user?.email ?? "", password }) };
+    const login = await setTemporaryPassword(creator.userId, passwordHash);
+    return { ok: t("adm.login.done", { login: login ?? "", password }) };
   }
 
   const phone = normalizePhone(String(formData.get("phone") ?? ""));
@@ -265,54 +291,6 @@ export async function setUserBlocked(userId: string, blocked: boolean): Promise<
 }
 
 /* ───────────── Creator requests ───────────── */
-
-/**
- * Approves a request: the person keeps their own account and gets a creator profile linked to it,
- * filled from the request (name, Instagram, Telegram). They see the studio the next time they open the site.
- */
-export async function approveApplication(applicationId: string): Promise<void> {
-  const admin = await requireAdmin();
-  if (!uuid.safeParse(applicationId).success) return;
-  const [app] = await db.select().from(schema.creatorApplications).where(eq(schema.creatorApplications.id, applicationId)).limit(1);
-  if (!app || app.status !== "pending") return;
-
-  const [existing] = await db.select({ id: schema.creators.id }).from(schema.creators).where(eq(schema.creators.userId, app.userId)).limit(1);
-  let creatorId = existing?.id;
-  if (!creatorId) {
-    const base = slugify(app.fullName) || "ijodkor";
-    let slug = base;
-    for (let i = 0; i < 5 && (await slugTaken(slug)); i++) slug = `${base}-${randomInt(1000, 9999)}`;
-    const handle = app.telegram ? normalizeTelegram(app.telegram) : "";
-    const socialLinks: Record<string, string> = {};
-    if (app.instagram) socialLinks.instagram = app.instagram;
-    if (app.telegram) socialLinks.telegram = app.telegram;
-    const [row] = await db
-      .insert(schema.creators)
-      .values({ userId: app.userId, slug, name: app.fullName, socialLinks, telegramUsername: TELEGRAM_PATTERN.test(handle) ? handle : null })
-      .returning({ id: schema.creators.id });
-    creatorId = row.id;
-  }
-  await db.update(schema.users).set({ role: "creator" }).where(and(eq(schema.users.id, app.userId), eq(schema.users.role, "user")));
-  await db
-    .update(schema.creatorApplications)
-    .set({ status: "approved", reviewedBy: admin.id, reviewedAt: new Date() })
-    .where(eq(schema.creatorApplications.id, applicationId));
-  refreshPublic();
-  redirect(`/admin/creators/${creatorId}?approved=1`);
-}
-
-export async function rejectApplication(applicationId: string, _: FormState, formData: FormData): Promise<FormState> {
-  const t = await getT();
-  const admin = await requireAdmin();
-  if (!uuid.safeParse(applicationId).success) return { error: t("adm.err.badUser") };
-  const note = String(formData.get("note") ?? "").trim().slice(0, 300);
-  await db
-    .update(schema.creatorApplications)
-    .set({ status: "rejected", adminNote: note || null, reviewedBy: admin.id, reviewedAt: new Date() })
-    .where(and(eq(schema.creatorApplications.id, applicationId), eq(schema.creatorApplications.status, "pending")));
-  revalidatePath("/admin", "layout");
-  return { ok: t("apply.adm.rejectedOk") };
-}
 
 /* ───────────── Recipes ───────────── */
 

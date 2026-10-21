@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { PageHeader, Panel } from "@/components/admin/ui";
 import { PromoForm, PromoList, SaleRow } from "@/components/studio/Promotions";
 import { getT } from "@/i18n/server";
@@ -14,7 +14,7 @@ export const dynamic = "force-dynamic";
 
 export default async function PromotionsPage() {
   const [ctx, t] = await Promise.all([getCurrentCreator(), getT()]);
-  if (!ctx) redirect("/creators/join");
+  if (!ctx) notFound();
   const [recipes, promos] = await Promise.all([ownPremiumRecipes(ctx.creator.id), listPromos(ctx.creator.id)]);
   const prefix = ctx.creator.name.normalize("NFKD").replace(/[^A-Za-z]/g, "").slice(0, 6).toUpperCase();
 

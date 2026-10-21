@@ -1,4 +1,5 @@
 import type { NextConfig } from "next";
+import { ADMIN_LOGIN_ROUTE, adminLoginPath } from "./src/lib/admin-entry";
 
 const isDev = process.env.NODE_ENV === "development";
 
@@ -37,7 +38,19 @@ const securityHeaders = [
   { key: "X-DNS-Prefetch-Control", value: "off" },
 ];
 
+// Read at build time: changing ADMIN_LOGIN_PATH needs a new deploy.
+const adminPath = adminLoginPath();
+const privatePage = [
+  { key: "Cache-Control", value: "no-store" },
+  { key: "Referrer-Policy", value: "no-referrer" },
+  { key: "X-Robots-Tag", value: "noindex, nofollow" },
+];
+
 const nextConfig: NextConfig = {
+  async rewrites() {
+    // The secret address shows the admin sign-in; the page checks the key again.
+    return adminPath ? [{ source: `/${adminPath}`, destination: `${ADMIN_LOGIN_ROUTE}/${adminPath}` }] : [];
+  },
   async headers() {
     return [
       { source: "/:path*", headers: securityHeaders },
@@ -49,6 +62,10 @@ const nextConfig: NextConfig = {
           { key: "Referrer-Policy", value: "no-referrer" },
         ],
       },
+      // The secret address must never leak through a cache, a Referer or a search engine.
+      ...(adminPath ? [{ source: `/${adminPath}`, headers: privatePage }] : []),
+      { source: `${ADMIN_LOGIN_ROUTE}/:path*`, headers: privatePage },
+      { source: "/admin/:path*", headers: privatePage },
     ];
   },
   poweredByHeader: false,

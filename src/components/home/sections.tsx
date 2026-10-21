@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight, ArrowUpRight, Clock } from "lucide-react";
+import { ArrowRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Container } from "@/components/ui/Container";
 import { BookmarkButton } from "@/components/recipe/BookmarkButton";
@@ -163,28 +163,6 @@ export async function HowItCooks() {
             </li>
           ))}
         </ol>
-      </Container>
-    </section>
-  );
-}
-
-export async function CreatorInvite() {
-  const t = await getT();
-  return (
-    <section aria-labelledby="invite-heading" className="bg-amber-950 text-amber-50">
-      <Container size="xl" className="flex flex-col items-start justify-between gap-8 py-16 lg:flex-row lg:items-end lg:py-20">
-        <div className="max-w-2xl">
-          <p className="text-xs font-semibold uppercase tracking-[0.18em] text-clay-400">{t("home.inviteEyebrow")}</p>
-          <h2 id="invite-heading" className="mt-3 text-[1.9rem] font-medium leading-tight sm:text-[2.6rem]">
-            {t("home.inviteTitle")}
-          </h2>
-          <p className="mt-4 text-amber-200">
-            {t("home.inviteText", { count: PLATFORM_CONFIG.creator.foundingCreatorCount })}
-          </p>
-        </div>
-        <Button size="xl" asChild className="shrink-0 bg-amber-50 text-amber-950 hover:bg-amber-100">
-          <Link href={PLATFORM_CONFIG.urls.becomeCreator}>{t("nav.becomeCreator")} <ArrowUpRight className="h-5 w-5" aria-hidden="true" /></Link>
-        </Button>
       </Container>
     </section>
   );

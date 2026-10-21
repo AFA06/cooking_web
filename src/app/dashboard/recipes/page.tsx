@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Plus } from "lucide-react";
 import { EmptyState, PageHeader, SearchForm, SegmentedLinks } from "@/components/admin/ui";
 import { StudioRecipeCard } from "@/components/studio/StudioRecipeCard";
@@ -29,7 +29,7 @@ export default async function StudioRecipesPage({ searchParams }: { searchParams
   const [user, t, sp] = await Promise.all([getCurrentUser(), getT(), searchParams]);
   if (!user) redirect("/auth/login?next=/dashboard/recipes");
   const creator = await getCreatorForUser(user.id);
-  if (!creator) redirect("/creators/join");
+  if (!creator) notFound();
 
   const q = sp.q?.trim().toLowerCase() || undefined;
   const status = STATUS.some((s) => s.value === sp.status) ? sp.status! : "all";

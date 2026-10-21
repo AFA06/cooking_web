@@ -9,8 +9,8 @@ import type { AuthState } from "@/app/auth/actions";
 
 type Action = (state: AuthState, formData: FormData) => Promise<AuthState>;
 
-/** Six digits only; the form is sent as soon as the last one is typed or pasted. */
-function CodeField({ autoSubmit = false }: { autoSubmit?: boolean }) {
+/** Six digits only. */
+function CodeField() {
   const t = useT();
   return (
     <div>
@@ -29,7 +29,6 @@ function CodeField({ autoSubmit = false }: { autoSubmit?: boolean }) {
         onChange={(e) => {
           const input = e.currentTarget;
           input.value = input.value.replace(/\D/g, "").slice(0, CODE_LENGTH);
-          if (autoSubmit && input.value.length === CODE_LENGTH) input.form?.requestSubmit();
         }}
         className={`${authInputClass} text-center font-mono text-2xl tracking-[0.5em]`}
       />
@@ -47,13 +46,11 @@ function Message({ state }: { state: AuthState }) {
 export function ResendButton({
   action,
   challengeId,
-  via,
   label,
   secondsLeft = RESEND_COOLDOWN_SECONDS,
 }: {
   action: Action;
   challengeId: string;
-  via?: "sms";
   label: string;
   secondsLeft?: number;
 }) {
@@ -73,7 +70,6 @@ export function ResendButton({
   return (
     <form action={formAction} className="flex flex-col items-start gap-1.5">
       <input type="hidden" name="challengeId" value={challengeId} />
-      {via && <input type="hidden" name="via" value={via} />}
       <button
         type="submit"
         disabled={pending || left > 0}
@@ -82,20 +78,6 @@ export function ResendButton({
         {left > 0 ? t("auth.wait", { label, seconds: left }) : label}
       </button>
       <Message state={state} />
-    </form>
-  );
-}
-
-export function VerifyCodeForm({ action, challengeId, next }: { action: Action; challengeId: string; next: string }) {
-  const t = useT();
-  const [state, formAction, pending] = React.useActionState(action, {});
-  return (
-    <form action={formAction} className="mt-8 space-y-5">
-      <input type="hidden" name="challengeId" value={challengeId} />
-      <input type="hidden" name="next" value={next} />
-      <CodeField autoSubmit />
-      {state.error && <p role="alert" className="text-sm font-medium text-red-700">{state.error}</p>}
-      <Button type="submit" size="xl" className="w-full rounded-full" loading={pending}>{t("auth.confirm")}</Button>
     </form>
   );
 }

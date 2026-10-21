@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PageHeader } from "@/components/admin/ui";
 import { OrdersDesk, type DeskOrder } from "@/components/studio/OrdersDesk";
 import { getLocale, getT } from "@/i18n/server";
@@ -18,7 +18,7 @@ export default async function StudioOrdersPage() {
   const [user, t, locale] = await Promise.all([getCurrentUser(), getT(), getLocale()]);
   if (!user) redirect("/auth/login?next=/dashboard/orders");
   const creator = await getCreatorForUser(user.id);
-  if (!creator) redirect("/creators/join");
+  if (!creator) notFound();
 
   const { pending, granted } = await listStudioOrders(creator.id);
   const toDesk = (o: StudioOrder): DeskOrder => ({

@@ -1,8 +1,9 @@
+import { BRAND_NAME } from "@/lib/brand";
+
 export const PLATFORM_CONFIG = {
-  name: "Damda",
+  name: BRAND_NAME,
   urls: {
     recipes: "/recipes",
-    becomeCreator: "/creators/join",
     login: "/auth/login",
     signup: "/auth/signup",
     account: "/account",
@@ -29,13 +30,9 @@ export const NAVIGATION_LINKS = {
   public: [
     { label: "nav.home", href: "/" },
     { label: "nav.recipes", href: PLATFORM_CONFIG.urls.recipes },
-    { label: "nav.becomeCreator", href: PLATFORM_CONFIG.urls.becomeCreator },
   ],
   footer: {
-    product: [
-      { label: "nav.recipes", href: PLATFORM_CONFIG.urls.recipes },
-      { label: "nav.becomeCreator", href: PLATFORM_CONFIG.urls.becomeCreator },
-    ],
+    product: [{ label: "nav.recipes", href: PLATFORM_CONFIG.urls.recipes }],
     legal: [
       { label: "nav.terms", href: "/terms" },
       { label: "nav.privacy", href: "/privacy" },

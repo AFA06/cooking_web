@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { RangeTabs } from "@/components/admin/RangeTabs";
 import { TimeSeriesChart } from "@/components/admin/TimeSeriesChart";
 import { BarList, EmptyState, PageHeader, Panel, StatTile, table } from "@/components/admin/ui";
@@ -23,7 +23,7 @@ export default async function StudioStatsPage({ searchParams }: { searchParams: 
   const [user, t, sp] = await Promise.all([getCurrentUser(), getT(), searchParams]);
   if (!user) redirect("/auth/login?next=/dashboard/stats");
   const creator = await getCreatorForUser(user.id);
-  if (!creator) redirect("/creators/join");
+  if (!creator) notFound();
 
   const range = parseRange(sp.range);
   const [series, recipes, sources] = await Promise.all([getStudioSeries(creator.id, range * 2), getRecipePerformance(creator.id, range), getStudioSources(creator.id, range)]);

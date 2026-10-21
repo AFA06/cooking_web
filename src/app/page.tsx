@@ -1,7 +1,7 @@
 import { Container } from "@/components/ui/Container";
 import { SiteShell } from "@/components/layout/SiteShell";
 import { SearchBar } from "@/components/home/SearchBar";
-import { CategoryRail, ContinueCooking, CreatorInvite, HowItCooks, LatestRecipes, LeadRecipe } from "@/components/home/sections";
+import { CategoryRail, ContinueCooking, HowItCooks, LatestRecipes, LeadRecipe } from "@/components/home/sections";
 import { getT } from "@/i18n/server";
 import type { TFunction } from "@/i18n/core";
 import { getCurrentUser } from "@/server/auth";
@@ -69,7 +69,6 @@ export default async function HomePage() {
 
       {!user && <HowItCooks />}
 
-      <CreatorInvite />
     </SiteShell>
   );
 }

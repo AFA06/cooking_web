@@ -42,7 +42,7 @@ export function parseIdentifier(input: string): Identifier | null {
 const COMMON_PASSWORDS = new Set([
   "12345678", "123456789", "1234567890", "password", "password1", "qwerty123", "qwertyuiop", "11111111",
   "00000000", "87654321", "iloveyou", "12341234", "asdfghjk", "1q2w3e4r", "qazwsxedc", "abcd1234",
-  "parol123", "parol1234", "salom123", "uzbekistan", "tashkent", "damda123",
+  "parol123", "parol1234", "salom123", "uzbekistan", "tashkent", "damda123", "retseplar", "retseplar1", "retseplar123",
 ]);
 
 /** Returns a message KEY (translate with t) when the password is unacceptable, otherwise null. bcrypt only reads the first 72 bytes. */

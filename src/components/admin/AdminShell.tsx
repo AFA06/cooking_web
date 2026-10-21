@@ -3,14 +3,14 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { BookOpen, ChartColumn, ChefHat, ExternalLink, Inbox, LayoutDashboard, Menu, Receipt, Users, X } from "lucide-react";
+import { BookOpen, ChartColumn, ChefHat, ExternalLink, LayoutDashboard, Menu, Receipt, Users, X } from "lucide-react";
 import { useT } from "@/i18n/client";
+import { BRAND_NAME } from "@/lib/brand";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/admin", label: "adm.nav.overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/analytics", label: "adm.nav.stats", icon: ChartColumn },
-  { href: "/admin/applications", label: "apply.adm.nav", icon: Inbox },
   { href: "/admin/creators", label: "adm.nav.creators", icon: ChefHat },
   { href: "/admin/recipes", label: "nav.recipes", icon: BookOpen },
   { href: "/admin/users", label: "adm.nav.users", icon: Users },
@@ -20,14 +20,12 @@ const NAV = [
 interface Props {
   userName: string;
   userEmail: string;
-  /** New creator requests waiting for a decision, shown as a count in the menu. */
-  pendingApplications: number;
   /** Logout form rendered by the server layout. */
   logout: React.ReactNode;
   children: React.ReactNode;
 }
 
-export function AdminShell({ userName, userEmail, pendingApplications, logout, children }: Props) {
+export function AdminShell({ userName, userEmail, logout, children }: Props) {
   const t = useT();
   const pathname = usePathname();
   const [open, setOpen] = React.useState(false);
@@ -43,7 +41,7 @@ export function AdminShell({ userName, userEmail, pendingApplications, logout, c
     <div className="theme-light flex h-full flex-col bg-amber-950 text-amber-100">
       <div className="flex h-16 items-center justify-between px-6">
         <Link href="/admin" className="flex items-baseline gap-2" onClick={() => setOpen(false)}>
-          <span className="font-serif text-2xl font-semibold text-white">Damda</span>
+          <span className="font-serif text-2xl font-semibold text-white">{BRAND_NAME}</span>
           <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-amber-400">Admin</span>
         </Link>
         <button type="button" className="flex h-10 w-10 items-center justify-center lg:hidden" aria-label={t("nav.closeMenu")} onClick={() => setOpen(false)}>
@@ -70,9 +68,6 @@ export function AdminShell({ userName, userEmail, pendingApplications, logout, c
                   {active && <span className="absolute inset-y-2 left-0 w-0.5 rounded-full bg-amber-300" aria-hidden="true" />}
                   <Icon className="h-[1.1rem] w-[1.1rem] shrink-0" strokeWidth={1.75} aria-hidden="true" />
                   {t(label)}
-                  {href === "/admin/applications" && pendingApplications > 0 && (
-                    <span className="ml-auto rounded-full bg-clay-400 px-2 py-0.5 text-xs font-semibold tabular-nums text-white">{pendingApplications}</span>
-                  )}
                 </Link>
               </li>
             );
@@ -114,7 +109,7 @@ export function AdminShell({ userName, userEmail, pendingApplications, logout, c
         <button type="button" className="flex h-11 w-11 items-center justify-center text-amber-950" aria-label={t("nav.openMenu")} aria-expanded={open} onClick={() => setOpen(true)}>
           <Menu className="h-6 w-6" aria-hidden="true" />
         </button>
-        <span className="font-serif text-xl font-semibold text-amber-950">Damda</span>
+        <span className="font-serif text-xl font-semibold text-amber-950">{BRAND_NAME}</span>
         <span className="text-[0.65rem] font-semibold uppercase tracking-[0.2em] text-amber-700">Admin</span>
       </header>
 
