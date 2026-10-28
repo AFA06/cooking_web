@@ -922,8 +922,8 @@
     }
   },
   "price": {
-    "leftDays": "{d}d {h}h left",
-    "leftHours": "{h}h {m}m left",
+    "leftClock": "Ends in {time}",
+    "leftDaysClock": "Ends in {d}d {time}",
     "now": "Now:",
     "was": "Was:"
   },

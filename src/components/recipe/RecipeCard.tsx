@@ -7,7 +7,7 @@ import { CaloriesBadge } from "@/components/recipe/NutritionFacts";
 import { BookmarkButton } from "@/components/recipe/BookmarkButton";
 import { useT } from "@/i18n/client";
 import { DIFFICULTY_KEY, formatMinutes, formatNumber } from "@/lib/format";
-import { PriceTag } from "@/components/recipe/PriceTag";
+import { PriceTag, SaleTimer } from "@/components/recipe/PriceTag";
 import { cn } from "@/lib/utils";
 import type { RecipeListItem } from "@/types/recipe";
 
@@ -43,20 +43,23 @@ export function RecipeCard({ recipe, isLoggedIn = false, saved = false, shape = 
           priority={priority}
           className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.04]"
         />
-        <span
-          className={cn(
-            "absolute left-3 top-3 flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.8rem] font-semibold tracking-wide shadow-sm backdrop-blur-sm",
-            recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-amber-50",
-          )}
-        >
-          {recipe.isPremium ? t("filter.premium") : t("filter.free")}
-          {price && (
-            <>
-              <span className="h-3 w-px bg-amber-50/40" aria-hidden="true" />
-              <PriceTag price={recipe.price} salePrice={recipe.salePrice} saleEndsAt={recipe.saleEndsAt} currency={recipe.currency} className="text-clay-100" />
-            </>
-          )}
-        </span>
+        <div className="absolute left-3 top-3 flex flex-col items-start gap-1.5">
+          <span
+            className={cn(
+              "flex items-center gap-2 rounded-full px-3.5 py-1.5 text-[0.8rem] font-semibold tracking-wide shadow-sm backdrop-blur-sm",
+              recipe.isPremium ? "bg-amber-950/90 text-amber-50" : "bg-sage-600/95 text-amber-50",
+            )}
+          >
+            {recipe.isPremium ? t("filter.premium") : t("filter.free")}
+            {price && (
+              <>
+                <span className="h-3 w-px bg-amber-50/40" aria-hidden="true" />
+                <PriceTag price={recipe.price} salePrice={recipe.salePrice} saleEndsAt={recipe.saleEndsAt} currency={recipe.currency} className="text-clay-100" />
+              </>
+            )}
+          </span>
+          {price && <SaleTimer price={recipe.price} salePrice={recipe.salePrice} saleEndsAt={recipe.saleEndsAt} />}
+        </div>
         {/* One row along the bottom edge, so the rating pill and the calories can never sit on top of each other. */}
         <div className="absolute inset-x-3 bottom-3 flex items-end justify-between gap-2">
           {(recipe.rating.count > 0 || recipe.cookedCount > 0) && (

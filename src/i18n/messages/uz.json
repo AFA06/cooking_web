@@ -914,8 +914,8 @@
     }
   },
   "price": {
-    "leftDays": "Tugashiga {d} kun {h} soat",
-    "leftHours": "Tugashiga {h} soat {m} daqiqa",
+    "leftClock": "Tugashiga {time}",
+    "leftDaysClock": "Tugashiga {d} kun {time}",
     "now": "Hozirgi narx:",
     "was": "Avvalgi narx:"
   },

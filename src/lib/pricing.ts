@@ -42,10 +42,3 @@ export function applyPromo(price: number, kind: PromoKind, value: number): numbe
   if (kind === "percent") return Math.max(0, Math.round(price * (1 - Math.min(Math.max(value, 0), 100) / 100)));
   return Math.max(0, price - Math.max(value, 0));
 }
-
-/** Hours and minutes left, for "ends in …" labels. */
-export function timeLeft(endsAt: Date, now = Date.now()): { days: number; hours: number; minutes: number } {
-  const ms = Math.max(0, endsAt.getTime() - now);
-  const totalMinutes = Math.ceil(ms / 60_000);
-  return { days: Math.floor(totalMinutes / 1440), hours: Math.floor((totalMinutes % 1440) / 60), minutes: totalMinutes % 60 };
-}

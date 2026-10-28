@@ -935,8 +935,8 @@
     }
   },
   "price": {
-    "leftDays": "До конца {d} д {h} ч",
-    "leftHours": "До конца {h} ч {m} мин",
+    "leftClock": "До конца {time}",
+    "leftDaysClock": "До конца {d} д {time}",
     "now": "Сейчас:",
     "was": "Было:"
   },

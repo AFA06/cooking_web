@@ -279,7 +279,7 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
       className={cn("grid items-start gap-8", sidebar && "xl:grid-cols-[minmax(0,1fr)_21rem]")}
       onSubmit={(e) => {
         e.preventDefault();
-        submit(v.status === "published");
+        submit(!v.id || v.status === "published");
       }}
     >
       <div className="min-w-0 space-y-6">
@@ -654,12 +654,15 @@ export function RecipeEditor({ initial, save, basePath, sidebar = true }: Recipe
           {notice && <p role="status" className="text-sm font-medium text-sage-700">{notice}</p>}
           {uploads > 0 && <p role="status" className="text-sm font-medium text-amber-700">{t("ed.waitUploads")}</p>}
           <div className="flex flex-wrap gap-3">
-            <Button type="button" variant="outline" size="lg" loading={pending} disabled={uploads > 0} onClick={() => submit(false)}>
-              {v.status === "published" ? t("ed.toDraft") : t("ed.saveDraft")}
-            </Button>
             <Button type="button" size="lg" loading={pending} disabled={uploads > 0} onClick={() => submit(true)}>
               {v.status === "published" ? t("common.save") : t("ed.publish")}
             </Button>
+            {/* A new recipe goes straight out; drafts are only for taking a recipe down or finishing an old draft. */}
+            {v.id && (
+              <Button type="button" variant="outline" size="lg" loading={pending} disabled={uploads > 0} onClick={() => submit(false)}>
+                {v.status === "published" ? t("ed.toDraft") : t("ed.saveDraft")}
+              </Button>
+            )}
           </div>
         </div>
       </div>
