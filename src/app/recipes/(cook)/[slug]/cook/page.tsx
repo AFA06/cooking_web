@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { getRecipeBySlug } from "@/server/recipes";
 import { getCurrentUser } from "@/server/auth";
 import { getT } from "@/i18n/server";
@@ -28,12 +28,7 @@ export default async function CookPage({ params, searchParams }: Props) {
   const recipe = await getRecipeBySlug(slug);
   if (!recipe) notFound();
   const user = await getCurrentUser();
-  // Cooking is for signed-in people: a new visitor makes an account (or signs in) and lands right back here.
-  if (!user) {
-    const here = `/recipes/${recipe.slug}/cook${servings ? `?servings=${encodeURIComponent(servings)}` : ""}`;
-    redirect(`/auth/signup?next=${encodeURIComponent(here)}`);
-  }
-  const ownCreator = await getCreatorForUser(user.id);
+  const ownCreator = user ? await getCreatorForUser(user.id) : null;
   const unlocked = await hasFullAccess(user, recipe, ownCreator?.id ?? null, recipe.creator.id);
   // Someone who has not bought the recipe only gets the free steps: locked steps never reach their browser.
   const visible = unlocked ? recipe : { ...recipe, steps: recipe.steps.filter((s) => s.isFree) };
